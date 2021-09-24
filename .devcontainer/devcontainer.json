@@ -51,6 +51,7 @@
             "--disable", "scopelint",
             "--disable", "interfacer",
             "--disable", "maligned",
+            "--disable", "paralleltest",
         ],
         // Golang on save
         "go.buildOnSave": "workspace",
