@@ -1,6 +1,7 @@
 package jsonline
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strconv"
 )
@@ -72,5 +73,18 @@ func toBoolean(val interface{}) interface{} {
 		return toBoolean(fmt.Sprintf("%v", string(typedValue)))
 	default:
 		return toBoolean(fmt.Sprintf("%v", val))
+	}
+}
+
+func toBinary(val interface{}) interface{} {
+	switch typedValue := val.(type) {
+	case nil:
+		return nil
+	case []byte:
+		return base64.StdEncoding.EncodeToString(typedValue)
+	case string:
+		return base64.StdEncoding.EncodeToString([]byte(typedValue))
+	default:
+		return base64.StdEncoding.EncodeToString([]byte(toString(typedValue).(string)))
 	}
 }

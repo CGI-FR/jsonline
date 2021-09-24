@@ -51,6 +51,7 @@ func (v *value) Export() interface{} {
 	case Boolean:
 		return toBoolean(val)
 	case Binary:
+		return toBinary(val)
 	case Hidden:
 		panic(fmt.Errorf("%w: %v", ErrExportHiddenValueFobidden, v))
 	}
