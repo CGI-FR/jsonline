@@ -14,12 +14,41 @@ func TestValueExportString(t *testing.T) {
 		expected interface{}
 	}{
 		{nil, nil},
-		{1, "1"},
-		{1.2, "1.2"},
-		{"string", "string"},
+		// signed integers
+		{int(-2), "-2"},
+		{int8(-1), "-1"},
+		{int16(0), "0"},
+		{int32(1), "1"},
+		{int64(2), "2"},
+		// unsigned integers
+		{uint(0), "0"},
+		{uint8(1), "1"},
+		{uint16(2), "2"},
+		{uint32(3), "3"},
+		{uint64(4), "4"},
+		// floats
+		{float32(1.2), "1.2"},
+		{float64(-1.2), "-1.2"},
+		// complex numbers
+		{complex64(1.2i + 5), "(5+1.2i)"},
+		{complex128(-1.0i + 8), "(8-1i)"},
+		// booleans
 		{true, "true"},
-		{[]string{"a", "b"}, "[a b]"},
+		{false, "false"},
+		// strings
+		{"string", "string"},
+		{'r', "114"},
+		// binary
+		{byte(36), "36"},
 		{[]byte("hello"), "hello"},
+		// composite
+		{[]string{"a", "b"}, "[a b]"},
+		{struct {
+			a string
+			b string
+		}{"a", "b"}, "{a b}"},
+		// references
+		// TODO
 	}
 
 	for _, td := range testdatas {
