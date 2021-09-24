@@ -45,14 +45,9 @@ func (v *value) Export() interface{} {
 
 	switch v.export {
 	case String:
-		if val == nil {
-			return nil
-		} else if b, ok := val.([]byte); ok {
-			return string(b)
-		} else {
-			return fmt.Sprintf("%v", val)
-		}
+		return toString(val)
 	case Numeric:
+		return toNumeric(val)
 	case Boolean:
 	case Binary:
 	case Hidden:
