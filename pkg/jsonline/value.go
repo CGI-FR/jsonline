@@ -19,34 +19,91 @@ const (
 )
 
 type Value interface {
-	SetExportFormat(format)
-
-	Export() interface{}
+	Get() interface{}
 
 	json.Marshaler
 	fmt.Stringer
 }
 
 type value struct {
-	raw    interface{}
-	export format
+	raw interface{}
+	f   format
 }
 
-func NewValue(v interface{}) Value {
+func NewValue(v interface{}, f format) Value {
 	return &value{
-		raw:    v,
-		export: String,
+		raw: v,
+		f:   f,
 	}
 }
 
-func (v *value) SetExportFormat(f format) {
-	v.export = f
+func NewRaw(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   None,
+	}
 }
 
-func (v *value) Export() interface{} {
+func NewString(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   String,
+	}
+}
+
+func NewNumeric(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   Numeric,
+	}
+}
+
+func NewBoolean(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   Boolean,
+	}
+}
+
+func NewBinary(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   Binary,
+	}
+}
+
+func NewDateTime(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   DateTime,
+	}
+}
+
+func NewTime(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   Time,
+	}
+}
+
+func NewTimestamp(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   Timestamp,
+	}
+}
+
+func NewNull() Value {
+	return &value{
+		raw: nil,
+		f:   None,
+	}
+}
+
+func (v *value) Get() interface{} {
 	val := v.raw
 
-	switch v.export {
+	switch v.f {
 	case String:
 		return toString(val)
 	case Numeric:
@@ -65,11 +122,11 @@ func (v *value) Export() interface{} {
 		return v.raw
 	}
 
-	panic(fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.export))
+	panic(fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.f))
 }
 
 func (v *value) MarshalJSON() (res []byte, err error) {
-	e := v.Export()
+	e := v.Get()
 
 	b, err := json.Marshal(e)
 	if err != nil {
