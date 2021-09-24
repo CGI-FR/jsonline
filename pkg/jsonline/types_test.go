@@ -199,12 +199,11 @@ func TestValueMarshalBinary(t *testing.T) {
 		expected interface{}
 	}{
 		{nil, "null"},
-		{1, "\"1\""},
-		{1.2, "\"1.2\""},
-		{"string", "\"string\""},
-		{true, "\"true\""},
-		{[]string{"a", "b"}, "\"[a b]\""},
-		{[]byte("hello"), "\"hello\""},
+		{1, "\"MQ==\""},
+		{1.2, "\"MS4y\""},
+		{"string", "\"c3RyaW5n\""},
+		{true, "\"dHJ1ZQ==\""},
+		{[]byte("hello"), "\"aGVsbG8=\""},
 	}
 
 	for _, td := range testdatas {
