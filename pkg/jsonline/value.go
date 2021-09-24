@@ -8,11 +8,14 @@ import (
 type format int8
 
 const (
-	String  format = iota // default representation, e.g. : "hello", "2.4", "true"
-	Numeric               // integer or decimal, e.g. : 2.4, 1
-	Boolean               // true or false
-	Binary                // base64 encoded data
-	Hidden                // will never appear in the output
+	String    format = iota // default representation, e.g. : "hello", "2.4", "true"
+	Numeric                 // integer or decimal, e.g. : 2.4, 1
+	Boolean                 // true or false
+	Binary                  // base64 encoded data
+	DateTime                // date and time as RFC3339, e.g. : "2006-01-02T15:04:05Z", "2006-01-02T15:04:05+07:00"
+	Time                    // time with timezone, e.g. : "15:04:05Z", "15:04:05-07:00"
+	Timestamp               // milliseconds since 1970
+	None                    // no specific format enforced
 )
 
 type Value interface {
@@ -52,11 +55,17 @@ func (v *value) Export() interface{} {
 		return toBoolean(val)
 	case Binary:
 		return toBinary(val)
-	case Hidden:
-		panic(fmt.Errorf("%w: %v", ErrExportHiddenValueFobidden, v))
+	case DateTime:
+		return toDateTime(val)
+	case Time:
+		return toTime(val)
+	case Timestamp:
+		return toTimeStamp(val)
+	case None:
+		return v.raw
 	}
 
-	return v.raw
+	panic(fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.export))
 }
 
 func (v *value) MarshalJSON() (res []byte, err error) {

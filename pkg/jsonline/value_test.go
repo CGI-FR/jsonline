@@ -3,6 +3,7 @@ package jsonline_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/adrienaury/go-template/pkg/jsonline"
 	"github.com/stretchr/testify/assert"
@@ -47,8 +48,8 @@ func TestValueExportString(t *testing.T) {
 			a string
 			b string
 		}{"a", "b"}, "{a b}"},
-		// references
-		// TODO
+		// references (slices, maps, channels, pointers, functions)
+		// interfaces
 	}
 
 	for _, td := range testdatas {
@@ -241,6 +242,29 @@ func TestValueMarshalBinary(t *testing.T) {
 			value.SetExportFormat(jsonline.Binary)
 
 			assert.Equal(t, td.expected, value.String())
+		})
+	}
+}
+
+func TestValueExportDateTime(t *testing.T) {
+	tz, _ := time.LoadLocation("Asia/Shanghai")
+	testdatas := []struct {
+		value    interface{}
+		expected interface{}
+	}{
+		{nil, nil},
+		{"2006-01-02T15:04:05Z", "2006-01-02T15:04:05Z"},
+		{"2006-01-02T15:04:05+07:00", "2006-01-02T15:04:05+07:00"},
+		{time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC), "2021-09-24T21:21:00Z"},
+		{time.Date(2021, time.December, 25, 0, 0, 0, 0, tz), "2021-12-25T00:00:00+08:00"},
+	}
+
+	for _, td := range testdatas {
+		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
+			value := jsonline.NewValue(td.value)
+			value.SetExportFormat(jsonline.DateTime)
+
+			assert.Equal(t, td.expected, value.Export())
 		})
 	}
 }

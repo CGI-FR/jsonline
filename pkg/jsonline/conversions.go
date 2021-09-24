@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 const (
@@ -86,5 +87,61 @@ func toBinary(val interface{}) interface{} {
 		return base64.StdEncoding.EncodeToString([]byte(typedValue))
 	default:
 		return base64.StdEncoding.EncodeToString([]byte(toString(typedValue).(string)))
+	}
+}
+
+func toDateTime(val interface{}) interface{} {
+	switch typedValue := val.(type) {
+	case nil:
+		return nil
+	case time.Time:
+		return typedValue.Format(time.RFC3339)
+	case string:
+		t, err := time.Parse(time.RFC3339, typedValue)
+		if err != nil {
+			return fmt.Sprintf("ERROR: %v", err)
+		}
+
+		return toDateTime(t)
+	default:
+		return toDateTime(toString(val))
+	}
+}
+
+func toTime(val interface{}) interface{} {
+	switch typedValue := val.(type) {
+	case nil:
+		return nil
+	case time.Time:
+		return typedValue.Format("15:04:05Z07:00")
+	case string:
+		t, err := time.Parse("15:04:05Z07:00", typedValue)
+		if err != nil {
+			return fmt.Sprintf("ERROR: %v", err)
+		}
+
+		return toDateTime(t)
+	default:
+		return toDateTime(toString(val))
+	}
+}
+
+func toTimeStamp(val interface{}) interface{} {
+	switch typedValue := val.(type) {
+	case nil:
+		return nil
+	case time.Time:
+		return typedValue.UnixMilli()
+	case int64:
+		return typedValue
+	case string:
+		t, err := time.Parse(time.RFC3339, typedValue)
+		if err != nil {
+			return fmt.Sprintf("ERROR: %v", err)
+		}
+
+		return toDateTime(t)
+	default:
+		return toDateTime(toString(val))
 	}
 }
