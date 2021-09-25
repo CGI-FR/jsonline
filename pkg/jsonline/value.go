@@ -26,6 +26,7 @@ type Value interface {
 	Export() interface{}
 	Import(interface{}) Value
 
+	json.Unmarshaler
 	json.Marshaler
 	fmt.Stringer
 }
@@ -160,6 +161,10 @@ func (v *value) MarshalJSON() (res []byte, err error) {
 	}
 
 	return b, nil
+}
+
+func (v *value) UnmarshalJSON(data []byte) error {
+	return json.Unmarshal(data, &v.raw) //nolint
 }
 
 func (v *value) String() string {

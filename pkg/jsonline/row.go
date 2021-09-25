@@ -1,9 +1,11 @@
 package jsonline
 
 import (
+	"bytes"
 	"container/list"
 	"encoding/json"
 	"fmt"
+	"io"
 )
 
 // Row of data.
@@ -193,4 +195,127 @@ func (r *row) String() string {
 	}
 
 	return string(b)
+}
+
+//nolint
+func (r *row) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.UseNumber()
+
+	// must open with a delim token '{'
+	t, err := dec.Token()
+	if err != nil {
+		return err
+	}
+	if delim, ok := t.(json.Delim); !ok || delim != '{' {
+		return fmt.Errorf("expect JSON object open with '{'")
+	}
+
+	err = r.parseobject(dec)
+	if err != nil {
+		return err
+	}
+
+	t, err = dec.Token()
+	if err != io.EOF {
+		return fmt.Errorf("expect end of JSON object but got more token: %T: %v or err: %v", t, t, err)
+	}
+
+	return nil
+}
+
+//nolint
+func (r *row) parseobject(dec *json.Decoder) (err error) {
+	var t json.Token
+	for dec.More() {
+		t, err = dec.Token()
+		if err != nil {
+			return err
+		}
+
+		key, ok := t.(string)
+		if !ok {
+			return fmt.Errorf("expecting JSON key should be always a string: %T: %v", t, t)
+		}
+
+		t, err = dec.Token()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return err
+		}
+
+		var value interface{}
+		value, err = handledelim(t, dec)
+		if err != nil {
+			return err
+		}
+
+		r.keys[key] = r.l.PushBack(key)
+		r.m[key] = NewValueAuto(value)
+	}
+
+	t, err = dec.Token()
+	if err != nil {
+		return err
+	}
+	if delim, ok := t.(json.Delim); !ok || delim != '}' {
+		return fmt.Errorf("expect JSON object close with '}'")
+	}
+
+	return nil
+}
+
+//nolint
+func parsearray(dec *json.Decoder) (arr []interface{}, err error) {
+	var t json.Token
+	arr = make([]interface{}, 0)
+	for dec.More() {
+		t, err = dec.Token()
+		if err != nil {
+			return
+		}
+
+		var value interface{}
+		value, err = handledelim(t, dec)
+		if err != nil {
+			return
+		}
+		arr = append(arr, value)
+	}
+	t, err = dec.Token()
+	if err != nil {
+		return
+	}
+	if delim, ok := t.(json.Delim); !ok || delim != ']' {
+		err = fmt.Errorf("expect JSON array close with ']'")
+		return
+	}
+
+	return
+}
+
+//nolint
+func handledelim(t json.Token, dec *json.Decoder) (res interface{}, err error) {
+	if delim, ok := t.(json.Delim); ok {
+		switch delim {
+		case '{':
+			r2 := NewRow().(*row)
+			err = r2.parseobject(dec)
+			if err != nil {
+				return
+			}
+			return r2, nil
+		case '[':
+			var value []interface{}
+			value, err = parsearray(dec)
+			if err != nil {
+				return
+			}
+			return value, nil
+		default:
+			return nil, fmt.Errorf("Unexpected delimiter: %q", delim)
+		}
+	}
+	return t, nil
 }

@@ -1,11 +1,13 @@
 package jsonline_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/adrienaury/go-template/pkg/jsonline"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRow(t *testing.T) {
@@ -23,5 +25,13 @@ func TestRow(t *testing.T) {
 		jsonline.NewRow().
 			Set("address", jsonline.NewValueString("123 Main Street, New York, NY 10030")).
 			Set("last-update", jsonline.NewValueDateTime(time.Now()))
+	fmt.Println(row)
+}
+
+func TestRow2(t *testing.T) {
+	str := `{"name":"nathan","surname":"Aury","age":5}`
+	row := jsonline.NewRow()
+	err := json.Unmarshal([]byte(str), row)
+	assert.NoError(t, err)
 	fmt.Println(row)
 }
