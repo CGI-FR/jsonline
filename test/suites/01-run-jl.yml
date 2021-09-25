@@ -2,8 +2,37 @@
 # Check Venom documentation for more information : https://github.com/ovh/venom
 name: run jl
 testcases:
-  - name: no arguments
+  - name: empty line
     steps:
-      - script: jl
+      - script: echo '{}' | jl
         assertions:
-          - result.code ShouldEqual 1
+          - result.systemout ShouldEqual '{}'
+          - result.systemerr ShouldBeEmpty
+          - result.code ShouldEqual 0
+  - name: non empty line
+    steps:
+      - script: echo '{"string":"","numeric":0,"boolean":true,"nil":null,"row":{}}' | jl
+        assertions:
+          - result.systemoutjson.string ShouldEqual ''
+          - result.systemoutjson.numeric ShouldEqual 0
+          - result.systemoutjson.boolean ShouldEqual true
+          - result.systemoutjson.nil ShouldEqual ''
+          - result.systemoutjson.row ShouldEqual map[]
+          - result.systemerr ShouldBeEmpty
+          - result.code ShouldEqual 0
+  - name: add missing fields
+    steps:
+      - script: |-
+          echo '{}' | jl -t '[{name: field, type: string}]'
+        assertions:
+          - result.systemout ShouldEqual '{"field":null}'
+          - result.systemerr ShouldBeEmpty
+          - result.code ShouldEqual 0
+  - name: reorder fields
+    steps:
+      - script: |-
+          echo '{"second":"second","first":"first"}' | jl -t '[{name: first, type: string}, {name: second, type: string}]'
+        assertions:
+          - result.systemout ShouldEqual '{"first":"first","second":"second"}'
+          - result.systemerr ShouldBeEmpty
+          - result.code ShouldEqual 0

@@ -6,11 +6,13 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/adrienaury/go-template/pkg/jsonline"
 	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
 type globalFlags struct {
@@ -18,7 +20,7 @@ type globalFlags struct {
 	debug     bool
 	jsonlog   bool
 	colormode string
-	template  map[string]string
+	template  string
 	filename  string
 }
 
@@ -35,7 +37,7 @@ func NewRootCommand() (*RootCommand, error) {
 		Args:    cobra.NoArgs,
 		Run:     run,
 		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)", version, commit, buildDate, builtBy),
-		Example: fmt.Sprintf(`  %s name:string surname:string age:numeric <dirty.jsonl`, name),
+		Example: fmt.Sprintf(`  %s -t '[{name: first, type: string}, {name: second, type: string}]' <dirty.jsonl`, name),
 	}
 
 	cobra.OnInitialize(initConfig)
@@ -45,7 +47,7 @@ func NewRootCommand() (*RootCommand, error) {
 		debug:     false,
 		jsonlog:   false,
 		colormode: "auto",
-		template:  map[string]string{},
+		template:  "[]",
 		filename:  "./row.yml",
 	}
 
@@ -55,8 +57,8 @@ func NewRootCommand() (*RootCommand, error) {
 	rootCmd.PersistentFlags().BoolVar(&gf.jsonlog, "log-json", gf.jsonlog, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&gf.colormode, "color", gf.colormode,
 		"use colors in log outputs : yes, no or auto")
-	rootCmd.PersistentFlags().StringToStringVarP(&gf.template, "template", "t", nil,
-		`inline template definition (<name>=<type>,<name>=<type>,...)`+"\n"+
+	rootCmd.PersistentFlags().StringVarP(&gf.template, "template", "t", gf.template,
+		`inline columns definition in minified YAML (-t [name: title, type: string]`+"\n"+
 			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden`)
 	rootCmd.PersistentFlags().StringVarP(&gf.filename, "filename", "f", gf.filename, "name of row template filename")
 
@@ -178,21 +180,26 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	def, err := cmd.Flags().GetStringToString("template")
+	def, err := cmd.Flags().GetString("template")
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to read flag template")
 		os.Exit(1)
 	}
 
-	rowdef := &RowDefinition{Columns: []ColumnDefinition{}}
-	for colname, coltype := range def {
-		rowdef.Columns = append(rowdef.Columns, ColumnDefinition{Name: colname, Type: coltype, Columns: nil})
-	}
+	columns := []ColumnDefinition{}
 
-	t, err = parse(t, rowdef.Columns)
+	err = yaml.Unmarshal([]byte(def), &columns)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to parse flag template")
 		os.Exit(1)
+	}
+
+	if len(columns) > 0 {
+		t, err = parse(jsonline.NewTemplate(), columns)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to parse flag template")
+			os.Exit(1)
+		}
 	}
 
 	ri := NewJSONRowIterator(os.Stdin)
