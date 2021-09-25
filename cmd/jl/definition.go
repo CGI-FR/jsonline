@@ -50,12 +50,12 @@ func ParseRowDefinition(filename string) (jsonline.Template, error) {
 
 	template := jsonline.NewTemplate()
 
-	return parse(template, def)
+	return parse(template, def.Columns)
 }
 
 //nolint:cyclop
-func parse(tmpl jsonline.Template, def *RowDefinition) (jsonline.Template, error) {
-	for _, column := range def.Columns {
+func parse(tmpl jsonline.Template, columns []ColumnDefinition) (jsonline.Template, error) {
+	for _, column := range columns {
 		switch column.Type {
 		case "string":
 			tmpl = tmpl.WithString(column.Name)
@@ -75,6 +75,13 @@ func parse(tmpl jsonline.Template, def *RowDefinition) (jsonline.Template, error
 			tmpl = tmpl.WithAuto(column.Name)
 		case "hidden":
 			tmpl = tmpl.WithHidden(column.Name)
+		case "row":
+			rowt, err := parse(tmpl, column.Columns)
+			if err != nil {
+				return tmpl, err
+			}
+
+			tmpl = tmpl.WithRow(rowt)
 		}
 	}
 

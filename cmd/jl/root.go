@@ -184,13 +184,15 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
+	rowdef := &RowDefinition{Columns: []ColumnDefinition{}}
 	for colname, coltype := range def {
-		switch coltype {
-		case "string":
-			t = t.WithString(colname)
-		case "numeric":
-			t = t.WithNumeric(colname)
-		}
+		rowdef.Columns = append(rowdef.Columns, ColumnDefinition{Name: colname, Type: coltype, Columns: nil})
+	}
+
+	t, err = parse(t, rowdef.Columns)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to parse flag template")
+		os.Exit(1)
 	}
 
 	ri := NewJSONRowIterator(os.Stdin)

@@ -10,6 +10,7 @@ type Template interface {
 	WithTimestamp(string) Template
 	WithAuto(string) Template
 	WithHidden(string) Template
+	WithRow(Template) Template
 
 	Create(interface{}) Row
 
@@ -75,6 +76,10 @@ func (t *template) WithAuto(name string) Template {
 func (t *template) WithHidden(name string) Template {
 	t.empty.Set(name, NewValueHidden(nil))
 
+	return t
+}
+
+func (t *template) WithRow(rowt Template) Template {
 	return t
 }
 
