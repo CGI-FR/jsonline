@@ -11,6 +11,8 @@ type Row interface {
 	Set(key string, val Value) Row
 	SetIndex(index int, val Value) Row
 
+	Get(key string) Value
+
 	Clone() Row
 
 	Value
@@ -37,8 +39,20 @@ func (r *row) GetFormat() format {
 	return Auto
 }
 
-func (r *row) Export() interface{} {
+func (r *row) Raw() interface{} {
 	return r
+}
+
+func (r *row) Export() interface{} {
+	result := map[string]interface{}{}
+
+	iter := r.Iter()
+
+	for k, v, ok := iter(); ok; k, v, ok = iter() {
+		result[k] = v.Export()
+	}
+
+	return result
 }
 
 func (r *row) Import(v interface{}) Value {
@@ -66,15 +80,21 @@ func (r *row) Set(key string, val Value) Row {
 
 func (r *row) SetIndex(index int, val Value) Row {
 	var key string
+
 	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
 		if index == 0 {
-			key = cur.Value.(string)
+			key, _ = cur.Value.(string)
+
 			break
 		}
 		index--
 	}
 
 	return r.Set(key, val)
+}
+
+func (r *row) Get(key string) Value {
+	return r.m[key]
 }
 
 func (r *row) Clone() Row {
@@ -86,6 +106,21 @@ func (r *row) Clone() Row {
 	}
 
 	return result
+}
+
+func (r *row) Iter() func() (string, Value, bool) {
+	e := r.l.Front()
+
+	return func() (string, Value, bool) {
+		if e != nil {
+			key, _ := e.Value.(string)
+			e = e.Next()
+
+			return key, r.m[key], true
+		}
+
+		return "", NewValueAuto(nil), false
+	}
 }
 
 func (r *row) MarshalJSON() (res []byte, err error) {

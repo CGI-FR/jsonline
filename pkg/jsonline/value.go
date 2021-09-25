@@ -22,6 +22,7 @@ const (
 type Value interface {
 	GetFormat() format
 
+	Raw() interface{}
 	Export() interface{}
 	Import(interface{}) Value
 
@@ -113,6 +114,10 @@ func NewValueHidden(v interface{}) Value {
 
 func (v *value) GetFormat() format {
 	return v.f
+}
+
+func (v *value) Raw() interface{} {
+	return v.raw
 }
 
 func (v *value) Export() interface{} {
