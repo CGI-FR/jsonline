@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/adrienaury/go-template/pkg/jsonline"
 	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -28,7 +29,7 @@ func NewRootCommand() (*RootCommand, error) {
 	// nolint: exhaustivestruct
 	rootCmd := cobra.Command{
 		Use: fmt.Sprintf("%v [columns definitions]", name) + "\n\n" +
-			`A column definition format is : <name>:<type>` + "\n" +
+			`Column definition format is : <name>:<type>` + "\n" +
 			`Possible types : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`,
 		Short:   "JSONLine templating",
 		Long:    `Order keys and format output of JSON lines.`,
@@ -160,4 +161,27 @@ func initViper() {
 }
 
 func run(cmd *cobra.Command, args []string) {
+	t := jsonline.NewTemplate()
+
+	for _, definition := range args {
+		components := strings.SplitN(definition, ":", 2) //nolint:gomnd
+		colname := components[0]
+		coltype := components[1]
+
+		switch coltype {
+		case "string":
+			t = t.WithString(colname)
+		case "numeric":
+			t = t.WithNumeric(colname)
+		}
+	}
+
+	ri := NewJSONRowIterator(os.Stdin)
+
+	defer ri.Close()
+
+	for ri.Next() {
+		row := ri.Value()
+		fmt.Println(t.Create(row))
+	}
 }
