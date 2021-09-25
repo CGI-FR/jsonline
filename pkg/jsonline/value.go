@@ -15,10 +15,13 @@ const (
 	DateTime                // date and time as RFC3339, e.g. : "2006-01-02T15:04:05Z", "2006-01-02T15:04:05+07:00"
 	Time                    // time with timezone, e.g. : "15:04:05Z", "15:04:05-07:00"
 	Timestamp               // milliseconds since 1970
-	None                    // no specific format enforced
+	Auto                    // no specific format enforced
+	Hidden                  // will not be exported in jsonline
 )
 
 type Value interface {
+	GetFormat() format
+
 	Export() interface{}
 	Import(interface{}) Value
 
@@ -31,67 +34,85 @@ type value struct {
 	f   format
 }
 
-func NewValue(f format) Value {
+func NewValue(v interface{}, f format) Value {
 	return &value{
-		raw: nil,
+		raw: v,
 		f:   f,
 	}
 }
 
-func NewRaw(v interface{}) Value {
+func NewValueNil() Value {
 	return &value{
-		raw: v,
-		f:   None,
+		raw: nil,
+		f:   Auto,
 	}
 }
 
-func NewString(v interface{}) Value {
+func NewValueAuto(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   Auto,
+	}
+}
+
+func NewValueString(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   String,
 	}
 }
 
-func NewNumeric(v interface{}) Value {
+func NewValueNumeric(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Numeric,
 	}
 }
 
-func NewBoolean(v interface{}) Value {
+func NewValueBoolean(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Boolean,
 	}
 }
 
-func NewBinary(v interface{}) Value {
+func NewValueBinary(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Binary,
 	}
 }
 
-func NewDateTime(v interface{}) Value {
+func NewValueDateTime(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   DateTime,
 	}
 }
 
-func NewTime(v interface{}) Value {
+func NewValueTime(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Time,
 	}
 }
 
-func NewTimestamp(v interface{}) Value {
+func NewValueTimestamp(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Timestamp,
 	}
+}
+
+func NewValueHidden(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   Hidden,
+	}
+}
+
+func (v *value) GetFormat() format {
+	return v.f
 }
 
 func (v *value) Export() interface{} {
@@ -112,7 +133,7 @@ func (v *value) Export() interface{} {
 		return toTime(val)
 	case Timestamp:
 		return toTimeStamp(val)
-	case None:
+	case Auto, Hidden:
 		return v.raw
 	}
 

@@ -54,7 +54,7 @@ func TestValueFormatString(t *testing.T) {
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValue(jsonline.String).Import(td.value)
+			value := jsonline.NewValueString(td.value)
 			assert.Equal(t, td.expected, value.Export())
 		})
 	}
@@ -76,7 +76,7 @@ func TestValueMarshalString(t *testing.T) {
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValue(jsonline.String).Import(td.value)
+			value := jsonline.NewValueString(td.value)
 			assert.Equal(t, td.expected, value.String())
 		})
 	}
@@ -100,7 +100,7 @@ func TestValueFormatNumeric(t *testing.T) {
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValue(jsonline.Numeric).Import(td.value)
+			value := jsonline.NewValueNumeric(td.value)
 			assert.Equal(t, td.expected, value.Export())
 		})
 	}
@@ -124,7 +124,7 @@ func TestValueMarshalNumeric(t *testing.T) {
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValue(jsonline.Numeric).Import(td.value)
+			value := jsonline.NewValueNumeric(td.value)
 			assert.Equal(t, td.expected, value.String())
 		})
 	}
@@ -153,7 +153,7 @@ func TestValueFormatBoolean(t *testing.T) {
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValue(jsonline.Boolean).Import(td.value)
+			value := jsonline.NewValueBoolean(td.value)
 			assert.Equal(t, td.expected, value.Export())
 		})
 	}
@@ -182,7 +182,7 @@ func TestValueMarshalBoolean(t *testing.T) {
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValue(jsonline.Boolean).Import(td.value)
+			value := jsonline.NewValueBoolean(td.value)
 			assert.Equal(t, td.expected, value.String())
 		})
 	}
@@ -203,7 +203,7 @@ func TestValueFormatBinary(t *testing.T) {
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValue(jsonline.Binary).Import(td.value)
+			value := jsonline.NewValueBinary(td.value)
 			assert.Equal(t, td.expected, value.Export())
 		})
 	}
@@ -224,7 +224,7 @@ func TestValueMarshalBinary(t *testing.T) {
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValue(jsonline.Binary).Import(td.value)
+			value := jsonline.NewValueBinary(td.value)
 			assert.Equal(t, td.expected, value.String())
 		})
 	}
@@ -245,7 +245,7 @@ func TestValueFormatDateTime(t *testing.T) {
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValue(jsonline.DateTime).Import(td.value)
+			value := jsonline.NewValueDateTime(td.value)
 			assert.Equal(t, td.expected, value.Export())
 		})
 	}

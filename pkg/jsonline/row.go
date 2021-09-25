@@ -30,6 +30,10 @@ func NewRow() Row {
 	}
 }
 
+func (r *row) GetFormat() format {
+	return Auto
+}
+
 func (r *row) Export() interface{} {
 	return r
 }
@@ -40,19 +44,19 @@ func (r *row) Import(v interface{}) Value {
 		//
 	case map[string]interface{}:
 		for key, val := range values {
-			r.Set(key, NewValue(None).Import(val))
+			r.Set(key, NewValueAuto(val))
 		}
 	}
 
 	return r
 }
 
-func (r *row) Set(key string, value Value) Row {
+func (r *row) Set(key string, val Value) Row {
 	if _, ok := r.m[key]; !ok {
 		r.keys[key] = r.l.PushBack(key)
 	}
 
-	r.m[key] = value
+	r.m[key] = val
 
 	return r
 }
@@ -62,7 +66,7 @@ func (r *row) MarshalJSON() (res []byte, err error) {
 
 	for e := r.l.Front(); e != nil; e = e.Next() {
 		k, _ := e.Value.(string)
-		if true { // r.m[k].Format != None
+		if r.m[k].GetFormat() != Hidden {
 			res = append(res, fmt.Sprintf("%q:", k)...)
 
 			var b []byte

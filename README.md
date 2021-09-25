@@ -13,9 +13,9 @@ This repository contains a library that can handle JSONLine format.
 // row
 row :=
     jsonline.NewRow().
-        Set("address", jsonline.NewString("123 Main Street, New York, NY 10030")).
-        Set("last-update", jsonline.NewDateTime(time.Now()))
-fmt.Println(row) // {"address":"123 Main Street, New York, NY 10030","last-update":"2021-09-25T09:48:56Z"}
+        Set("address", jsonline.NewValueString("123 Main Street, New York, NY 10030")).
+        Set("last-update", jsonline.NewValueDateTime(time.Now()))
+fmt.Println(row) // {"address":"123 Main Street, New York, NY 10030","last-update":"2021-09-25T08:51:10+02:00"}
 
 // template
 template := jsonline.NewTemplate().WithString("name").WithNumeric("age").WithDateTime("birthdate"))
