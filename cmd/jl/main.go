@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/rs/zerolog"
@@ -22,7 +21,15 @@ func main() {
 	// nolint: exhaustivestruct
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
-	log.Info().Msgf("%v %v (commit=%v date=%v by=%v)", name, version, commit, buildDate, builtBy)
+	cmd, err := NewRootCommand()
+	if err != nil {
+		log.Error().Err(err).Msg("End of process")
+		os.Exit(1)
+	}
 
-	fmt.Println()
+	err = cmd.Execute()
+	if err != nil {
+		log.Error().Err(err).Msg("End of process")
+		os.Exit(1)
+	}
 }
