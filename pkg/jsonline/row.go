@@ -9,6 +9,9 @@ import (
 // Row of data.
 type Row interface {
 	Set(key string, val Value) Row
+	SetIndex(index int, val Value) Row
+
+	Clone() Row
 
 	Value
 }
@@ -59,6 +62,30 @@ func (r *row) Set(key string, val Value) Row {
 	r.m[key] = val
 
 	return r
+}
+
+func (r *row) SetIndex(index int, val Value) Row {
+	var key string
+	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
+		if index == 0 {
+			key = cur.Value.(string)
+			break
+		}
+		index--
+	}
+
+	return r.Set(key, val)
+}
+
+func (r *row) Clone() Row {
+	result := NewRow()
+
+	for e := r.l.Front(); e != nil; e = e.Next() {
+		k, _ := e.Value.(string)
+		result.Set(k, r.m[k])
+	}
+
+	return result
 }
 
 func (r *row) MarshalJSON() (res []byte, err error) {
