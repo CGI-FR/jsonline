@@ -6,4 +6,4 @@ testcases:
     steps:
       - script: jl
         assertions:
-          - result.code ShouldEqual 0
+          - result.code ShouldEqual 1
