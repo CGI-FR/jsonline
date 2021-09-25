@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/adrienaury/go-template/pkg/jsonline"
 	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -19,6 +18,8 @@ type globalFlags struct {
 	debug     bool
 	jsonlog   bool
 	colormode string
+	template  map[string]string
+	filename  string
 }
 
 type RootCommand struct {
@@ -28,12 +29,10 @@ type RootCommand struct {
 func NewRootCommand() (*RootCommand, error) {
 	// nolint: exhaustivestruct
 	rootCmd := cobra.Command{
-		Use: fmt.Sprintf("%v [columns definitions]", name) + "\n\n" +
-			`Column definition format is : <name>:<type>` + "\n" +
-			`Possible types : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`,
+		Use:     fmt.Sprintf("%v", name),
 		Short:   "JSONLine templating",
 		Long:    `Order keys and format output of JSON lines.`,
-		Args:    cobra.MinimumNArgs(1),
+		Args:    cobra.NoArgs,
 		Run:     run,
 		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)", version, commit, buildDate, builtBy),
 		Example: fmt.Sprintf(`  %s name:string surname:string age:numeric <dirty.jsonl`, name),
@@ -46,6 +45,8 @@ func NewRootCommand() (*RootCommand, error) {
 		debug:     false,
 		jsonlog:   false,
 		colormode: "auto",
+		template:  map[string]string{},
+		filename:  "./row.yml",
 	}
 
 	rootCmd.PersistentFlags().StringVarP(&gf.verbosity, "verbosity", "v", gf.verbosity,
@@ -54,12 +55,16 @@ func NewRootCommand() (*RootCommand, error) {
 	rootCmd.PersistentFlags().BoolVar(&gf.jsonlog, "log-json", gf.jsonlog, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&gf.colormode, "color", gf.colormode,
 		"use colors in log outputs : yes, no or auto")
+	rootCmd.PersistentFlags().StringToStringVarP(&gf.template, "template", "t", nil,
+		`inline template definition (<name>=<type>,<name>=<type>,...)`+"\n"+
+			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden`)
+	rootCmd.PersistentFlags().StringVarP(&gf.filename, "filename", "f", gf.filename, "name of row template filename")
 
 	if err := bindViper(rootCmd); err != nil {
 		return nil, err
 	}
 
-	// rootCmd.AddCommand(<package>.NewCommand(rootCmd.CommandPath()))s
+	// rootCmd.AddCommand(<package>.NewCommand(rootCmd.CommandPath()))
 
 	return &RootCommand{rootCmd}, nil
 }
@@ -161,13 +166,25 @@ func initViper() {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	t := jsonline.NewTemplate()
+	filename, err := cmd.Flags().GetString("filename")
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to read flag filename")
+		os.Exit(1)
+	}
 
-	for _, definition := range args {
-		components := strings.SplitN(definition, ":", 2) //nolint:gomnd
-		colname := components[0]
-		coltype := components[1]
+	t, err := ParseRowDefinition(filename)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to parse template file")
+		os.Exit(1)
+	}
 
+	def, err := cmd.Flags().GetStringToString("template")
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to read flag template")
+		os.Exit(1)
+	}
+
+	for colname, coltype := range def {
 		switch coltype {
 		case "string":
 			t = t.WithString(colname)
