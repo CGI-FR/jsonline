@@ -10,9 +10,10 @@ type Template interface {
 	WithTimestamp(string) Template
 	WithAuto(string) Template
 	WithHidden(string) Template
-	WithRow(Template) Template
+	WithRow(string, Template) Template
 
 	Create(interface{}) Row
+	CreateEmpty() Row
 
 	UnmarshalJSON([]byte) (Row, error) //nolint:stdmethods
 }
@@ -22,7 +23,9 @@ type template struct {
 }
 
 func NewTemplate() Template {
-	return &template{NewRow()}
+	return &template{
+		empty: NewRow(),
+	}
 }
 
 func (t *template) WithString(name string) Template {
@@ -79,7 +82,9 @@ func (t *template) WithHidden(name string) Template {
 	return t
 }
 
-func (t *template) WithRow(rowt Template) Template {
+func (t *template) WithRow(name string, rowt Template) Template {
+	t.empty.Set(name, rowt.CreateEmpty())
+
 	return t
 }
 
@@ -98,6 +103,10 @@ func (t *template) Create(v interface{}) Row {
 	}
 
 	return result
+}
+
+func (t *template) CreateEmpty() Row {
+	return t.Create(nil)
 }
 
 //nolint:stdmethods

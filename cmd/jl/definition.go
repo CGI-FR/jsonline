@@ -76,12 +76,12 @@ func parse(tmpl jsonline.Template, columns []ColumnDefinition) (jsonline.Templat
 		case "hidden":
 			tmpl = tmpl.WithHidden(column.Name)
 		case "row":
-			rowt, err := parse(tmpl, column.Columns)
+			rowt, err := parse(jsonline.NewTemplate(), column.Columns)
 			if err != nil {
 				return tmpl, err
 			}
 
-			tmpl = tmpl.WithRow(rowt)
+			tmpl = tmpl.WithRow(column.Name, rowt)
 		}
 	}
 
