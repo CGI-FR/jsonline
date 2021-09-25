@@ -20,7 +20,7 @@ type globalFlags struct {
 	debug     bool
 	jsonlog   bool
 	colormode string
-	template  string
+	columns   []string
 	filename  string
 }
 
@@ -47,7 +47,7 @@ func NewRootCommand() (*RootCommand, error) {
 		debug:     false,
 		jsonlog:   false,
 		colormode: "auto",
-		template:  "[]",
+		columns:   nil,
 		filename:  "./row.yml",
 	}
 
@@ -57,8 +57,8 @@ func NewRootCommand() (*RootCommand, error) {
 	rootCmd.PersistentFlags().BoolVar(&gf.jsonlog, "log-json", gf.jsonlog, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&gf.colormode, "color", gf.colormode,
 		"use colors in log outputs : yes, no or auto")
-	rootCmd.PersistentFlags().StringVarP(&gf.template, "template", "t", gf.template,
-		`inline columns definition in minified YAML (-t [name: title, type: string]`+"\n"+
+	rootCmd.PersistentFlags().StringArrayVarP(&gf.columns, "columns", "c", gf.columns,
+		`inline column definition in minified YAML (-c {name: title, type: string}`+"\n"+
 			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden`)
 	rootCmd.PersistentFlags().StringVarP(&gf.filename, "filename", "f", gf.filename, "name of row template filename")
 
@@ -180,18 +180,24 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	def, err := cmd.Flags().GetString("template")
+	columnsDef, err := cmd.Flags().GetStringArray("columns")
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to read flag template")
+		log.Error().Err(err).Msg("Failed to read flag column")
 		os.Exit(1)
 	}
 
 	columns := []ColumnDefinition{}
 
-	err = yaml.Unmarshal([]byte(def), &columns)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse flag template")
-		os.Exit(1)
+	for _, columnDef := range columnsDef {
+		colDef := ColumnDefinition{Name: "", Type: "", Columns: nil}
+
+		err = yaml.Unmarshal([]byte(columnDef), &colDef)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to parse flag template")
+			os.Exit(1)
+		}
+
+		columns = append(columns, colDef)
 	}
 
 	if len(columns) > 0 {
