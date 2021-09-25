@@ -9,7 +9,10 @@ import (
 // Row of data.
 type Row interface {
 	Set(key string, val Value) Row
-	SetIndex(index int, val Value) Row
+	SetAtIndex(index int, val Value) Row
+
+	ImportAtKey(key string, val interface{}) Row
+	ImportAtIndex(index int, val interface{}) Row
 
 	Get(key string) Value
 
@@ -58,14 +61,45 @@ func (r *row) Export() interface{} {
 func (r *row) Import(v interface{}) Value {
 	switch values := v.(type) {
 	case []interface{}:
-		//
+		for i, val := range values {
+			r.ImportAtIndex(i, val)
+		}
 	case map[string]interface{}:
 		for key, val := range values {
-			r.Set(key, NewValueAuto(val))
+			r.ImportAtKey(key, val)
 		}
 	}
 
 	return r
+}
+
+func (r *row) ImportAtKey(key string, val interface{}) Row {
+	if _, ok := r.m[key]; !ok {
+		r.keys[key] = r.l.PushBack(key)
+	}
+
+	if value, exist := r.m[key]; exist {
+		r.m[key] = value.Import(val)
+	} else {
+		r.m[key] = NewValueAuto(val)
+	}
+
+	return r
+}
+
+func (r *row) ImportAtIndex(index int, val interface{}) Row {
+	var key string
+
+	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
+		if index == 0 {
+			key, _ = cur.Value.(string)
+
+			break
+		}
+		index--
+	}
+
+	return r.ImportAtKey(key, val)
 }
 
 func (r *row) Set(key string, val Value) Row {
@@ -78,7 +112,7 @@ func (r *row) Set(key string, val Value) Row {
 	return r
 }
 
-func (r *row) SetIndex(index int, val Value) Row {
+func (r *row) SetAtIndex(index int, val Value) Row {
 	var key string
 
 	for cur := r.l.Front(); cur != nil; cur = cur.Next() {

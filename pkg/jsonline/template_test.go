@@ -28,3 +28,8 @@ func TestTemplate(t *testing.T) {
 		})
 	fmt.Println(person3)
 }
+
+func TestTemplate2(t *testing.T) {
+	template := jsonline.NewTemplate().WithNumeric("age")
+	fmt.Println(template.Create(map[string]interface{}{"age": "5"}))
+}

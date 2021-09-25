@@ -84,11 +84,11 @@ func (t *template) Create(v interface{}) Row {
 	switch values := v.(type) {
 	case []interface{}:
 		for i, val := range values {
-			result.SetIndex(i, NewValueAuto(val))
+			result.ImportAtIndex(i, val)
 		}
 	case map[string]interface{}:
 		for key, val := range values {
-			result.Set(key, NewValueAuto(val))
+			result.ImportAtKey(key, val)
 		}
 	}
 
