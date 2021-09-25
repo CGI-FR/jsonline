@@ -1,0 +1,39 @@
+# Venom Test Suite definition
+# Check Venom documentation for more information : https://github.com/ovh/venom
+name: run jl with inline columns definition
+testcases:
+  - name: add missing fields
+    steps:
+      - script: |-
+          echo '{}' | jl -c '{name: field, type: string}'
+        assertions:
+          - result.systemout ShouldEqual '{"field":null}'
+          - result.systemerr ShouldBeEmpty
+          - result.code ShouldEqual 0
+
+  - name: reorder fields (multiple column definition flags)
+    steps:
+      - script: |-
+          echo '{"second":"second","first":"first"}' | jl -c '{name: first, type: string}' -c '{name: second, type: string}'
+        assertions:
+          - result.systemout ShouldEqual '{"first":"first","second":"second"}'
+          - result.systemerr ShouldBeEmpty
+          - result.code ShouldEqual 0
+
+  - name: keep extra field at the end
+    steps:
+      - script: |-
+          echo '{"second":"second","third":"third","first":"first"}' | jl -c '{name: first, type: string}' -c '{name: second, type: string}'
+        assertions:
+          - result.systemout ShouldEqual '{"first":"first","second":"second","third":"third"}'
+          - result.systemerr ShouldBeEmpty
+          - result.code ShouldEqual 0
+
+  - name: sub row definition
+    steps:
+      - script: |-
+          echo '{}' | jl -c '{name: sub, type: row, columns: [{name: first, type: string}, {name: second, type: string}]}'
+        assertions:
+          - result.systemout ShouldEqual '{"sub":{"first":null,"second":null}}'
+          - result.systemerr ShouldBeEmpty
+          - result.code ShouldEqual 0
