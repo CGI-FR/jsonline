@@ -97,6 +97,15 @@ $ jl <movies.jsonl
 {"title":"Titanic","year":1999,"director":"James Cameron","running-time":195}
 ```
 
+Columns definition can also be inlined in the command.
+
+```json
+$ jl -c '{name: title, type: string}' -c '{name: year, type: numeric}' -c '{name: director, type: string}' -c '{name: running-time, type: numeric}' <movies.jsonl
+{"title":"Jurassic Park","year":1993,"director":null,"running-time":null}
+{"title":"The Matrix","year":1999,"director":null,"running-time":136}
+{"title":"Titanic","year":1999,"director":"James Cameron","running-time":195}
+```
+
 ## License
 
 This work is not licensed yet
