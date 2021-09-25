@@ -1,0 +1,9 @@
+# Venom Test Suite definition
+# Check Venom documentation for more information : https://github.com/ovh/venom
+name: run jl
+testcases:
+  - name: no arguments
+    steps:
+      - script: jl
+        assertions:
+          - result.code ShouldEqual 0
