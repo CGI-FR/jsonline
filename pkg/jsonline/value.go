@@ -19,7 +19,8 @@ const (
 )
 
 type Value interface {
-	Get() interface{}
+	Export() interface{}
+	Import(interface{}) Value
 
 	json.Marshaler
 	fmt.Stringer
@@ -30,9 +31,9 @@ type value struct {
 	f   format
 }
 
-func NewValue(v interface{}, f format) Value {
+func NewValue(f format) Value {
 	return &value{
-		raw: v,
+		raw: nil,
 		f:   f,
 	}
 }
@@ -93,14 +94,7 @@ func NewTimestamp(v interface{}) Value {
 	}
 }
 
-func NewNull() Value {
-	return &value{
-		raw: nil,
-		f:   None,
-	}
-}
-
-func (v *value) Get() interface{} {
+func (v *value) Export() interface{} {
 	val := v.raw
 
 	switch v.f {
@@ -125,8 +119,14 @@ func (v *value) Get() interface{} {
 	panic(fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.f))
 }
 
+func (v *value) Import(val interface{}) Value {
+	v.raw = val
+
+	return v
+}
+
 func (v *value) MarshalJSON() (res []byte, err error) {
-	e := v.Get()
+	e := v.Export()
 
 	b, err := json.Marshal(e)
 	if err != nil {

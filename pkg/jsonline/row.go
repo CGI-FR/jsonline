@@ -30,7 +30,20 @@ func NewRow() Row {
 	}
 }
 
-func (r *row) Get() interface{} {
+func (r *row) Export() interface{} {
+	return r
+}
+
+func (r *row) Import(v interface{}) Value {
+	switch values := v.(type) {
+	case []interface{}:
+		//
+	case map[string]interface{}:
+		for key, val := range values {
+			r.Set(key, NewValue(None).Import(val))
+		}
+	}
+
 	return r
 }
 
