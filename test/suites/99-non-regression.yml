@@ -1,0 +1,12 @@
+# Venom Test Suite definition
+# Check Venom documentation for more information : https://github.com/ovh/venom
+name: test suite for fixed bugs
+testcases:
+  - name: do not affect current row with values from previous row
+    steps:
+      - script: |-
+          echo -e '{}\n{"field":"value"}\n{}' | jl -c '{name: field, type: string}' | tr -d '\n'
+        assertions:
+          - result.systemout ShouldEqual '{"field":null}{"field":"value"}{"field":null}'
+          - result.systemerr ShouldBeEmpty
+          - result.code ShouldEqual 0
