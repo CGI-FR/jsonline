@@ -18,6 +18,8 @@ type Row interface {
 
 	Get(key string) Value
 
+	Iter() func() (string, Value, bool)
+
 	Clone() Row
 
 	Value

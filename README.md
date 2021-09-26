@@ -104,6 +104,13 @@ Columns definition can also be inlined in the command.
 jl -c '{name: title, type: string}' -c '{name: year, type: numeric}' -c '{name: director, type: string}' -c '{name: running-time, type: numeric}' <movies.jsonl
 ```
 
+Or you can use the more compact template version.
+
+```bash
+# give the same result as previous command
+jl -t '{"title":"string","year":"numeric","director":"string","running-time":"numeric"}' <movies.jsonl
+```
+
 ### Sub rows
 
 A row definition can contain sub rows.
@@ -124,8 +131,13 @@ columns:
 ```
 
 ```bash
-# inline version
+# inline columns version
 jl -c '{name: title, type: string}' -c '{name: year, type: numeric}' -c '{name: director, type: row, columns: [{name: first_name, type: string}, {name: last_name, type: string}]}' <movies.jsonl
+```
+
+```bash
+# template
+jl -t '{"title":"string","year":"numeric","director":{"first_name":"string","last_name":"string"}}' <movies.jsonl
 ```
 
 ## License

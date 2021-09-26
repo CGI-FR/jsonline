@@ -20,8 +20,12 @@ type globalFlags struct {
 	debug     bool
 	jsonlog   bool
 	colormode string
-	columns   []string
-	filename  string
+}
+
+type templateFlags struct {
+	columns  []string
+	template string
+	filename string
 }
 
 type RootCommand struct {
@@ -47,8 +51,12 @@ func NewRootCommand() (*RootCommand, error) {
 		debug:     false,
 		jsonlog:   false,
 		colormode: "auto",
-		columns:   nil,
-		filename:  "./row.yml",
+	}
+
+	tf := templateFlags{
+		columns:  nil,
+		template: "",
+		filename: "./row.yml",
 	}
 
 	rootCmd.PersistentFlags().StringVarP(&gf.verbosity, "verbosity", "v", gf.verbosity,
@@ -57,10 +65,13 @@ func NewRootCommand() (*RootCommand, error) {
 	rootCmd.PersistentFlags().BoolVar(&gf.jsonlog, "log-json", gf.jsonlog, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&gf.colormode, "color", gf.colormode,
 		"use colors in log outputs : yes, no or auto")
-	rootCmd.PersistentFlags().StringArrayVarP(&gf.columns, "columns", "c", gf.columns,
+	rootCmd.PersistentFlags().StringArrayVarP(&tf.columns, "columns", "c", tf.columns,
 		`inline column definition in minified YAML (-c {name: title, type: string}`+"\n"+
 			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden`)
-	rootCmd.PersistentFlags().StringVarP(&gf.filename, "filename", "f", gf.filename, "name of row template filename")
+	rootCmd.PersistentFlags().StringVarP(&tf.template, "template", "t", tf.template,
+		`row template definition in JSON (-t {"title":"string"}`+"\n"+
+			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`)
+	rootCmd.PersistentFlags().StringVarP(&tf.filename, "filename", "f", tf.filename, "name of row template filename")
 
 	if err := bindViper(rootCmd); err != nil {
 		return nil, err
@@ -168,44 +179,10 @@ func initViper() {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	filename, err := cmd.Flags().GetString("filename")
+	t, err := createTemplate(cmd)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to read flag filename")
+		log.Error().Err(err).Msg("Failed to parse row template")
 		os.Exit(1)
-	}
-
-	t, err := ParseRowDefinition(filename)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse template file")
-		os.Exit(1)
-	}
-
-	columnsDef, err := cmd.Flags().GetStringArray("columns")
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to read flag column")
-		os.Exit(1)
-	}
-
-	columns := []ColumnDefinition{}
-
-	for _, columnDef := range columnsDef {
-		colDef := ColumnDefinition{Name: "", Type: "", Columns: nil}
-
-		err = yaml.Unmarshal([]byte(columnDef), &colDef)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to parse flag template")
-			os.Exit(1)
-		}
-
-		columns = append(columns, colDef)
-	}
-
-	if len(columns) > 0 {
-		t, err = parse(jsonline.NewTemplate(), columns)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to parse flag template")
-			os.Exit(1)
-		}
 	}
 
 	ri := NewJSONRowIterator(os.Stdin)
@@ -216,4 +193,73 @@ func run(cmd *cobra.Command, args []string) {
 		row := ri.Value()
 		fmt.Println(t.Create(row))
 	}
+}
+
+func parseFlags(cmd *cobra.Command) (tf *templateFlags, err error) {
+	tf = &templateFlags{
+		columns:  []string{},
+		template: "",
+		filename: "",
+	}
+
+	tf.filename, err = cmd.Flags().GetString("filename")
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
+	tf.columns, err = cmd.Flags().GetStringArray("columns")
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
+	tf.template, err = cmd.Flags().GetString("template")
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
+	if len(tf.columns) > 0 && len(tf.template) > 0 {
+		log.Error().Err(err).Msg("Can't use both flags template and columns")
+		os.Exit(1)
+	}
+
+	return
+}
+
+func createTemplate(cmd *cobra.Command) (jsonline.Template, error) {
+	tf, err := parseFlags(cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	columns := []ColumnDefinition{}
+
+	for _, columnDef := range tf.columns {
+		colDef := ColumnDefinition{Name: "", Type: "", Columns: nil}
+
+		err = yaml.Unmarshal([]byte(columnDef), &colDef)
+		if err != nil {
+			return nil, fmt.Errorf("%w", err)
+		}
+
+		columns = append(columns, colDef)
+	}
+
+	t, err := ParseRowDefinition(tf.filename)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(columns) > 0 {
+		t, err = parse(jsonline.NewTemplate(), columns)
+		if err != nil {
+			return nil, err
+		}
+	} else if len(tf.template) > 0 {
+		t, err = createTemplateFromString(tf.template)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return t, nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -8,6 +9,19 @@ import (
 	"github.com/adrienaury/go-template/pkg/jsonline"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
+)
+
+const (
+	String    = "string"
+	Numeric   = "numeric"
+	Boolean   = "boolean"
+	Binary    = "binary"
+	DateTime  = "datetime"
+	Time      = "time"
+	Timestamp = "timestamp"
+	Auto      = "auto"
+	Hidden    = "hidden"
+	Row       = "row"
 )
 
 type RowDefinition struct {
@@ -57,25 +71,25 @@ func ParseRowDefinition(filename string) (jsonline.Template, error) {
 func parse(tmpl jsonline.Template, columns []ColumnDefinition) (jsonline.Template, error) {
 	for _, column := range columns {
 		switch column.Type {
-		case "string":
+		case String:
 			tmpl = tmpl.WithString(column.Name)
-		case "numeric":
+		case Numeric:
 			tmpl = tmpl.WithNumeric(column.Name)
-		case "boolean":
+		case Boolean:
 			tmpl = tmpl.WithBoolean(column.Name)
-		case "binary":
+		case Binary:
 			tmpl = tmpl.WithBinary(column.Name)
-		case "datetime":
+		case DateTime:
 			tmpl = tmpl.WithDateTime(column.Name)
-		case "time":
+		case Time:
 			tmpl = tmpl.WithTime(column.Name)
-		case "timestamp":
+		case Timestamp:
 			tmpl = tmpl.WithTimestamp(column.Name)
-		case "auto":
+		case Auto:
 			tmpl = tmpl.WithAuto(column.Name)
-		case "hidden":
+		case Hidden:
 			tmpl = tmpl.WithHidden(column.Name)
-		case "row":
+		case Row:
 			rowt, err := parse(jsonline.NewTemplate(), column.Columns)
 			if err != nil {
 				return tmpl, err
@@ -86,4 +100,62 @@ func parse(tmpl jsonline.Template, columns []ColumnDefinition) (jsonline.Templat
 	}
 
 	return tmpl, nil
+}
+
+func createTemplateFromString(input string) (jsonline.Template, error) {
+	row := jsonline.NewRow()
+
+	if err := json.Unmarshal([]byte(input), row); err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
+	return createTemplateFromRow(row)
+}
+
+func createTemplateFromRow(row jsonline.Row) (jsonline.Template, error) {
+	tmpl := jsonline.NewTemplate()
+
+	iter := row.Iter()
+
+	for colname, v, ok := iter(); ok; colname, v, ok = iter() {
+		switch coltype := v.Export().(type) {
+		case string:
+			tmpl = setColumnInTemplate(tmpl, coltype, colname)
+
+		case jsonline.Row:
+			rowt, err := createTemplateFromRow(coltype)
+			if err != nil {
+				return tmpl, err
+			}
+
+			tmpl = tmpl.WithRow(colname, rowt)
+		}
+	}
+
+	return tmpl, nil
+}
+
+func setColumnInTemplate(tmpl jsonline.Template, coltype string, colname string) jsonline.Template {
+	switch coltype {
+	case String:
+		tmpl = tmpl.WithString(colname)
+	case Numeric:
+		tmpl = tmpl.WithNumeric(colname)
+	case Boolean:
+		tmpl = tmpl.WithBoolean(colname)
+	case Binary:
+		tmpl = tmpl.WithBinary(colname)
+	case DateTime:
+		tmpl = tmpl.WithDateTime(colname)
+	case Time:
+		tmpl = tmpl.WithTime(colname)
+	case Timestamp:
+		tmpl = tmpl.WithTimestamp(colname)
+	case Auto:
+		tmpl = tmpl.WithAuto(colname)
+	case Hidden:
+		tmpl = tmpl.WithHidden(colname)
+	}
+
+	return tmpl
 }
