@@ -48,7 +48,7 @@ person1.Set("house", row)
 b, err := person1.MarshalJSON()
  // {"name":"Dorothy","age":30,"birthdate":"1991-09-24T21:21:00Z","house":{"address":"123 Main Street, New York, NY 10030","last-update":"2021-09-25T09:22:54+02:00"}
 fmt.Println(string(b))
-person2 := template.UnmarshalJSON(b)
+person2 := NewRow().UnmarshalJSON(b)
 
 // Extra field that are not defined in the template will appear at the end of the JSONLine.
 person3 := template.Create(map[string]interface{}{"name":"Alice", "extra":true, "age":17, "birthdate":time.Date(2004, time.June, 15, 21, 8, 47, 0, time.UTC)})
@@ -65,6 +65,33 @@ exporter.Export([]interface{}{"Alice", 17, time.Date(2004, time.June, 15, 21, 8,
 ```
 
 ## Command Line Usage
+
+```
+Order keys and enforce format of JSON lines.
+
+Usage:
+  jl [flags]
+
+Examples:
+  jl -c '{name: first, type: string}' -c '{name: second, type: string}' <dirty.jsonl
+  jl -t '{"first":"string","second":"string"}' <dirty.jsonl
+
+Flags:
+      --color string         use colors in log outputs : yes, no or auto (default "auto")
+  -c, --column stringArray   inline column definition in minified YAML (-c {name: title, type: string})
+                             use this flag multiple times, one for each column
+                             possible types : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden
+      --debug                add debug information to logs (very slow)
+  -f, --filename string      name of row template filename (default "./row.yml")
+  -h, --help                 help for jl
+      --log-json             output logs in JSON format
+  -t, --template string      row template definition in JSON (-t {"title":"string"})
+                             possible types : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden
+  -v, --verbosity string     set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5) (default "error")
+      --version              version for jl
+```
+
+### Example use case
 
 Look at this file.
 
