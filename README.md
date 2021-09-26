@@ -99,11 +99,33 @@ $ jl <movies.jsonl
 
 Columns definition can also be inlined in the command.
 
-```json
-$ jl -c '{name: title, type: string}' -c '{name: year, type: numeric}' -c '{name: director, type: string}' -c '{name: running-time, type: numeric}' <movies.jsonl
-{"title":"Jurassic Park","year":1993,"director":null,"running-time":null}
-{"title":"The Matrix","year":1999,"director":null,"running-time":136}
-{"title":"Titanic","year":1999,"director":"James Cameron","running-time":195}
+```bash
+# give the same result as previous command
+jl -c '{name: title, type: string}' -c '{name: year, type: numeric}' -c '{name: director, type: string}' -c '{name: running-time, type: numeric}' <movies.jsonl
+```
+
+### Sub rows
+
+A row definition can contain sub rows.
+
+```yaml
+columns:
+- name: "title"
+  type: "string"
+- name: "year"
+  type: "numeric"
+- name: "director"
+  type: "row"
+  columns:
+    - name: "first_name"
+      type: "string"
+    - name: "last_name"
+      type: "string"
+```
+
+```bash
+# inline version
+jl -c '{name: title, type: string}' -c '{name: year, type: numeric}' -c '{name: director, type: row, columns: [{name: first_name, type: string}, {name: last_name, type: string}]}' <movies.jsonl
 ```
 
 ## License
