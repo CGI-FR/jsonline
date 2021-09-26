@@ -1,5 +1,11 @@
 package jsonline
 
+import (
+	"fmt"
+
+	"github.com/rs/zerolog/log"
+)
+
 type Template interface {
 	WithString(string) Template
 	WithNumeric(string) Template
@@ -93,13 +99,20 @@ func (t *template) Create(v interface{}) Row {
 
 	switch values := v.(type) {
 	case []interface{}:
+		log.Info().Msg("create new row from slice")
+
 		for i, val := range values {
 			result.ImportAtIndex(i, val)
 		}
 	case map[string]interface{}:
+		log.Info().Msg("create new row from map")
+
 		for key, val := range values {
 			result.ImportAtKey(key, val)
 		}
+
+	default:
+		log.Warn().Str("type", fmt.Sprintf("%T", values)).Msg("can't create row from this type")
 	}
 
 	return result
@@ -110,6 +123,12 @@ func (t *template) CreateEmpty() Row {
 }
 
 //nolint:stdmethods
-func (t *template) UnmarshalJSON([]byte) (Row, error) {
+func (t *template) UnmarshalJSON(b []byte) (Row, error) {
+	row := CloneRow(t.empty)
+
+	if err := row.UnmarshalJSON(b); err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
 	return nil, nil
 }

@@ -3,6 +3,7 @@ module github.com/adrienaury/go-template
 go 1.16
 
 require (
+	github.com/Trendyol/overlog v0.1.0
 	github.com/mattn/go-isatty v0.0.14
 	github.com/rs/zerolog v1.25.0
 	github.com/spf13/cobra v1.2.1

@@ -5,6 +5,9 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
+
+	over "github.com/Trendyol/overlog"
 
 	"github.com/adrienaury/go-template/pkg/jsonline"
 	"github.com/mattn/go-isatty"
@@ -127,14 +130,16 @@ func initConfig() {
 		log.Logger = log.Logger.With().Caller().Logger()
 	}
 
+	over.New(log.Logger)
+
 	verbosity := viper.GetString("verbosity")
 	switch verbosity {
 	case "trace", "5":
 		zerolog.SetGlobalLevel(zerolog.TraceLevel)
-		log.Debug().Msg("Logger level set to trace")
+		log.Debug().Msg("logger level set to trace")
 	case "debug", "4":
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		log.Debug().Msg("Logger level set to debug")
+		log.Debug().Msg("logger level set to debug")
 	case "info", "3":
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	case "warn", "2":
@@ -184,7 +189,7 @@ func initViper() {
 func run(cmd *cobra.Command, args []string) {
 	t, err := createTemplate(cmd)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse row template")
+		log.Error().Err(err).Msg("failed to parse row template")
 		os.Exit(1)
 	}
 
@@ -192,10 +197,20 @@ func run(cmd *cobra.Command, args []string) {
 
 	defer ri.Close()
 
-	for ri.Next() {
+	over.AddGlobalFields("line-number")
+
+	startTime := time.Now()
+
+	for i := 1; ri.Next(); i++ {
+		over.MDC().Set("line-number", i)
+
 		row := ri.Value()
 		fmt.Println(t.Create(row))
 	}
+
+	duration := time.Since(startTime)
+
+	log.Info().Int("return", 0).Stringer("duration", duration).Msg("end of process")
 }
 
 func getTemplateFlags(cmd *cobra.Command) (*templateFlags, error) {
@@ -225,6 +240,12 @@ func getTemplateFlags(cmd *cobra.Command) (*templateFlags, error) {
 	if len(tf.columns) > 0 && len(tf.template) > 0 {
 		return nil, ErrForbiddenTemplateAndColumnFlags
 	}
+
+	log.Debug().
+		Str("filename", tf.filename).
+		Str("template", tf.template).
+		Str("columns", fmt.Sprintf("%v", tf.columns)).
+		Msg("template flags")
 
 	return tf, nil
 }

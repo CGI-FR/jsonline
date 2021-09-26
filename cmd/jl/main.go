@@ -23,13 +23,13 @@ func main() {
 
 	cmd, err := NewRootCommand()
 	if err != nil {
-		log.Error().Err(err).Msg("End of process")
+		log.Error().Err(err).Msg("cannot initialize command")
 		os.Exit(1)
 	}
 
 	err = cmd.Execute()
 	if err != nil {
-		log.Error().Err(err).Msg("End of process")
+		log.Error().Err(err).Msg("end of process")
 		os.Exit(1)
 	}
 }
