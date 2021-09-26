@@ -198,12 +198,14 @@ func run(cmd *cobra.Command, args []string) {
 	}
 }
 
-func parseFlags(cmd *cobra.Command) (tf *templateFlags, err error) {
-	tf = &templateFlags{
+func getTemplateFlags(cmd *cobra.Command) (*templateFlags, error) {
+	tf := &templateFlags{
 		columns:  []string{},
 		template: "",
 		filename: "",
 	}
+
+	var err error
 
 	tf.filename, err = cmd.Flags().GetString("filename")
 	if err != nil {
@@ -221,15 +223,14 @@ func parseFlags(cmd *cobra.Command) (tf *templateFlags, err error) {
 	}
 
 	if len(tf.columns) > 0 && len(tf.template) > 0 {
-		log.Error().Err(err).Msg("Can't use both flags template and columns")
-		os.Exit(1)
+		return nil, ErrForbiddenTemplateAndColumnFlags
 	}
 
-	return
+	return tf, nil
 }
 
 func createTemplate(cmd *cobra.Command) (jsonline.Template, error) {
-	tf, err := parseFlags(cmd)
+	tf, err := getTemplateFlags(cmd)
 	if err != nil {
 		return nil, err
 	}
