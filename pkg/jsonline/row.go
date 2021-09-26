@@ -40,6 +40,18 @@ func NewRow() Row {
 	}
 }
 
+func CloneRow(r Row) Row {
+	result := NewRow()
+
+	iter := r.Iter()
+
+	for k, v, ok := iter(); ok; k, v, ok = iter() {
+		result.Set(k, CloneValue(v))
+	}
+
+	return result
+}
+
 func (r *row) GetFormat() format {
 	return Auto
 }
@@ -131,17 +143,6 @@ func (r *row) SetAtIndex(index int, val Value) Row {
 
 func (r *row) Get(key string) Value {
 	return r.m[key]
-}
-
-func (r *row) Clone() interface{} {
-	result := NewRow()
-
-	for e := r.l.Front(); e != nil; e = e.Next() {
-		k, _ := e.Value.(string)
-		result.Set(k, r.m[k].Clone().(Value))
-	}
-
-	return result
 }
 
 func (r *row) Iter() func() (string, Value, bool) {

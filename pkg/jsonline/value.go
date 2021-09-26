@@ -26,8 +26,6 @@ type Value interface {
 	Export() interface{}
 	Import(interface{}) Value
 
-	Clone() interface{}
-
 	json.Unmarshaler
 	json.Marshaler
 	fmt.Stringer
@@ -115,6 +113,10 @@ func NewValueHidden(v interface{}) Value {
 	}
 }
 
+func CloneValue(v Value) Value {
+	return NewValue(v.Raw(), v.GetFormat())
+}
+
 func (v *value) GetFormat() format {
 	return v.f
 }
@@ -152,10 +154,6 @@ func (v *value) Import(val interface{}) Value {
 	v.raw = val
 
 	return v
-}
-
-func (v *value) Clone() interface{} {
-	return NewValue(v.raw, v.f)
 }
 
 func (v *value) MarshalJSON() (res []byte, err error) {
