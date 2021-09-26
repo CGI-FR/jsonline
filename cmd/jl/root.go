@@ -41,7 +41,9 @@ func NewRootCommand() (*RootCommand, error) {
 		Args:    cobra.NoArgs,
 		Run:     run,
 		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)", version, commit, buildDate, builtBy),
-		Example: fmt.Sprintf(`  %s -t '[{name: first, type: string}, {name: second, type: string}]' <dirty.jsonl`, name),
+		Example: "" +
+			fmt.Sprintf(`  %s -c '{name: first, type: string}' -c '{name: second, type: string}' <dirty.jsonl`, name) + "\n" +
+			fmt.Sprintf(`  %s -t '{"first":"string","second":"string"}' <dirty.jsonl`, name),
 	}
 
 	cobra.OnInitialize(initConfig)
@@ -65,11 +67,12 @@ func NewRootCommand() (*RootCommand, error) {
 	rootCmd.PersistentFlags().BoolVar(&gf.jsonlog, "log-json", gf.jsonlog, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&gf.colormode, "color", gf.colormode,
 		"use colors in log outputs : yes, no or auto")
-	rootCmd.PersistentFlags().StringArrayVarP(&tf.columns, "columns", "c", tf.columns,
-		`inline column definition in minified YAML (-c {name: title, type: string}`+"\n"+
+	rootCmd.PersistentFlags().StringArrayVarP(&tf.columns, "column", "c", tf.columns,
+		`inline column definition in minified YAML (-c {name: title, type: string})`+"\n"+
+			`use this flag multiple times, one for each column`+"\n"+
 			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden`)
 	rootCmd.PersistentFlags().StringVarP(&tf.template, "template", "t", tf.template,
-		`row template definition in JSON (-t {"title":"string"}`+"\n"+
+		`row template definition in JSON (-t {"title":"string"})`+"\n"+
 			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`)
 	rootCmd.PersistentFlags().StringVarP(&tf.filename, "filename", "f", tf.filename, "name of row template filename")
 
@@ -207,7 +210,7 @@ func parseFlags(cmd *cobra.Command) (tf *templateFlags, err error) {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	tf.columns, err = cmd.Flags().GetStringArray("columns")
+	tf.columns, err = cmd.Flags().GetStringArray("column")
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
