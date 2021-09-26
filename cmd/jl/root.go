@@ -70,14 +70,19 @@ func NewRootCommand() (*RootCommand, error) {
 	rootCmd.PersistentFlags().BoolVar(&gf.jsonlog, "log-json", gf.jsonlog, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&gf.colormode, "color", gf.colormode,
 		"use colors in log outputs : yes, no or auto")
-	rootCmd.PersistentFlags().StringArrayVarP(&tf.columns, "column", "c", tf.columns,
+
+	rootCmd.PersistentFlags().SortFlags = false
+
+	rootCmd.Flags().StringArrayVarP(&tf.columns, "column", "c", tf.columns,
 		`inline column definition in minified YAML (-c {name: title, type: string})`+"\n"+
 			`use this flag multiple times, one for each column`+"\n"+
 			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden`)
-	rootCmd.PersistentFlags().StringVarP(&tf.template, "template", "t", tf.template,
+	rootCmd.Flags().StringVarP(&tf.template, "template", "t", tf.template,
 		`row template definition in JSON (-t {"title":"string"})`+"\n"+
 			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`)
-	rootCmd.PersistentFlags().StringVarP(&tf.filename, "filename", "f", tf.filename, "name of row template filename")
+	rootCmd.Flags().StringVarP(&tf.filename, "filename", "f", tf.filename, "name of row template filename")
+
+	rootCmd.Flags().SortFlags = false
 
 	if err := bindViper(rootCmd); err != nil {
 		return nil, err
