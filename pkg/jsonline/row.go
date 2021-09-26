@@ -20,8 +20,6 @@ type Row interface {
 
 	Iter() func() (string, Value, bool)
 
-	Clone() Row
-
 	Value
 }
 
@@ -135,12 +133,12 @@ func (r *row) Get(key string) Value {
 	return r.m[key]
 }
 
-func (r *row) Clone() Row {
+func (r *row) Clone() interface{} {
 	result := NewRow()
 
 	for e := r.l.Front(); e != nil; e = e.Next() {
 		k, _ := e.Value.(string)
-		result.Set(k, r.m[k])
+		result.Set(k, r.m[k].Clone().(Value))
 	}
 
 	return result

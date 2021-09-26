@@ -89,7 +89,7 @@ func (t *template) WithRow(name string, rowt Template) Template {
 }
 
 func (t *template) Create(v interface{}) Row {
-	result := t.empty.Clone()
+	result, _ := t.empty.Clone().(Row)
 
 	switch values := v.(type) {
 	case []interface{}:
