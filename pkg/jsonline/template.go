@@ -2,6 +2,7 @@ package jsonline
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/rs/zerolog/log"
 )
@@ -20,6 +21,8 @@ type Template interface {
 
 	Create(interface{}) Row
 	CreateEmpty() Row
+
+	GetExporter(io.Writer) Exporter
 
 	UnmarshalJSON([]byte) (Row, error) //nolint:stdmethods
 }
@@ -99,13 +102,13 @@ func (t *template) Create(v interface{}) Row {
 
 	switch values := v.(type) {
 	case []interface{}:
-		log.Info().Msg("create new row from slice")
+		log.Debug().Msg("create new row from slice")
 
 		for i, val := range values {
 			result.ImportAtIndex(i, val)
 		}
 	case map[string]interface{}:
-		log.Info().Msg("create new row from map")
+		log.Debug().Msg("create new row from map")
 
 		for key, val := range values {
 			result.ImportAtKey(key, val)
@@ -120,6 +123,10 @@ func (t *template) Create(v interface{}) Row {
 
 func (t *template) CreateEmpty() Row {
 	return t.Create(nil)
+}
+
+func (t *template) GetExporter(w io.Writer) Exporter {
+	return NewExporter(w, t)
 }
 
 //nolint:stdmethods
