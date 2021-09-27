@@ -14,6 +14,6 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.1.0] 2021-09-25
+## [0.1.0] Unreleased
 
 - `Added` First official version of `jl` command line.

@@ -64,9 +64,13 @@ exporter.Export([]interface{}{"Dorothy", 30, time.Date(1991, time.September, 24,
 exporter.Export([]interface{}{"Alice", 17, time.Date(2004, time.June, 15, 21, 8, 47, 0, time.UTC)})
 
 // An importer will read JSON lines from os.Reader.
-importer := jsonline.NewImporter(os.Stdin).WithTemplate(template) // or template.GetImporter(os.Stdin)
-for row := importer.Import(); row != null; row = importer.Import() {
-    fmt.Println(row)
+// or jsonline.NewImporter(os.Stdin).WithTemplate(template)
+for importer := template.GetImporter(os.Stdin); importer.Import() ; row, err := importer.GetRow() {
+    if err := nil {
+        fmt.Println("an error occured!", err)
+    } else {
+        fmt.Println(row)
+    }
 }
 
 // A streamer will process JSON lines from os.Reader to os.Writer.
