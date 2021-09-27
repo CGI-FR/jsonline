@@ -23,8 +23,6 @@ type Template interface {
 	CreateEmpty() Row
 
 	GetExporter(io.Writer) Exporter
-
-	UnmarshalJSON([]byte) (Row, error) //nolint:stdmethods
 }
 
 type template struct {
@@ -122,20 +120,9 @@ func (t *template) Create(v interface{}) Row {
 }
 
 func (t *template) CreateEmpty() Row {
-	return t.Create(nil)
+	return CloneRow(t.empty)
 }
 
 func (t *template) GetExporter(w io.Writer) Exporter {
 	return NewExporter(w, t)
-}
-
-//nolint:stdmethods
-func (t *template) UnmarshalJSON(b []byte) (Row, error) {
-	row := CloneRow(t.empty)
-
-	if err := row.UnmarshalJSON(b); err != nil {
-		return nil, fmt.Errorf("%w", err)
-	}
-
-	return nil, nil
 }
