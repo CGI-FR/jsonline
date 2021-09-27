@@ -65,9 +65,10 @@ exporter.Export([]interface{}{"Alice", 17, time.Date(2004, time.June, 15, 21, 8,
 
 // An importer will read JSON lines from os.Reader.
 // or jsonline.NewImporter(os.Stdin).WithTemplate(template)
-for importer := template.GetImporter(os.Stdin); importer.Import() ; row, err := importer.GetRow() {
-    if err := nil {
-        fmt.Println("an error occured!", err)
+for importer := template.GetImporter(os.Stdin); importer.Import(); {
+    row, err := importer.GetRow()
+    if err != nil {
+        fmt.Println("an error occurred!", err)
     } else {
         fmt.Println(row)
     }

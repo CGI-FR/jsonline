@@ -19,6 +19,7 @@ package jsonline_test
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -49,4 +50,13 @@ func TestTemplate(t *testing.T) {
 func TestTemplate2(t *testing.T) {
 	template := jsonline.NewTemplate().WithNumeric("age")
 	fmt.Println(template.Create(map[string]interface{}{"age": "5"}))
+
+	for importer := template.GetImporter(os.Stdin); importer.Import(); {
+		row, err := importer.GetRow()
+		if err != nil {
+			fmt.Println("an error occurred!", err)
+		} else {
+			fmt.Println(row)
+		}
+	}
 }

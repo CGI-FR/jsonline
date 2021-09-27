@@ -57,6 +57,7 @@ type Template interface {
 	CreateEmpty() Row
 
 	GetExporter(io.Writer) Exporter
+	GetImporter(io.Reader) Importer
 }
 
 type template struct {
@@ -159,4 +160,8 @@ func (t *template) CreateEmpty() Row {
 
 func (t *template) GetExporter(w io.Writer) Exporter {
 	return NewExporter(w).WithTemplate(t)
+}
+
+func (t *template) GetImporter(r io.Reader) Importer {
+	return NewImporter(r).WithTemplate(t)
 }

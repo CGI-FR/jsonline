@@ -47,7 +47,8 @@ const (
 
 type Importer interface {
 	WithTemplate(Template) Importer
-	Import() (Row, error)
+	Import() bool
+	GetRow() (Row, error)
 }
 
 type importer struct {
@@ -56,7 +57,7 @@ type importer struct {
 	t Template
 }
 
-func NewImporter(r io.Reader, t Template) Importer {
+func NewImporter(r io.Reader) Importer {
 	buf := make([]byte, 0, initialBufferSize)
 	s := bufio.NewScanner(r)
 	s.Buffer(buf, maximumBufferSize)
@@ -74,13 +75,13 @@ func (i *importer) WithTemplate(t Template) Importer {
 	return i
 }
 
-func (i *importer) Import() (Row, error) {
-	if !i.s.Scan() {
-		if i.s.Err() != nil {
-			return nil, fmt.Errorf("%w", i.s.Err())
-		}
+func (i *importer) Import() bool {
+	return i.s.Scan()
+}
 
-		return nil, nil
+func (i *importer) GetRow() (Row, error) {
+	if i.s.Err() != nil {
+		return nil, fmt.Errorf("%w", i.s.Err())
 	}
 
 	b := i.s.Bytes()
