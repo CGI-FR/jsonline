@@ -80,7 +80,7 @@ streamer.Stream()
 
 ## Command Line Usage
 
-```
+```text
 Order keys and enforce format of JSON lines.
 
 Usage:
@@ -91,17 +91,17 @@ Examples:
   jl -t '{"first":"string","second":"string"}' <dirty.jsonl
 
 Flags:
-      --color string         use colors in log outputs : yes, no or auto (default "auto")
   -c, --column stringArray   inline column definition in minified YAML (-c {name: title, type: string})
                              use this flag multiple times, one for each column
                              possible types : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden
-      --debug                add debug information to logs (very slow)
-  -f, --filename string      name of row template filename (default "./row.yml")
-  -h, --help                 help for jl
-      --log-json             output logs in JSON format
   -t, --template string      row template definition in JSON (-t {"title":"string"})
                              possible types : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden
+  -f, --filename string      name of row template filename (default "./row.yml")
   -v, --verbosity string     set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5) (default "error")
+      --debug                add debug information to logs (very slow)
+      --log-json             output logs in JSON format
+      --color string         use colors in log outputs : yes, no or auto (default "auto")
+  -h, --help                 help for jl
       --version              version for jl
 ```
 
