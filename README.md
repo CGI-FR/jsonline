@@ -58,10 +58,24 @@ fmt.Println(person3) // {"name":"Alice","age":17,"birthdate":"2004-06-15T21:08:4
 ### Read and write JSONLine
 
 ```go
-// exporter
+// An exporter will write objects as JSON lines into os.Writer.
 exporter := jsonline.NewExporter(os.Stdout).WithTemplate(template) // or template.GetExporter(os.Stdout)
 exporter.Export([]interface{}{"Dorothy", 30, time.Date(1991, time.September, 24, 21, 21, 0, 0, time.UTC)})
 exporter.Export([]interface{}{"Alice", 17, time.Date(2004, time.June, 15, 21, 8, 47, 0, time.UTC)})
+
+// An importer will read JSON lines from os.Reader.
+importer := jsonline.NewImporter(os.Stdin).WithTemplate(template) // or template.GetImporter(os.Stdin)
+for row := importer.Import() {
+    if row == nil {
+        // end of Reader has been reached
+        break
+    }
+    fmt.Println(row)
+}
+
+// A streamer will process JSON lines from os.Reader to os.Writer.
+streamer := jsonline.NewStreamer(os.Stdin, os.Stdout).WithExportTemplate(template) // template.GetStreamer(os.Stdin)
+streamer.Stream()
 ```
 
 ## Command Line Usage
