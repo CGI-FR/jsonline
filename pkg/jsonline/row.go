@@ -287,7 +287,11 @@ func (r *row) parseobject(dec *json.Decoder) (err error) {
 		}
 
 		r.keys[key] = r.l.PushBack(key)
-		r.m[key] = NewValueAuto(value)
+		if r.m[key] == nil {
+			r.m[key] = NewValueAuto(value)
+		} else {
+			r.m[key].Import(value)
+		}
 	}
 
 	t, err = dec.Token()

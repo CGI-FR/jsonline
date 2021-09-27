@@ -146,6 +146,14 @@ func (t *template) Create(v interface{}) Row {
 		for key, val := range values {
 			result.ImportAtKey(key, val)
 		}
+	case Row:
+		log.Debug().Msg("create new row from row")
+
+		iter := values.Iter()
+
+		for key, val, ok := iter(); ok; key, val, ok = iter() {
+			result.ImportAtKey(key, val.Export())
+		}
 
 	default:
 		log.Warn().Str("type", fmt.Sprintf("%T", values)).Msg("can't create row from this type")

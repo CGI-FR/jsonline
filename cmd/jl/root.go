@@ -215,20 +215,20 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	e := t.GetExporter(os.Stdout)
-
-	ri := NewJSONRowIterator(os.Stdin)
-
-	defer ri.Close()
+	exporter := t.GetExporter(os.Stdout)
+	importer := jsonline.NewImporter(os.Stdin)
 
 	over.AddGlobalFields("line-number")
 
 	startTime := time.Now()
 
-	for i := 1; ri.Next(); i++ {
+	for i := 1; importer.Import(); i++ {
 		over.MDC().Set("line-number", i)
 
-		if err := e.Export(ri.Value()); err != nil {
+		row, err := importer.GetRow()
+		if err != nil {
+			log.Error().Err(err).Msg("failed to process JSON line")
+		} else if err := exporter.Export(row); err != nil {
 			log.Error().Err(err).Msg("failed to process JSON line")
 		}
 	}
