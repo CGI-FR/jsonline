@@ -124,5 +124,5 @@ func (t *template) CreateEmpty() Row {
 }
 
 func (t *template) GetExporter(w io.Writer) Exporter {
-	return NewExporter(w, t)
+	return NewExporter(w).WithTemplate(t)
 }

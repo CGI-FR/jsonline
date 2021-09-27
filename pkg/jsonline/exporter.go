@@ -8,6 +8,7 @@ import (
 const lineSeparator byte = 10
 
 type Exporter interface {
+	WithTemplate(Template) Exporter
 	Export(interface{}) error
 }
 
@@ -16,11 +17,17 @@ type exporter struct {
 	t Template
 }
 
-func NewExporter(w io.Writer, t Template) Exporter {
+func NewExporter(w io.Writer) Exporter {
 	return &exporter{
 		w: w,
-		t: t,
+		t: NewTemplate(),
 	}
+}
+
+func (e *exporter) WithTemplate(t Template) Exporter {
+	e.t = t
+
+	return e
 }
 
 func (e *exporter) Export(input interface{}) error {
