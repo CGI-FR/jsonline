@@ -98,6 +98,7 @@ func TestValueFormatString(t *testing.T) {
 	}
 }
 
+//nolint:dupl
 func TestValueMarshalString(t *testing.T) {
 	testdatas := []struct {
 		value    interface{}
