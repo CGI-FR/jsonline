@@ -60,15 +60,15 @@ type Streamer interface {
 }
 
 type streamer struct {
-	exporter  Exporter
 	importer  Importer
+	exporter  Exporter
 	processor Processor
 }
 
-func NewStreamer(exporter Exporter, importer Importer) Streamer {
+func NewStreamer(importer Importer, exporter Exporter) Streamer {
 	return &streamer{
-		exporter:  exporter,
 		importer:  importer,
+		exporter:  exporter,
 		processor: DefaultProcessor,
 	}
 }

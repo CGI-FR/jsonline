@@ -215,9 +215,9 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	exporter := t.GetExporter(os.Stdout)
 	importer := jsonline.NewImporter(os.Stdin)
-	streamer := jsonline.NewStreamer(exporter, importer)
+	exporter := t.GetExporter(os.Stdout)
+	streamer := jsonline.NewStreamer(importer, exporter)
 
 	over.AddGlobalFields("line-number")
 
