@@ -366,7 +366,7 @@ func TestValueMarshalBoolean(t *testing.T) {
 }
 
 //nolint:dupl
-func TestValueFormatBinary(t *testing.T) {
+func TestValueExportBinary(t *testing.T) {
 	testdatas := []struct {
 		value    interface{}
 		expected interface{}
@@ -421,6 +421,26 @@ func TestValueFormatBinary(t *testing.T) {
 	}
 }
 
+func TestValueImportBinary(t *testing.T) {
+	testdatas := []struct {
+		value    interface{}
+		expected interface{}
+	}{
+		{nil, nil},
+		{"LTI=", []uint8{0x2d, 0x32}},
+	}
+
+	for _, td := range testdatas {
+		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
+			value := jsonline.NewValueBinary(nil)
+			err := value.Import(td.value)
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, value.Raw())
+		})
+	}
+}
+
+//nolint:dupl
 func TestValueMarshalBinary(t *testing.T) {
 	testdatas := []struct {
 		value    interface{}
@@ -475,7 +495,7 @@ func TestValueMarshalBinary(t *testing.T) {
 }
 
 //nolint:dupl
-func TestValueFormatDateTime(t *testing.T) {
+func TestValueExportDateTime(t *testing.T) {
 	tz, _ := time.LoadLocation("Asia/Shanghai")
 	testdatas := []struct {
 		value    interface{}
@@ -527,8 +547,27 @@ func TestValueFormatDateTime(t *testing.T) {
 	}
 }
 
+func TestValueImportDateTime(t *testing.T) {
+	testdatas := []struct {
+		value    interface{}
+		expected interface{}
+	}{
+		{nil, nil},
+		{"2021-09-28T11:59:49+02:00", time.Date(2021, time.September, 28, 11, 59, 49, 0, time.Local)},
+	}
+
+	for _, td := range testdatas {
+		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
+			value := jsonline.NewValueDateTime(nil)
+			err := value.Import(td.value)
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, value.Raw())
+		})
+	}
+}
+
 //nolint:dupl
-func TestValueFormatTime(t *testing.T) {
+func TestValueExportTime(t *testing.T) {
 	tz, _ := time.LoadLocation("Asia/Shanghai")
 	testdatas := []struct {
 		value    interface{}
@@ -580,7 +619,26 @@ func TestValueFormatTime(t *testing.T) {
 	}
 }
 
-func TestValueFormatTimestamp(t *testing.T) {
+func TestValueImportTime(t *testing.T) {
+	testdatas := []struct {
+		value    interface{}
+		expected interface{}
+	}{
+		{nil, nil},
+		{"11:59:49Z", time.Date(0, time.January, 1, 11, 59, 49, 0, time.UTC)},
+	}
+
+	for _, td := range testdatas {
+		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
+			value := jsonline.NewValueTime(nil)
+			err := value.Import(td.value)
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, value.Raw())
+		})
+	}
+}
+
+func TestValueExportTimestamp(t *testing.T) {
 	tz, _ := time.LoadLocation("Asia/Shanghai")
 	testdatas := []struct {
 		value    interface{}
@@ -628,6 +686,25 @@ func TestValueFormatTimestamp(t *testing.T) {
 			result, err := value.Export()
 			assert.NoError(t, err)
 			assert.Equal(t, td.expected, result)
+		})
+	}
+}
+
+func TestValueImportTimestamp(t *testing.T) {
+	testdatas := []struct {
+		value    interface{}
+		expected interface{}
+	}{
+		{nil, nil},
+		{"2021-09-28T11:59:49+02:00", int64(1632823189)},
+	}
+
+	for _, td := range testdatas {
+		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
+			value := jsonline.NewValueTimestamp(nil)
+			err := value.Import(td.value)
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, value.Raw())
 		})
 	}
 }
