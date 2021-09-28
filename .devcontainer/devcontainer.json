@@ -1,5 +1,5 @@
 {
-    "name": "CHANGE IT",
+    "name": "JSONLine Library",
     "dockerComposeFile": [
         "../docker-compose.yml"
     ],
