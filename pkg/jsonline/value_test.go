@@ -466,6 +466,7 @@ func TestValueMarshalBinary(t *testing.T) {
 	}
 }
 
+//nolint:dupl
 func TestValueFormatDateTime(t *testing.T) {
 	tz, _ := time.LoadLocation("Asia/Shanghai")
 	testdatas := []struct {
@@ -511,6 +512,57 @@ func TestValueFormatDateTime(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueDateTime(td.value)
+			assert.Equal(t, td.expected, value.Export())
+		})
+	}
+}
+
+//nolint:dupl
+func TestValueFormatTime(t *testing.T) {
+	tz, _ := time.LoadLocation("Asia/Shanghai")
+	testdatas := []struct {
+		value    interface{}
+		expected interface{}
+	}{
+		{nil, nil},
+		// signed integers
+		{int(1632823189), "11:59:49+02:00"},
+		{int8(127), "01:02:07+01:00"},
+		{int16(32767), "10:06:07+01:00"},
+		{int32(1632823189), "11:59:49+02:00"},
+		{int64(1632823189), "11:59:49+02:00"},
+		// unsigned integers
+		{uint(1632823189), "11:59:49+02:00"},
+		{uint8(255), "01:04:15+01:00"},
+		{uint16(65535), "19:12:15+01:00"},
+		{uint32(1632823189), "11:59:49+02:00"},
+		{uint64(1632823189), "11:59:49+02:00"},
+		// floats
+		{float32(1632823189.2), "11:59:28+02:00"},
+		{float64(-1632823189.2), "15:00:11+01:00"},
+		// complex numbers
+		// {complex64(1.2i + 5), "(5+1.2i)"}, => UNSUPPORTED
+		// {complex128(-1.0i + 8), "(8-1i)"}, => UNSUPPORTED
+		// booleans
+		// {true, "true"}, => UNSUPPORTED
+		// {false, "false"}, => UNSUPPORTED
+		// strings
+		{"15:04:05Z", "15:04:05Z"},
+		{"15:04:05+07:00", "15:04:05+07:00"},
+		// {'r', "r"}, = int32
+		// binary
+		// {byte(36), "36"}, // = uint8
+		{[]byte("15:04:05+07:00"), "15:04:05+07:00"},
+		// composite => UNSUPPORTED
+		// references (structs)
+		{time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC), "21:21:00Z"},
+		{time.Date(2021, time.December, 25, 0, 0, 0, 0, tz), "00:00:00+08:00"},
+		// interfaces
+	}
+
+	for _, td := range testdatas {
+		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
+			value := jsonline.NewValueTime(td.value)
 			assert.Equal(t, td.expected, value.Export())
 		})
 	}

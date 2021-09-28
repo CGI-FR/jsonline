@@ -194,10 +194,35 @@ func toDateTime(val interface{}) interface{} {
 	}
 }
 
+//nolint:cyclop
 func toTime(val interface{}) interface{} {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil
+	case int64:
+		return toTime(time.Unix(typedValue, 0))
+	case int32:
+		return toTime(time.Unix(int64(typedValue), 0))
+	case int16:
+		return toTime(time.Unix(int64(typedValue), 0))
+	case int8:
+		return toTime(time.Unix(int64(typedValue), 0))
+	case int:
+		return toTime(time.Unix(int64(typedValue), 0))
+	case uint64:
+		return toTime(time.Unix(int64(typedValue), 0))
+	case uint32:
+		return toTime(time.Unix(int64(typedValue), 0))
+	case uint16:
+		return toTime(time.Unix(int64(typedValue), 0))
+	case uint8:
+		return toTime(time.Unix(int64(typedValue), 0))
+	case uint:
+		return toTime(time.Unix(int64(typedValue), 0))
+	case float32:
+		return toTime(time.Unix(int64(typedValue), 0))
+	case float64:
+		return toTime(time.Unix(int64(typedValue), 0))
 	case time.Time:
 		return typedValue.Format("15:04:05Z07:00")
 	case string:
@@ -206,9 +231,9 @@ func toTime(val interface{}) interface{} {
 			return fmt.Sprintf("ERROR: %v", err)
 		}
 
-		return toDateTime(t)
+		return toTime(t)
 	default:
-		return toDateTime(toString(val))
+		return toTime(toString(val))
 	}
 }
 
