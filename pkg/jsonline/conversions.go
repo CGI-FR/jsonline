@@ -35,87 +35,104 @@
 package jsonline
 
 import (
-	"encoding/base64"
 	"fmt"
-	"time"
+	"strconv"
 )
 
-func importToBinary(val interface{}) (interface{}, error) {
-	if val == nil {
-		return nil, nil
-	}
+const (
+	conversionBase = 10
+	conversionSize = 64
+)
 
-	b, err := base64.StdEncoding.DecodeString(convertToString(val).(string))
-	if err != nil {
-		return nil, fmt.Errorf("%w", err)
-	}
-
-	return b, nil
-}
-
-func importToDateTime(val interface{}) (interface{}, error) {
+func convertToString(val interface{}) interface{} {
 	switch typedValue := val.(type) {
 	case nil:
-		return nil, nil
-	case string:
-		res, err := time.Parse(time.RFC3339, typedValue)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return res, nil
+		return nil
+	case rune:
+		return string(typedValue)
+	case []byte:
+		return string(typedValue)
 	default:
-		return importToDateTime(convertToString(val))
+		return fmt.Sprintf("%v", val)
 	}
 }
 
-func importToTime(val interface{}) (interface{}, error) {
+func convertToNumeric(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil, nil
-	case string:
-		res, err := time.Parse("15:04:05Z07:00", typedValue)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return res, nil
-	default:
-		return importToTime(convertToString(val))
-	}
-}
-
-//nolint:cyclop
-func importToTimestamp(val interface{}) (interface{}, error) {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil, nil
-	case int64:
+	case int64, int, int16, int8, byte, rune, float64, float32, uint, uint16, uint32, uint64:
 		return typedValue, nil
-	case int32:
-		return int64(typedValue), nil
-	case int16:
-		return int64(typedValue), nil
-	case int8:
-		return int64(typedValue), nil
-	case int:
-		return int64(typedValue), nil
-	case uint64:
-		return int64(typedValue), nil
-	case uint32:
-		return int64(typedValue), nil
-	case uint16:
-		return int64(typedValue), nil
-	case uint8:
-		return int64(typedValue), nil
-	case uint:
-		return int64(typedValue), nil
-	default:
-		t, err := importToDateTime(typedValue)
+	case bool:
+		if typedValue {
+			return 1, nil
+		}
+
+		return 0, nil
+	case string:
+		r, err := strconv.ParseFloat(typedValue, conversionSize)
 		if err != nil {
 			return nil, fmt.Errorf("%w", err)
 		}
 
-		return t.(time.Time).Unix(), nil
+		return r, nil
+	case []byte:
+		return convertToNumeric(fmt.Sprintf("%v", string(typedValue)))
+	default:
+		return convertToNumeric(fmt.Sprintf("%v", val))
+	}
+}
+
+//nolint:funlen,cyclop
+func convertToBoolean(val interface{}) (interface{}, error) {
+	switch typedValue := val.(type) {
+	case nil:
+		return nil, nil
+	case int:
+		return typedValue != 0, nil
+	case int8:
+		return typedValue != 0, nil
+	case int16:
+		return typedValue != 0, nil
+	case int32: // rune=int32
+		return typedValue != 0, nil
+	case int64:
+		return typedValue != 0, nil
+	case uint:
+		return typedValue != 0, nil
+	case uint8: // byte=uint8
+		return typedValue != 0, nil
+	case uint16:
+		return typedValue != 0, nil
+	case uint32:
+		return typedValue != 0, nil
+	case uint64:
+		return typedValue != 0, nil
+	case float64:
+		return typedValue != 0.0, nil
+	case float32:
+		return typedValue != 0.0, nil
+	case complex64:
+		return typedValue != 0i+0, nil
+	case complex128:
+		return typedValue != 0i+0, nil
+	case bool:
+		return typedValue, nil
+	case string:
+		r, err := strconv.ParseBool(typedValue)
+		if err == nil {
+			return r, nil
+		}
+
+		f64, err := strconv.ParseFloat(typedValue, conversionSize)
+		if err == nil {
+			return convertToBoolean(f64)
+		}
+
+		return nil, fmt.Errorf("%w", err)
+	case []byte:
+		return convertToBoolean(fmt.Sprintf("%v", string(typedValue)))
+	default:
+		return convertToBoolean(fmt.Sprintf("%v", val))
 	}
 }

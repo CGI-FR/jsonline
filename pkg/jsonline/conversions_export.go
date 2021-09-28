@@ -41,104 +41,6 @@ import (
 	"time"
 )
 
-const (
-	conversionBase = 10
-	conversionSize = 64
-)
-
-func exportToString(val interface{}) interface{} {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil
-	case rune:
-		return string(typedValue)
-	case []byte:
-		return string(typedValue)
-	default:
-		return fmt.Sprintf("%v", val)
-	}
-}
-
-func exportToNumeric(val interface{}) (interface{}, error) {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil, nil
-	case int64, int, int16, int8, byte, rune, float64, float32, uint, uint16, uint32, uint64:
-		return typedValue, nil
-	case bool:
-		if typedValue {
-			return 1, nil
-		}
-
-		return 0, nil
-	case string:
-		r, err := strconv.ParseFloat(typedValue, conversionSize)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return r, nil
-	case []byte:
-		return exportToNumeric(fmt.Sprintf("%v", string(typedValue)))
-	default:
-		return exportToNumeric(fmt.Sprintf("%v", val))
-	}
-}
-
-//nolint:funlen,cyclop
-func exportToBoolean(val interface{}) (interface{}, error) {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil, nil
-	case int:
-		return typedValue != 0, nil
-	case int8:
-		return typedValue != 0, nil
-	case int16:
-		return typedValue != 0, nil
-	case int32: // rune=int32
-		return typedValue != 0, nil
-	case int64:
-		return typedValue != 0, nil
-	case uint:
-		return typedValue != 0, nil
-	case uint8: // byte=uint8
-		return typedValue != 0, nil
-	case uint16:
-		return typedValue != 0, nil
-	case uint32:
-		return typedValue != 0, nil
-	case uint64:
-		return typedValue != 0, nil
-	case float64:
-		return typedValue != 0.0, nil
-	case float32:
-		return typedValue != 0.0, nil
-	case complex64:
-		return typedValue != 0i+0, nil
-	case complex128:
-		return typedValue != 0i+0, nil
-	case bool:
-		return typedValue, nil
-	case string:
-		r, err := strconv.ParseBool(typedValue)
-		if err == nil {
-			return r, nil
-		}
-
-		f64, err := strconv.ParseFloat(typedValue, conversionSize)
-		if err == nil {
-			return exportToBoolean(f64)
-		}
-
-		return nil, fmt.Errorf("%w", err)
-	case []byte:
-		return exportToBoolean(fmt.Sprintf("%v", string(typedValue)))
-	default:
-		return exportToBoolean(fmt.Sprintf("%v", val))
-	}
-}
-
 func exportToBinary(val interface{}) interface{} {
 	switch typedValue := val.(type) {
 	case nil:
@@ -148,7 +50,7 @@ func exportToBinary(val interface{}) interface{} {
 	case string:
 		return base64.StdEncoding.EncodeToString([]byte(typedValue))
 	default:
-		return base64.StdEncoding.EncodeToString([]byte(exportToString(typedValue).(string)))
+		return base64.StdEncoding.EncodeToString([]byte(convertToString(typedValue).(string)))
 	}
 }
 
@@ -191,7 +93,7 @@ func exportToDateTime(val interface{}) (interface{}, error) {
 
 		return exportToDateTime(t)
 	default:
-		return exportToDateTime(exportToString(val))
+		return exportToDateTime(convertToString(val))
 	}
 }
 
@@ -234,7 +136,7 @@ func exportToTime(val interface{}) (interface{}, error) {
 
 		return exportToTime(t)
 	default:
-		return exportToTime(exportToString(val))
+		return exportToTime(convertToString(val))
 	}
 }
 

@@ -164,11 +164,11 @@ func (v *value) Export() (interface{}, error) {
 
 	switch v.f {
 	case String:
-		return exportToString(val), nil
+		return convertToString(val), nil
 	case Numeric:
-		return exportToNumeric(val)
+		return convertToNumeric(val)
 	case Boolean:
-		return exportToBoolean(val)
+		return convertToBoolean(val)
 	case Binary:
 		return exportToBinary(val), nil
 	case DateTime:
@@ -189,19 +189,19 @@ func (v *value) Import(val interface{}) error {
 
 	switch v.f {
 	case String:
-		v.raw = importToString(val)
+		v.raw = convertToString(val)
 	case Numeric:
-		v.raw = val
+		v.raw, err = convertToNumeric(val)
 	case Boolean:
-		v.raw = val
+		v.raw, err = convertToBoolean(val)
 	case Binary:
-		v.raw = val
+		v.raw, err = importToBinary(val)
 	case DateTime:
 		v.raw, err = importToDateTime(val)
 	case Time:
-		v.raw = val
+		v.raw, err = importToTime(val)
 	case Timestamp:
-		v.raw = val
+		v.raw, err = importToTimestamp(val)
 	case Auto, Hidden:
 		v.raw = val
 	default:
