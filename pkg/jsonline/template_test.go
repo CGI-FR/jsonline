@@ -26,7 +26,7 @@ import (
 )
 
 func init() { //nolint:gochecknoinits
-	os.Setenv("TZ", "Africa/Cairo")
+	os.Setenv("TZ", "Europe/Paris")
 }
 
 func TestTemplateCreateEmpty(t *testing.T) {
