@@ -18,8 +18,6 @@
 package jsonline_test
 
 import (
-	"encoding/json"
-	"fmt"
 	"testing"
 	"time"
 
@@ -27,28 +25,80 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRow(t *testing.T) {
-	r := jsonline.NewRow()
-	r.Set("name", jsonline.NewValueString("Dorothy"))
-	r.Set("age", jsonline.NewValueNumeric(30))
-	r.Set("car", jsonline.NewValueNil())
-	r.Set("pet", jsonline.NewRow())
-	r.Set("house", jsonline.NewRow().
-		Set("address", jsonline.NewValueString("123 Main Street, New York, NY 10030")).
-		Set("buy-date", jsonline.NewValueDateTime(time.Now())))
-	fmt.Println(r.String())
+func TestMarshal(t *testing.T) {
+	r1 := jsonline.NewRow()
+	r1.Set("string", jsonline.NewValueString("value"))
+	r1.Set("numeric", jsonline.NewValueNumeric(42.5))
+	r1.Set("boolean", jsonline.NewValueBoolean(true))
+	r1.Set("binary", jsonline.NewValueBinary("value"))
+	r1.Set("datetime", jsonline.NewValueDateTime(time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC)))
+	r1.Set("time", jsonline.NewValueTime(time.Now()))
+	r1.Set("timestamp", jsonline.NewValueTimestamp(time.Now()))
 
-	row :=
-		jsonline.NewRow().
-			Set("address", jsonline.NewValueString("123 Main Street, New York, NY 10030")).
-			Set("last-update", jsonline.NewValueDateTime(time.Now()))
-	fmt.Println(row)
+	r2 := jsonline.NewRow()
+
+	err := r2.UnmarshalJSON([]byte(r1.String()))
+	assert.NoError(t, err)
+
+	assert.Equal(t, r1.String(), r2.String())
 }
 
-func TestRow2(t *testing.T) {
-	str := `{"name":"nathan","surname":"Aury","age":5}`
-	row := jsonline.NewRow()
-	err := json.Unmarshal([]byte(str), row)
+//nolint:funlen
+func TestExportImport(t *testing.T) {
+	r1 := jsonline.NewRow()
+	r1.Set("string", jsonline.NewValueString("value"))
+	r1.Set("numeric", jsonline.NewValueNumeric(42.5))
+	r1.Set("boolean", jsonline.NewValueBoolean(true))
+	r1.Set("binary", jsonline.NewValueBinary("value"))
+	r1.Set("datetime", jsonline.NewValueDateTime(time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC)))
+	r1.Set("time", jsonline.NewValueTime(time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC)))
+	r1.Set("timestamp", jsonline.NewValueTimestamp(time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC)))
+
+	res, err := r1.Export()
 	assert.NoError(t, err)
-	fmt.Println(row)
+
+	assert.IsType(t, map[string]interface{}{}, res)
+
+	m, _ := res.(map[string]interface{})
+
+	assert.Equal(t, "value", m["string"])
+	assert.Equal(t, float64(42.5), m["numeric"])
+	assert.Equal(t, true, m["boolean"])
+	assert.Equal(t, "dmFsdWU=", m["binary"])
+	assert.Equal(t, "2021-09-24T21:21:00Z", m["datetime"])
+	assert.Equal(t, "21:21:00Z", m["time"])
+	assert.Equal(t, int64(1632518460), m["timestamp"])
+
+	r2 := jsonline.NewRow()
+	err = r2.Import(m)
+	assert.NoError(t, err)
+
+	res, err = r2.Export()
+	assert.NoError(t, err)
+
+	assert.IsType(t, map[string]interface{}{}, res)
+
+	m, _ = res.(map[string]interface{})
+
+	assert.Equal(t, "value", m["string"])
+	assert.Equal(t, float64(42.5), m["numeric"])
+	assert.Equal(t, true, m["boolean"])
+	assert.Equal(t, "dmFsdWU=", m["binary"])
+	assert.Equal(t, "2021-09-24T21:21:00Z", m["datetime"])
+	assert.Equal(t, "21:21:00Z", m["time"])
+	assert.Equal(t, int64(1632518460), m["timestamp"])
+
+	r3 := jsonline.NewRow()
+	r3.Set("string", jsonline.NewValueNil(jsonline.String))
+	r3.Set("numeric", jsonline.NewValueNil(jsonline.Numeric))
+	r3.Set("boolean", jsonline.NewValueNil(jsonline.Boolean))
+	r3.Set("binary", jsonline.NewValueNil(jsonline.Binary))
+	r3.Set("datetime", jsonline.NewValueNil(jsonline.DateTime))
+	r3.Set("time", jsonline.NewValueNil(jsonline.Time))
+	r3.Set("timestamp", jsonline.NewValueNil(jsonline.Timestamp))
+
+	err = r3.Import([]interface{}{"value", 42.5, true, "dmFsdWU=", "2021-09-24T21:21:00Z", "21:21:00Z", 1632518460})
+	assert.NoError(t, err)
+
+	assert.Equal(t, r1.String(), r3.String())
 }

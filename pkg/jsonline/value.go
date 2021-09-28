@@ -77,10 +77,10 @@ func NewValue(v interface{}, f format) Value {
 	}
 }
 
-func NewValueNil() Value {
+func NewValueNil(f format) Value {
 	return &value{
 		raw: nil,
-		f:   Auto,
+		f:   f,
 	}
 }
 
