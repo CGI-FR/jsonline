@@ -92,7 +92,15 @@ func (r *row) GetFormat() format {
 }
 
 func (r *row) Raw() interface{} {
-	return r
+	result := map[string]interface{}{}
+
+	iter := r.Iter()
+
+	for k, v, ok := iter(); ok; k, v, ok = iter() {
+		result[k] = v.Raw()
+	}
+
+	return result
 }
 
 func (r *row) Export() (interface{}, error) {
