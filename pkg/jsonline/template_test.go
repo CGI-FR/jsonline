@@ -42,7 +42,7 @@ func TestTemplateCreateEmpty(t *testing.T) {
 		WithAuto("auto").
 		WithRow("row", jsonline.NewTemplate())
 
-	row := template.CreateEmpty()
+	row := template.CreateRowEmpty()
 
 	//nolint:lll
 	assert.Equal(t,
@@ -67,7 +67,7 @@ func TestTemplateCreateFromSlice(t *testing.T) {
 		"first": 0,
 	}
 
-	row, err := template.Create([]interface{}{"value", 0, true, "value", 1566844858, 1566844858, 1566844858, "hidden", "hello", sub, "extra1", "extra2"}) //nolint:lll
+	row, err := template.CreateRow([]interface{}{"value", 0, true, "value", 1566844858, 1566844858, 1566844858, "hidden", "hello", sub, "extra1", "extra2"}) //nolint:lll
 	assert.NoError(t, err)
 
 	//nolint:lll
@@ -93,7 +93,7 @@ func TestTemplateCreateFromMap(t *testing.T) {
 		"first": 0,
 	}
 
-	row, err := template.Create(map[string]interface{}{
+	row, err := template.CreateRow(map[string]interface{}{
 		"datetime":  1566844858,
 		"numeric":   0,
 		"boolean":   true,
@@ -144,7 +144,7 @@ func TestTemplateCreateFromRow(t *testing.T) {
 		Set("row", jsonline.NewValueAuto(sub)).
 		Set("string", jsonline.NewValueString("value"))
 
-	row, err := template.Create(rsrc)
+	row, err := template.CreateRow(rsrc)
 	assert.NoError(t, err)
 
 	//nolint:lll
@@ -167,7 +167,7 @@ func TestTemplateCreateFromString(t *testing.T) {
 		WithRow("row", jsonline.NewTemplate())
 
 	//nolint:lll
-	row, err := template.Create(`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`)
+	row, err := template.CreateRow(`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`)
 	assert.NoError(t, err)
 
 	//nolint:lll
@@ -190,7 +190,7 @@ func TestTemplateCreateFromByteBuffer(t *testing.T) {
 		WithRow("row", jsonline.NewTemplate())
 
 	//nolint:lll
-	row, err := template.Create([]byte(`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`))
+	row, err := template.CreateRow([]byte(`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`))
 	assert.NoError(t, err)
 
 	//nolint:lll

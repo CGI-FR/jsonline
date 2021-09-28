@@ -86,7 +86,7 @@ func (i *importer) GetRow() (Row, error) {
 
 	b := i.s.Bytes()
 
-	row := i.t.CreateEmpty()
+	row := i.t.CreateRowEmpty()
 	if err := row.UnmarshalJSON(b); err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}

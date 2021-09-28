@@ -53,8 +53,8 @@ type Template interface {
 	WithHidden(string) Template
 	WithRow(string, Template) Template
 
-	Create(interface{}) (Row, error)
-	CreateEmpty() Row
+	CreateRow(interface{}) (Row, error)
+	CreateRowEmpty() Row
 
 	GetExporter(io.Writer) Exporter
 	GetImporter(io.Reader) Importer
@@ -125,13 +125,13 @@ func (t *template) WithHidden(name string) Template {
 }
 
 func (t *template) WithRow(name string, rowt Template) Template {
-	t.empty.Set(name, rowt.CreateEmpty())
+	t.empty.Set(name, rowt.CreateRowEmpty())
 
 	return t
 }
 
 //nolint:cyclop,funlen
-func (t *template) Create(v interface{}) (Row, error) {
+func (t *template) CreateRow(v interface{}) (Row, error) {
 	result := CloneRow(t.empty)
 
 	switch values := v.(type) {
@@ -198,7 +198,7 @@ func (t *template) Create(v interface{}) (Row, error) {
 	return result, nil
 }
 
-func (t *template) CreateEmpty() Row {
+func (t *template) CreateRowEmpty() Row {
 	return CloneRow(t.empty)
 }
 

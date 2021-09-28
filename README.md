@@ -153,7 +153,7 @@ The template can create rows for you, give it either a map, or a slice.
 Keys order and format will be enforced for every rows created from the template.
 
 ```go
-person1, err := template.Create([]interface{}{"Dorothy", 30, time.Date(1991, time.September, 24, 21, 21, 0, 0, time.UTC)})
+person1, err := template.CreateRow([]interface{}{"Dorothy", 30, time.Date(1991, time.September, 24, 21, 21, 0, 0, time.UTC)})
 if err != nil {
     fmt.Println(person1) // {"name":"Dorothy","age":30,"birthdate":"1991-09-24T21:21:00Z"}
 }
@@ -180,7 +180,7 @@ fmt.Println(person2) // same result as fmt.Println(person1)
 Extra field that are not defined in the template will appear at the end of the JSONLine.
 
 ```go
-person3, err := template.Create(map[string]interface{}{"name":"Alice", "extra":true, "age":17, "birthdate":time.Date(2004, time.June, 15, 21, 8, 47, 0, time.UTC)})
+person3, err := template.CreateRow(map[string]interface{}{"name":"Alice", "extra":true, "age":17, "birthdate":time.Date(2004, time.June, 15, 21, 8, 47, 0, time.UTC)})
 if err != nil {
     fmt.Println(person3) // {"name":"Alice","age":17,"birthdate":"2004-06-15T21:08:47Z","extra":true}
 } else {

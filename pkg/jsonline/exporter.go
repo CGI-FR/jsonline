@@ -65,7 +65,7 @@ func (e *exporter) WithTemplate(t Template) Exporter {
 }
 
 func (e *exporter) Export(input interface{}) error {
-	row, err := e.t.Create(input)
+	row, err := e.t.CreateRow(input)
 	if err != nil {
 		return fmt.Errorf("%w", err)
 	}
