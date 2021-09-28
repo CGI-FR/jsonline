@@ -42,6 +42,7 @@ import (
 )
 
 const (
+	conversionBase = 10
 	conversionSize = 64
 )
 
@@ -243,16 +244,23 @@ func toTimeStamp(val interface{}) interface{} {
 		return nil
 	case time.Time:
 		return typedValue.Unix()
-	case int64:
+	case int64, int32, int16, int8, int, uint64, uint32, uint16, uint8, uint:
 		return typedValue
+	case float32, float64:
+		result, err := strconv.ParseInt(fmt.Sprintf("%.0f", typedValue), conversionBase, conversionSize)
+		if err != nil {
+			return fmt.Sprintf("ERROR: %v", err)
+		}
+
+		return result
 	case string:
 		t, err := time.Parse(time.RFC3339, typedValue)
 		if err != nil {
 			return fmt.Sprintf("ERROR: %v", err)
 		}
 
-		return toDateTime(t)
+		return toTimeStamp(t)
 	default:
-		return toDateTime(toString(val))
+		return toTimeStamp(toDateTime(val))
 	}
 }

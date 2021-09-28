@@ -567,3 +567,102 @@ func TestValueFormatTime(t *testing.T) {
 		})
 	}
 }
+
+func TestValueFormatTimestamp(t *testing.T) {
+	tz, _ := time.LoadLocation("Asia/Shanghai")
+	testdatas := []struct {
+		value    interface{}
+		expected interface{}
+	}{
+		{nil, nil},
+		// signed integers
+		{int(1632823189), int(1632823189)},
+		{int8(127), int8(127)},
+		{int16(32767), int16(32767)},
+		{int32(1632823189), int32(1632823189)},
+		{int64(1632823189), int64(1632823189)},
+		// unsigned integers
+		{uint(1632823189), uint(1632823189)},
+		{uint8(255), uint8(255)},
+		{uint16(65535), uint16(65535)},
+		{uint32(1632823189), uint32(1632823189)},
+		{uint64(1632823189), uint64(1632823189)},
+		// floats
+		{float32(1632823189.2), int64(1632823168)}, // rounding error
+		{float64(-1632823189.2), int64(-1632823189)},
+		// complex numbers
+		// {complex64(1.2i + 5), "(5+1.2i)"}, => UNSUPPORTED
+		// {complex128(-1.0i + 8), "(8-1i)"}, => UNSUPPORTED
+		// booleans
+		// {true, "true"}, => UNSUPPORTED
+		// {false, "false"}, => UNSUPPORTED
+		// strings
+		{"2006-01-02T15:04:05Z", int64(1136214245)},
+		{"2006-01-02T15:04:05+07:00", int64(1136189045)},
+		// {'r', "r"}, = int32
+		// binary
+		// {byte(36), "36"}, // = uint8
+		{[]byte("2006-01-02T15:04:05+07:00"), int64(1136189045)},
+		// composite => UNSUPPORTED
+		// references (structs)
+		{time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC), int64(1632518460)},
+		{time.Date(2021, time.December, 25, 0, 0, 0, 0, tz), int64(1640361600)},
+		// interfaces
+	}
+
+	for _, td := range testdatas {
+		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
+			value := jsonline.NewValueTimestamp(td.value)
+			assert.Equal(t, td.expected, value.Export())
+		})
+	}
+}
+
+func TestValueFormatAuto(t *testing.T) {
+	testdatas := []interface{}{
+		nil,
+		// signed integers
+		int(-2),
+		int8(-1),
+		int16(0),
+		int32(1), // int32 is an alias of
+		int64(2),
+		// unsigned int
+		uint(0),
+		uint8(1),
+		uint16(2),
+		uint32(3),
+		uint64(4),
+		// floats
+		float32(1.2),
+		float64(-1.2),
+		// complex numbers
+		complex64(1.2i + 5),
+		complex128(-1.0i + 8),
+		// booleans
+		true,
+		false,
+		// strings
+		"string",
+		'r',
+		// binary
+		byte(36),
+		[]byte("hello"),
+		// composite
+		stringArray,
+		// references
+		[]string{"a", "b"},
+		map[string]string{"k1": "a", "k2": "b"},
+	}
+
+	for _, td := range testdatas {
+		t.Run(fmt.Sprintf("Auto %#v", td), func(t *testing.T) {
+			value := jsonline.NewValueAuto(td)
+			assert.Equal(t, td, value.Export())
+		})
+		t.Run(fmt.Sprintf("Hidden %#v", td), func(t *testing.T) {
+			value := jsonline.NewValueHidden(td)
+			assert.Equal(t, td, value.Export())
+		})
+	}
+}
