@@ -57,7 +57,7 @@ func NewRootCommand() (*RootCommand, error) {
 	rootCmd := cobra.Command{
 		Use:     fmt.Sprintf("%v", name),
 		Short:   "JSONLine templating",
-		Long:    `Order keys and format output of JSON lines.`,
+		Long:    `Order keys and enforce format of JSON lines.`,
 		Args:    cobra.NoArgs,
 		Run:     run,
 		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)", version, commit, buildDate, builtBy),
