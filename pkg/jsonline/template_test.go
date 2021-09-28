@@ -18,56 +18,178 @@
 package jsonline_test
 
 import (
-	"fmt"
-	"os"
 	"testing"
-	"time"
 
 	"github.com/adrienaury/go-template/pkg/jsonline"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTemplate(t *testing.T) {
-	row :=
-		jsonline.NewRow().
-			Set("address", jsonline.NewValueString("123 Main Street, New York, NY 10030")).
-			Set("last-update", jsonline.NewValueDateTime(time.Now()))
+func TestTemplateCreateEmpty(t *testing.T) {
+	template := jsonline.NewTemplate().
+		WithString("string").
+		WithNumeric("numeric").
+		WithBoolean("boolean").
+		WithBinary("binary").
+		WithDateTime("datetime").
+		WithTime("time").
+		WithTimestamp("timestamp").
+		WithHidden("hidden").
+		WithAuto("auto").
+		WithRow("row", jsonline.NewTemplate())
 
-	template := jsonline.NewTemplate().WithString("name").WithNumeric("age").WithDateTime("birthdate")
-	person1, _ := template.Create([]interface{}{"Bob", 30, time.Date(1991, time.September, 24, 21, 21, 0, 0, time.UTC)})
-	person1.Set("house", row)
-	fmt.Println(person1)
+	row := template.CreateEmpty()
 
-	person3, _ := template.Create(
-		map[string]interface{}{
-			"name":      "Alice",
-			"age":       17,
-			"birthdate": time.Date(2004, time.June, 15, 21, 8, 47, 0, time.UTC),
-			"extra":     true,
-		})
-	fmt.Println(person3)
+	//nolint:lll
+	assert.Equal(t,
+		`{"string":null,"numeric":null,"boolean":null,"binary":null,"datetime":null,"time":null,"timestamp":null,"auto":null,"row":{}}`,
+		row.String())
 }
 
-func TestTemplate2(t *testing.T) {
-	template := jsonline.NewTemplate().WithNumeric("age")
-	fmt.Println(template.Create(map[string]interface{}{"age": "5"}))
+func TestTemplateCreateFromSlice(t *testing.T) {
+	template := jsonline.NewTemplate().
+		WithString("string").
+		WithNumeric("numeric").
+		WithBoolean("boolean").
+		WithBinary("binary").
+		WithDateTime("datetime").
+		WithTime("time").
+		WithTimestamp("timestamp").
+		WithHidden("hidden").
+		WithAuto("auto").
+		WithRow("row", jsonline.NewTemplate())
 
-	for importer := template.GetImporter(os.Stdin); importer.Import(); {
-		row, err := importer.GetRow()
-		if err != nil {
-			fmt.Println("an error occurred!", err)
-		} else {
-			fmt.Println(row)
-		}
+	sub := map[string]interface{}{
+		"first": 0,
 	}
+
+	row, err := template.Create([]interface{}{"value", 0, true, "value", 1566844858, 1566844858, 1566844858, "hidden", "hello", sub, "extra1", "extra2"}) //nolint:lll
+	assert.NoError(t, err)
+
+	//nolint:lll
+	assert.Equal(t,
+		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"":"extra2"}`,
+		row.String())
 }
 
-func TestTemplate3(t *testing.T) {
-	template := jsonline.NewTemplate().WithDateTime("date")
-	str := `{"date":"2006-01-02T15:04:05Z","test":1}`
+func TestTemplateCreateFromMap(t *testing.T) {
+	template := jsonline.NewTemplate().
+		WithString("string").
+		WithNumeric("numeric").
+		WithBoolean("boolean").
+		WithBinary("binary").
+		WithDateTime("datetime").
+		WithTime("time").
+		WithTimestamp("timestamp").
+		WithHidden("hidden").
+		WithAuto("auto").
+		WithRow("row", jsonline.NewTemplate())
 
-	row, err := template.Create(str)
+	sub := map[string]interface{}{
+		"first": 0,
+	}
+
+	row, err := template.Create(map[string]interface{}{
+		"datetime":  1566844858,
+		"numeric":   0,
+		"boolean":   true,
+		"time":      1566844858,
+		"extra":     "extra",
+		"timestamp": 1566844858,
+		"binary":    "value",
+		"hidden":    "hidden",
+		"auto":      "hello",
+		"row":       sub,
+		"string":    "value",
+	})
 	assert.NoError(t, err)
-	assert.Equal(t, time.Date(2006, time.January, 2, 15, 4, 5, 0, time.UTC), row.Get("date").Raw())
-	fmt.Println(row)
+
+	//nolint:lll
+	assert.Equal(t,
+		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
+		row.String())
+}
+
+func TestTemplateCreateFromRow(t *testing.T) {
+	template := jsonline.NewTemplate().
+		WithString("string").
+		WithNumeric("numeric").
+		WithBoolean("boolean").
+		WithBinary("binary").
+		WithDateTime("datetime").
+		WithTime("time").
+		WithTimestamp("timestamp").
+		WithHidden("hidden").
+		WithAuto("auto").
+		WithRow("row", jsonline.NewTemplate())
+
+	sub := map[string]interface{}{
+		"first": 0,
+	}
+
+	rsrc := jsonline.NewRow().
+		Set("datetime", jsonline.NewValueDateTime(1566844858)).
+		Set("numeric", jsonline.NewValueNumeric(0)).
+		Set("boolean", jsonline.NewValueBoolean(true)).
+		Set("time", jsonline.NewValueTime(1566844858)).
+		Set("extra", jsonline.NewValueAuto("extra")).
+		Set("timestamp", jsonline.NewValueTimestamp(1566844858)).
+		Set("binary", jsonline.NewValueBinary("value")).
+		Set("hidden", jsonline.NewValueHidden("hidden")).
+		Set("auto", jsonline.NewValueAuto("hello")).
+		Set("row", jsonline.NewValueAuto(sub)).
+		Set("string", jsonline.NewValueString("value"))
+
+	row, err := template.Create(rsrc)
+	assert.NoError(t, err)
+
+	//nolint:lll
+	assert.Equal(t,
+		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
+		row.String())
+}
+
+func TestTemplateCreateFromString(t *testing.T) {
+	template := jsonline.NewTemplate().
+		WithString("string").
+		WithNumeric("numeric").
+		WithBoolean("boolean").
+		WithBinary("binary").
+		WithDateTime("datetime").
+		WithTime("time").
+		WithTimestamp("timestamp").
+		WithHidden("hidden").
+		WithAuto("auto").
+		WithRow("row", jsonline.NewTemplate())
+
+	//nolint:lll
+	row, err := template.Create(`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`)
+	assert.NoError(t, err)
+
+	//nolint:lll
+	assert.Equal(t,
+		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
+		row.String())
+}
+
+func TestTemplateCreateFromByteBuffer(t *testing.T) {
+	template := jsonline.NewTemplate().
+		WithString("string").
+		WithNumeric("numeric").
+		WithBoolean("boolean").
+		WithBinary("binary").
+		WithDateTime("datetime").
+		WithTime("time").
+		WithTimestamp("timestamp").
+		WithHidden("hidden").
+		WithAuto("auto").
+		WithRow("row", jsonline.NewTemplate())
+
+	//nolint:lll
+	row, err := template.Create([]byte(`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`))
+	assert.NoError(t, err)
+
+	//nolint:lll
+	assert.Equal(t,
+		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
+		row.String())
 }

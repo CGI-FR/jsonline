@@ -51,6 +51,7 @@ type Row interface {
 	ImportAtIndex(index int, val interface{}) error
 
 	Get(key string) Value
+	GetAtIndex(index int) Value
 
 	Iter() func() (string, Value, bool)
 
@@ -192,6 +193,21 @@ func (r *row) SetAtIndex(index int, val Value) Row {
 
 func (r *row) Get(key string) Value {
 	return r.m[key]
+}
+
+func (r *row) GetAtIndex(index int) Value {
+	var key string
+
+	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
+		if index == 0 {
+			key, _ = cur.Value.(string)
+
+			break
+		}
+		index--
+	}
+
+	return r.Get(key)
 }
 
 func (r *row) Iter() func() (string, Value, bool) {

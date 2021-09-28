@@ -130,7 +130,7 @@ func (t *template) WithRow(name string, rowt Template) Template {
 	return t
 }
 
-//nolint:cyclop
+//nolint:cyclop,funlen
 func (t *template) Create(v interface{}) (Row, error) {
 	result := CloneRow(t.empty)
 
@@ -139,17 +139,27 @@ func (t *template) Create(v interface{}) (Row, error) {
 		log.Debug().Msg("create new row from slice")
 
 		for i, val := range values {
-			if err := result.ImportAtIndex(i, val); err != nil {
-				return result, fmt.Errorf("%w", err)
+			target := result.GetAtIndex(i)
+			if target != nil {
+				target = NewValue(val, target.GetFormat())
+			} else {
+				target = NewValueAuto(val)
 			}
+
+			result.SetAtIndex(i, target)
 		}
 	case map[string]interface{}:
 		log.Debug().Msg("create new row from map")
 
 		for key, val := range values {
-			if err := result.ImportAtKey(key, val); err != nil {
-				return result, fmt.Errorf("%w", err)
+			target := result.Get(key)
+			if target != nil {
+				target = NewValue(val, target.GetFormat())
+			} else {
+				target = NewValueAuto(val)
 			}
+
+			result.Set(key, target)
 		}
 	case Row:
 		log.Debug().Msg("create new row from row")
@@ -157,14 +167,14 @@ func (t *template) Create(v interface{}) (Row, error) {
 		iter := values.Iter()
 
 		for key, val, ok := iter(); ok; key, val, ok = iter() {
-			valExported, err := val.Export()
-			if err != nil {
-				return nil, fmt.Errorf("%w", err)
+			target := result.Get(key)
+			if target != nil {
+				target = NewValue(val.Raw(), target.GetFormat())
+			} else {
+				target = NewValueAuto(val.Raw())
 			}
 
-			if err := result.ImportAtKey(key, valExported); err != nil {
-				return result, fmt.Errorf("%w", err)
-			}
+			result.Set(key, target)
 		}
 
 	case []byte:

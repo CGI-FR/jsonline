@@ -111,6 +111,10 @@ func importToTimestamp(val interface{}) (interface{}, error) {
 	case uint:
 		return int64(typedValue), nil
 	default:
+		if res, err := convertToNumeric(typedValue); err == nil {
+			return res, nil
+		}
+
 		t, err := importToDateTime(typedValue)
 		if err != nil {
 			return nil, fmt.Errorf("%w", err)
