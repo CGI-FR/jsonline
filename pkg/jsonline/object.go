@@ -35,10 +35,14 @@
 package jsonline
 
 import (
-	"errors"
+	"encoding/json"
+	"fmt"
 )
 
-var (
-	ErrUnsupportedFormat     = errors.New("unsupported format")
-	ErrUnsupportedImportType = errors.New("can't import from this type")
-)
+type Object interface {
+	Import(interface{}) Object
+
+	json.Unmarshaler
+	json.Marshaler
+	fmt.Stringer
+}

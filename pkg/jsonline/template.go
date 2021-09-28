@@ -130,6 +130,7 @@ func (t *template) WithRow(name string, rowt Template) Template {
 	return t
 }
 
+//nolint:cyclop
 func (t *template) Create(v interface{}) (Row, error) {
 	result := CloneRow(t.empty)
 
@@ -138,13 +139,17 @@ func (t *template) Create(v interface{}) (Row, error) {
 		log.Debug().Msg("create new row from slice")
 
 		for i, val := range values {
-			result.ImportAtIndex(i, val)
+			if err := result.ImportAtIndex(i, val); err != nil {
+				return result, fmt.Errorf("%w", err)
+			}
 		}
 	case map[string]interface{}:
 		log.Debug().Msg("create new row from map")
 
 		for key, val := range values {
-			result.ImportAtKey(key, val)
+			if err := result.ImportAtKey(key, val); err != nil {
+				return result, fmt.Errorf("%w", err)
+			}
 		}
 	case Row:
 		log.Debug().Msg("create new row from row")
@@ -157,11 +162,27 @@ func (t *template) Create(v interface{}) (Row, error) {
 				return nil, fmt.Errorf("%w", err)
 			}
 
-			result.ImportAtKey(key, valExported)
+			if err := result.ImportAtKey(key, valExported); err != nil {
+				return result, fmt.Errorf("%w", err)
+			}
+		}
+
+	case []byte:
+		log.Debug().Msg("create new row from byte buffer")
+
+		if err := result.UnmarshalJSON(values); err != nil {
+			return nil, fmt.Errorf("%w", err)
+		}
+
+	case string:
+		log.Debug().Msg("create new row from JSON string")
+
+		if err := result.UnmarshalJSON([]byte(values)); err != nil {
+			return nil, fmt.Errorf("%w", err)
 		}
 
 	default:
-		log.Warn().Str("type", fmt.Sprintf("%T", values)).Msg("can't create row from this type")
+		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
 	}
 
 	return result, nil

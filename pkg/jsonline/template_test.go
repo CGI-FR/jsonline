@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/adrienaury/go-template/pkg/jsonline"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTemplate(t *testing.T) {
@@ -59,4 +60,14 @@ func TestTemplate2(t *testing.T) {
 			fmt.Println(row)
 		}
 	}
+}
+
+func TestTemplate3(t *testing.T) {
+	template := jsonline.NewTemplate().WithDateTime("date")
+	str := `{"date":"2006-01-02T15:04:05Z","test":1}`
+
+	row, err := template.Create(str)
+	assert.NoError(t, err)
+	assert.Equal(t, time.Date(2006, time.January, 2, 15, 4, 5, 0, time.UTC), row.Get("date").Raw())
+	fmt.Println(row)
 }

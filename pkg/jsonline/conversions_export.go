@@ -46,7 +46,7 @@ const (
 	conversionSize = 64
 )
 
-func toString(val interface{}) interface{} {
+func exportToString(val interface{}) interface{} {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil
@@ -59,7 +59,7 @@ func toString(val interface{}) interface{} {
 	}
 }
 
-func toNumeric(val interface{}) (interface{}, error) {
+func exportToNumeric(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil, nil
@@ -79,14 +79,14 @@ func toNumeric(val interface{}) (interface{}, error) {
 
 		return r, nil
 	case []byte:
-		return toNumeric(fmt.Sprintf("%v", string(typedValue)))
+		return exportToNumeric(fmt.Sprintf("%v", string(typedValue)))
 	default:
-		return toNumeric(fmt.Sprintf("%v", val))
+		return exportToNumeric(fmt.Sprintf("%v", val))
 	}
 }
 
 //nolint:funlen,cyclop
-func toBoolean(val interface{}) (interface{}, error) {
+func exportToBoolean(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil, nil
@@ -128,18 +128,18 @@ func toBoolean(val interface{}) (interface{}, error) {
 
 		f64, err := strconv.ParseFloat(typedValue, conversionSize)
 		if err == nil {
-			return toBoolean(f64)
+			return exportToBoolean(f64)
 		}
 
 		return nil, fmt.Errorf("%w", err)
 	case []byte:
-		return toBoolean(fmt.Sprintf("%v", string(typedValue)))
+		return exportToBoolean(fmt.Sprintf("%v", string(typedValue)))
 	default:
-		return toBoolean(fmt.Sprintf("%v", val))
+		return exportToBoolean(fmt.Sprintf("%v", val))
 	}
 }
 
-func toBinary(val interface{}) interface{} {
+func exportToBinary(val interface{}) interface{} {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil
@@ -148,39 +148,39 @@ func toBinary(val interface{}) interface{} {
 	case string:
 		return base64.StdEncoding.EncodeToString([]byte(typedValue))
 	default:
-		return base64.StdEncoding.EncodeToString([]byte(toString(typedValue).(string)))
+		return base64.StdEncoding.EncodeToString([]byte(exportToString(typedValue).(string)))
 	}
 }
 
 //nolint:cyclop
-func toDateTime(val interface{}) (interface{}, error) {
+func exportToDateTime(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil, nil
 	case int64:
-		return toDateTime(time.Unix(typedValue, 0))
+		return exportToDateTime(time.Unix(typedValue, 0))
 	case int32:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case int16:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case int8:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case int:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case uint64:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case uint32:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case uint16:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case uint8:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case uint:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case float32:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case float64:
-		return toDateTime(time.Unix(int64(typedValue), 0))
+		return exportToDateTime(time.Unix(int64(typedValue), 0))
 	case time.Time:
 		return typedValue.Format(time.RFC3339), nil
 	case string:
@@ -189,41 +189,41 @@ func toDateTime(val interface{}) (interface{}, error) {
 			return nil, fmt.Errorf("%w", err)
 		}
 
-		return toDateTime(t)
+		return exportToDateTime(t)
 	default:
-		return toDateTime(toString(val))
+		return exportToDateTime(exportToString(val))
 	}
 }
 
 //nolint:cyclop
-func toTime(val interface{}) (interface{}, error) {
+func exportToTime(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil, nil
 	case int64:
-		return toTime(time.Unix(typedValue, 0))
+		return exportToTime(time.Unix(typedValue, 0))
 	case int32:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case int16:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case int8:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case int:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case uint64:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case uint32:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case uint16:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case uint8:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case uint:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case float32:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case float64:
-		return toTime(time.Unix(int64(typedValue), 0))
+		return exportToTime(time.Unix(int64(typedValue), 0))
 	case time.Time:
 		return typedValue.Format("15:04:05Z07:00"), nil
 	case string:
@@ -232,13 +232,13 @@ func toTime(val interface{}) (interface{}, error) {
 			return nil, fmt.Errorf("%w", err)
 		}
 
-		return toTime(t)
+		return exportToTime(t)
 	default:
-		return toTime(toString(val))
+		return exportToTime(exportToString(val))
 	}
 }
 
-func toTimeStamp(val interface{}) (interface{}, error) {
+func exportToTimeStamp(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil, nil
@@ -259,13 +259,13 @@ func toTimeStamp(val interface{}) (interface{}, error) {
 			return nil, fmt.Errorf("%w", err)
 		}
 
-		return toTimeStamp(t)
+		return exportToTimeStamp(t)
 	default:
-		d, err := toDateTime(val)
+		d, err := exportToDateTime(val)
 		if err != nil {
 			return nil, fmt.Errorf("%w", err)
 		}
 
-		return toTimeStamp(d)
+		return exportToTimeStamp(d)
 	}
 }

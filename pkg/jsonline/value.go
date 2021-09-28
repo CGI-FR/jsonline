@@ -58,7 +58,7 @@ type Value interface {
 
 	Raw() interface{}
 	Export() (interface{}, error)
-	Import(interface{}) Value
+	Import(interface{}) error
 
 	json.Unmarshaler
 	json.Marshaler
@@ -164,19 +164,19 @@ func (v *value) Export() (interface{}, error) {
 
 	switch v.f {
 	case String:
-		return toString(val), nil
+		return exportToString(val), nil
 	case Numeric:
-		return toNumeric(val)
+		return exportToNumeric(val)
 	case Boolean:
-		return toBoolean(val)
+		return exportToBoolean(val)
 	case Binary:
-		return toBinary(val), nil
+		return exportToBinary(val), nil
 	case DateTime:
-		return toDateTime(val)
+		return exportToDateTime(val)
 	case Time:
-		return toTime(val)
+		return exportToTime(val)
 	case Timestamp:
-		return toTimeStamp(val)
+		return exportToTimeStamp(val)
 	case Auto, Hidden:
 		return v.raw, nil
 	}
@@ -184,10 +184,31 @@ func (v *value) Export() (interface{}, error) {
 	return nil, fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.f)
 }
 
-func (v *value) Import(val interface{}) Value {
-	v.raw = val
+func (v *value) Import(val interface{}) error {
+	var err error
 
-	return v
+	switch v.f {
+	case String:
+		v.raw = importToString(val)
+	case Numeric:
+		v.raw = val
+	case Boolean:
+		v.raw = val
+	case Binary:
+		v.raw = val
+	case DateTime:
+		v.raw, err = importToDateTime(val)
+	case Time:
+		v.raw = val
+	case Timestamp:
+		v.raw = val
+	case Auto, Hidden:
+		v.raw = val
+	default:
+		return fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.f)
+	}
+
+	return err
 }
 
 func (v *value) MarshalJSON() ([]byte, error) {

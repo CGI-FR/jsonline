@@ -47,8 +47,8 @@ type Row interface {
 	Set(key string, val Value) Row
 	SetAtIndex(index int, val Value) Row
 
-	ImportAtKey(key string, val interface{}) Row
-	ImportAtIndex(index int, val interface{}) Row
+	ImportAtKey(key string, val interface{}) error
+	ImportAtIndex(index int, val interface{}) error
 
 	Get(key string) Value
 
@@ -111,36 +111,46 @@ func (r *row) Export() (interface{}, error) {
 	return result, nil
 }
 
-func (r *row) Import(v interface{}) Value {
+func (r *row) Import(v interface{}) error {
 	switch values := v.(type) {
 	case []interface{}:
 		for i, val := range values {
-			r.ImportAtIndex(i, val)
+			if err := r.ImportAtIndex(i, val); err != nil {
+				return err
+			}
 		}
 	case map[string]interface{}:
 		for key, val := range values {
-			r.ImportAtKey(key, val)
+			if err := r.ImportAtKey(key, val); err != nil {
+				return err
+			}
 		}
+	default:
+		return fmt.Errorf("%w", ErrUnsupportedImportType)
 	}
 
-	return r
+	return nil
 }
 
-func (r *row) ImportAtKey(key string, val interface{}) Row {
+func (r *row) ImportAtKey(key string, val interface{}) error {
 	if _, ok := r.m[key]; !ok {
 		r.keys[key] = r.l.PushBack(key)
 	}
 
 	if value, exist := r.m[key]; exist {
-		r.m[key] = value.Import(val)
+		if err := value.Import(val); err != nil {
+			return fmt.Errorf("%w", err)
+		}
+
+		r.m[key] = value
 	} else {
 		r.m[key] = NewValueAuto(val)
 	}
 
-	return r
+	return nil
 }
 
-func (r *row) ImportAtIndex(index int, val interface{}) Row {
+func (r *row) ImportAtIndex(index int, val interface{}) error {
 	var key string
 
 	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
@@ -291,11 +301,11 @@ func (r *row) parseobject(dec *json.Decoder) (err error) {
 			return err
 		}
 
-		r.keys[key] = r.l.PushBack(key)
-		if r.m[key] == nil {
-			r.m[key] = NewValueAuto(value)
+		if existing, ok := r.m[key]; ok {
+			existing.Import(value)
 		} else {
-			r.m[key].Import(value)
+			r.keys[key] = r.l.PushBack(key)
+			r.m[key] = NewValueAuto(value)
 		}
 	}
 

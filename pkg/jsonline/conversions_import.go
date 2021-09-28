@@ -35,10 +35,26 @@
 package jsonline
 
 import (
-	"errors"
+	"fmt"
+	"time"
 )
 
-var (
-	ErrUnsupportedFormat     = errors.New("unsupported format")
-	ErrUnsupportedImportType = errors.New("can't import from this type")
-)
+func importToString(val interface{}) interface{} {
+	return fmt.Sprintf("%v", val)
+}
+
+func importToDateTime(val interface{}) (interface{}, error) {
+	switch typedValue := val.(type) {
+	case nil:
+		return nil, nil
+	case string:
+		res, err := time.Parse(time.RFC3339, typedValue)
+		if err != nil {
+			return nil, fmt.Errorf("%w", err)
+		}
+
+		return res, nil
+	default:
+		return importToDateTime(importToString(val))
+	}
+}
