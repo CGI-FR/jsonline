@@ -326,7 +326,9 @@ func (r *row) parseobject(dec *json.Decoder) (err error) {
 		}
 
 		if existing, ok := r.m[key]; ok {
-			existing.Import(value)
+			if err := existing.Import(value); err != nil {
+				return err
+			}
 		} else {
 			r.keys[key] = r.l.PushBack(key)
 			r.m[key] = NewValueAuto(value)
