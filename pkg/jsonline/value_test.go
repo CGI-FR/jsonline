@@ -42,6 +42,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+//nolint:dupl
 func TestValueFormatString(t *testing.T) {
 	testdatas := []struct {
 		value    interface{}
