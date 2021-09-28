@@ -9,6 +9,7 @@ testcases:
           - result.systemout ShouldEqual '{}'
           - result.systemerr ShouldBeEmpty
           - result.code ShouldEqual 0
+
   - name: non empty line
     steps:
       - script: echo '{"string":"","numeric":0,"boolean":true,"nil":null,"row":{}}' | jl
@@ -18,5 +19,13 @@ testcases:
           - result.systemoutjson.boolean ShouldEqual true
           - result.systemoutjson.nil ShouldEqual ''
           - result.systemoutjson.row ShouldEqual map[]
+          - result.systemerr ShouldBeEmpty
+          - result.code ShouldEqual 0
+
+  - name: non empty line with nulls
+    steps:
+      - script: echo '{"string":null,"numeric":null,"boolean":null,"nil":null,"row":null}' | jl
+        assertions:
+          - result.systemout ShouldEqual '{"string":null,"numeric":null,"boolean":null,"nil":null,"row":null}'
           - result.systemerr ShouldBeEmpty
           - result.code ShouldEqual 0
