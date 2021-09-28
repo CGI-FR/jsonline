@@ -59,25 +59,25 @@ func toString(val interface{}) interface{} {
 	}
 }
 
-func toNumeric(val interface{}) interface{} {
+func toNumeric(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
-		return nil
+		return nil, nil
 	case int64, int, int16, int8, byte, rune, float64, float32, uint, uint16, uint32, uint64:
-		return typedValue
+		return typedValue, nil
 	case bool:
 		if typedValue {
-			return 1
+			return 1, nil
 		}
 
-		return 0
+		return 0, nil
 	case string:
 		r, err := strconv.ParseFloat(typedValue, conversionSize)
-		if err == nil {
-			return r
+		if err != nil {
+			return nil, fmt.Errorf("%w", err)
 		}
 
-		return fmt.Sprintf("ERROR: %v", err)
+		return r, nil
 	case []byte:
 		return toNumeric(fmt.Sprintf("%v", string(typedValue)))
 	default:
@@ -86,44 +86,44 @@ func toNumeric(val interface{}) interface{} {
 }
 
 //nolint:funlen,cyclop
-func toBoolean(val interface{}) interface{} {
+func toBoolean(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
-		return nil
+		return nil, nil
 	case int:
-		return typedValue != 0
+		return typedValue != 0, nil
 	case int8:
-		return typedValue != 0
+		return typedValue != 0, nil
 	case int16:
-		return typedValue != 0
+		return typedValue != 0, nil
 	case int32: // rune=int32
-		return typedValue != 0
+		return typedValue != 0, nil
 	case int64:
-		return typedValue != 0
+		return typedValue != 0, nil
 	case uint:
-		return typedValue != 0
+		return typedValue != 0, nil
 	case uint8: // byte=uint8
-		return typedValue != 0
+		return typedValue != 0, nil
 	case uint16:
-		return typedValue != 0
+		return typedValue != 0, nil
 	case uint32:
-		return typedValue != 0
+		return typedValue != 0, nil
 	case uint64:
-		return typedValue != 0
+		return typedValue != 0, nil
 	case float64:
-		return typedValue != 0.0
+		return typedValue != 0.0, nil
 	case float32:
-		return typedValue != 0.0
+		return typedValue != 0.0, nil
 	case complex64:
-		return typedValue != 0i+0
+		return typedValue != 0i+0, nil
 	case complex128:
-		return typedValue != 0i+0
+		return typedValue != 0i+0, nil
 	case bool:
-		return typedValue
+		return typedValue, nil
 	case string:
 		r, err := strconv.ParseBool(typedValue)
 		if err == nil {
-			return r
+			return r, nil
 		}
 
 		f64, err := strconv.ParseFloat(typedValue, conversionSize)
@@ -131,7 +131,7 @@ func toBoolean(val interface{}) interface{} {
 			return toBoolean(f64)
 		}
 
-		return fmt.Sprintf("ERROR: %v", err)
+		return nil, fmt.Errorf("%w", err)
 	case []byte:
 		return toBoolean(fmt.Sprintf("%v", string(typedValue)))
 	default:
@@ -153,10 +153,10 @@ func toBinary(val interface{}) interface{} {
 }
 
 //nolint:cyclop
-func toDateTime(val interface{}) interface{} {
+func toDateTime(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
-		return nil
+		return nil, nil
 	case int64:
 		return toDateTime(time.Unix(typedValue, 0))
 	case int32:
@@ -182,11 +182,11 @@ func toDateTime(val interface{}) interface{} {
 	case float64:
 		return toDateTime(time.Unix(int64(typedValue), 0))
 	case time.Time:
-		return typedValue.Format(time.RFC3339)
+		return typedValue.Format(time.RFC3339), nil
 	case string:
 		t, err := time.Parse(time.RFC3339, typedValue)
 		if err != nil {
-			return fmt.Sprintf("ERROR: %v", err)
+			return nil, fmt.Errorf("%w", err)
 		}
 
 		return toDateTime(t)
@@ -196,10 +196,10 @@ func toDateTime(val interface{}) interface{} {
 }
 
 //nolint:cyclop
-func toTime(val interface{}) interface{} {
+func toTime(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
-		return nil
+		return nil, nil
 	case int64:
 		return toTime(time.Unix(typedValue, 0))
 	case int32:
@@ -225,11 +225,11 @@ func toTime(val interface{}) interface{} {
 	case float64:
 		return toTime(time.Unix(int64(typedValue), 0))
 	case time.Time:
-		return typedValue.Format("15:04:05Z07:00")
+		return typedValue.Format("15:04:05Z07:00"), nil
 	case string:
 		t, err := time.Parse("15:04:05Z07:00", typedValue)
 		if err != nil {
-			return fmt.Sprintf("ERROR: %v", err)
+			return nil, fmt.Errorf("%w", err)
 		}
 
 		return toTime(t)
@@ -238,29 +238,34 @@ func toTime(val interface{}) interface{} {
 	}
 }
 
-func toTimeStamp(val interface{}) interface{} {
+func toTimeStamp(val interface{}) (interface{}, error) {
 	switch typedValue := val.(type) {
 	case nil:
-		return nil
+		return nil, nil
 	case time.Time:
-		return typedValue.Unix()
+		return typedValue.Unix(), nil
 	case int64, int32, int16, int8, int, uint64, uint32, uint16, uint8, uint:
-		return typedValue
+		return typedValue, nil
 	case float32, float64:
 		result, err := strconv.ParseInt(fmt.Sprintf("%.0f", typedValue), conversionBase, conversionSize)
 		if err != nil {
-			return fmt.Sprintf("ERROR: %v", err)
+			return nil, fmt.Errorf("%w", err)
 		}
 
-		return result
+		return result, nil
 	case string:
 		t, err := time.Parse(time.RFC3339, typedValue)
 		if err != nil {
-			return fmt.Sprintf("ERROR: %v", err)
+			return nil, fmt.Errorf("%w", err)
 		}
 
 		return toTimeStamp(t)
 	default:
-		return toTimeStamp(toDateTime(val))
+		d, err := toDateTime(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w", err)
+		}
+
+		return toTimeStamp(d)
 	}
 }

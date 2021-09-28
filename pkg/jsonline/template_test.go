@@ -33,11 +33,11 @@ func TestTemplate(t *testing.T) {
 			Set("last-update", jsonline.NewValueDateTime(time.Now()))
 
 	template := jsonline.NewTemplate().WithString("name").WithNumeric("age").WithDateTime("birthdate")
-	person1 := template.Create([]interface{}{"Dorothy", 30, time.Date(1991, time.September, 24, 21, 21, 0, 0, time.UTC)})
+	person1, _ := template.Create([]interface{}{"Bob", 30, time.Date(1991, time.September, 24, 21, 21, 0, 0, time.UTC)})
 	person1.Set("house", row)
 	fmt.Println(person1)
 
-	person3 := template.Create(
+	person3, _ := template.Create(
 		map[string]interface{}{
 			"name":      "Alice",
 			"age":       17,

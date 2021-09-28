@@ -94,16 +94,21 @@ func (r *row) Raw() interface{} {
 	return r
 }
 
-func (r *row) Export() interface{} {
+func (r *row) Export() (interface{}, error) {
 	result := map[string]interface{}{}
 
 	iter := r.Iter()
 
 	for k, v, ok := iter(); ok; k, v, ok = iter() {
-		result[k] = v.Export()
+		valExported, err := v.Export()
+		if err != nil {
+			return nil, fmt.Errorf("%w", err)
+		}
+
+		result[k] = valExported
 	}
 
-	return result
+	return result, nil
 }
 
 func (r *row) Import(v interface{}) Value {

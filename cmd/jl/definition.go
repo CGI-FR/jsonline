@@ -135,7 +135,12 @@ func createTemplateFromRow(row jsonline.Row) (jsonline.Template, error) {
 	iter := row.Iter()
 
 	for colname, v, ok := iter(); ok; colname, v, ok = iter() {
-		switch coltype := v.Export().(type) {
+		valExported, err := v.Export()
+		if err != nil {
+			return tmpl, fmt.Errorf("%w", err)
+		}
+
+		switch coltype := valExported.(type) {
 		case string:
 			tmpl = setColumnInTemplate(tmpl, coltype, colname)
 

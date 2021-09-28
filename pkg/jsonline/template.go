@@ -53,7 +53,7 @@ type Template interface {
 	WithHidden(string) Template
 	WithRow(string, Template) Template
 
-	Create(interface{}) Row
+	Create(interface{}) (Row, error)
 	CreateEmpty() Row
 
 	GetExporter(io.Writer) Exporter
@@ -130,7 +130,7 @@ func (t *template) WithRow(name string, rowt Template) Template {
 	return t
 }
 
-func (t *template) Create(v interface{}) Row {
+func (t *template) Create(v interface{}) (Row, error) {
 	result := CloneRow(t.empty)
 
 	switch values := v.(type) {
@@ -152,14 +152,19 @@ func (t *template) Create(v interface{}) Row {
 		iter := values.Iter()
 
 		for key, val, ok := iter(); ok; key, val, ok = iter() {
-			result.ImportAtKey(key, val.Export())
+			valExported, err := val.Export()
+			if err != nil {
+				return nil, fmt.Errorf("%w", err)
+			}
+
+			result.ImportAtKey(key, valExported)
 		}
 
 	default:
 		log.Warn().Str("type", fmt.Sprintf("%T", values)).Msg("can't create row from this type")
 	}
 
-	return result
+	return result, nil
 }
 
 func (t *template) CreateEmpty() Row {

@@ -91,7 +91,9 @@ func TestValueFormatString(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueString(td.value)
-			assert.Equal(t, td.expected, value.Export())
+			result, err := value.Export()
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, result)
 		})
 	}
 }
@@ -190,7 +192,9 @@ func TestValueFormatNumeric(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueNumeric(td.value)
-			assert.Equal(t, td.expected, value.Export())
+			result, err := value.Export()
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, result)
 		})
 	}
 }
@@ -295,7 +299,9 @@ func TestValueFormatBoolean(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueBoolean(td.value)
-			assert.Equal(t, td.expected, value.Export())
+			result, err := value.Export()
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, result)
 		})
 	}
 }
@@ -408,7 +414,9 @@ func TestValueFormatBinary(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueBinary(td.value)
-			assert.Equal(t, td.expected, value.Export())
+			result, err := value.Export()
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, result)
 		})
 	}
 }
@@ -512,7 +520,9 @@ func TestValueFormatDateTime(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueDateTime(td.value)
-			assert.Equal(t, td.expected, value.Export())
+			result, err := value.Export()
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, result)
 		})
 	}
 }
@@ -563,7 +573,9 @@ func TestValueFormatTime(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueTime(td.value)
-			assert.Equal(t, td.expected, value.Export())
+			result, err := value.Export()
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, result)
 		})
 	}
 }
@@ -613,7 +625,9 @@ func TestValueFormatTimestamp(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueTimestamp(td.value)
-			assert.Equal(t, td.expected, value.Export())
+			result, err := value.Export()
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, result)
 		})
 	}
 }
@@ -658,11 +672,15 @@ func TestValueFormatAuto(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("Auto %#v", td), func(t *testing.T) {
 			value := jsonline.NewValueAuto(td)
-			assert.Equal(t, td, value.Export())
+			result, err := value.Export()
+			assert.NoError(t, err)
+			assert.Equal(t, td, result)
 		})
 		t.Run(fmt.Sprintf("Hidden %#v", td), func(t *testing.T) {
 			value := jsonline.NewValueHidden(td)
-			assert.Equal(t, td, value.Export())
+			result, err := value.Export()
+			assert.NoError(t, err)
+			assert.Equal(t, td, result)
 		})
 	}
 }

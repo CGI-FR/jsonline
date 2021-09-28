@@ -65,7 +65,10 @@ func (e *exporter) WithTemplate(t Template) Exporter {
 }
 
 func (e *exporter) Export(input interface{}) error {
-	row := e.t.Create(input)
+	row, err := e.t.Create(input)
+	if err != nil {
+		return fmt.Errorf("%w", err)
+	}
 
 	b, err := row.MarshalJSON()
 	if err != nil {
