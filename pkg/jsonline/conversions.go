@@ -49,6 +49,8 @@ func toString(val interface{}) interface{} {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil
+	case rune:
+		return string(typedValue)
 	case []byte:
 		return string(typedValue)
 	default:
@@ -60,7 +62,7 @@ func toNumeric(val interface{}) interface{} {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil
-	case int64, int, int16, int8, byte, rune, float64, float32:
+	case int64, int, int16, int8, byte, rune, float64, float32, uint, uint16, uint32, uint64:
 		return typedValue
 	case bool:
 		if typedValue {
@@ -82,14 +84,39 @@ func toNumeric(val interface{}) interface{} {
 	}
 }
 
+//nolint:funlen,cyclop
 func toBoolean(val interface{}) interface{} {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil
-	case int64, int, int16, int8, byte, rune:
+	case int:
 		return typedValue != 0
-	case float64, float32:
+	case int8:
+		return typedValue != 0
+	case int16:
+		return typedValue != 0
+	case int32: // rune=int32
+		return typedValue != 0
+	case int64:
+		return typedValue != 0
+	case uint:
+		return typedValue != 0
+	case uint8: // byte=uint8
+		return typedValue != 0
+	case uint16:
+		return typedValue != 0
+	case uint32:
+		return typedValue != 0
+	case uint64:
+		return typedValue != 0
+	case float64:
 		return typedValue != 0.0
+	case float32:
+		return typedValue != 0.0
+	case complex64:
+		return typedValue != 0i+0
+	case complex128:
+		return typedValue != 0i+0
 	case bool:
 		return typedValue
 	case string:
@@ -124,10 +151,35 @@ func toBinary(val interface{}) interface{} {
 	}
 }
 
+//nolint:cyclop
 func toDateTime(val interface{}) interface{} {
 	switch typedValue := val.(type) {
 	case nil:
 		return nil
+	case int64:
+		return toDateTime(time.Unix(typedValue, 0))
+	case int32:
+		return toDateTime(time.Unix(int64(typedValue), 0))
+	case int16:
+		return toDateTime(time.Unix(int64(typedValue), 0))
+	case int8:
+		return toDateTime(time.Unix(int64(typedValue), 0))
+	case int:
+		return toDateTime(time.Unix(int64(typedValue), 0))
+	case uint64:
+		return toDateTime(time.Unix(int64(typedValue), 0))
+	case uint32:
+		return toDateTime(time.Unix(int64(typedValue), 0))
+	case uint16:
+		return toDateTime(time.Unix(int64(typedValue), 0))
+	case uint8:
+		return toDateTime(time.Unix(int64(typedValue), 0))
+	case uint:
+		return toDateTime(time.Unix(int64(typedValue), 0))
+	case float32:
+		return toDateTime(time.Unix(int64(typedValue), 0))
+	case float64:
+		return toDateTime(time.Unix(int64(typedValue), 0))
 	case time.Time:
 		return typedValue.Format(time.RFC3339)
 	case string:
@@ -165,7 +217,7 @@ func toTimeStamp(val interface{}) interface{} {
 	case nil:
 		return nil
 	case time.Time:
-		return typedValue.UnixMilli()
+		return typedValue.Unix()
 	case int64:
 		return typedValue
 	case string:
