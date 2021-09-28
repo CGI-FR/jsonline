@@ -18,11 +18,16 @@
 package jsonline_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/adrienaury/go-template/pkg/jsonline"
 	"github.com/stretchr/testify/assert"
 )
+
+func init() { //nolint:gochecknoinits
+	os.Setenv("TZ", "Africa/Cairo")
+}
 
 func TestTemplateCreateEmpty(t *testing.T) {
 	template := jsonline.NewTemplate().
