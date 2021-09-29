@@ -14,6 +14,12 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.2.0] Unreleased
+
+- `Changed` template.Create() renamed in template.CreateRow() for readability.
+- `Fixed` row.Raw() now return the correct value (a map[string]interface{} of raw values).
+- `Fixed` conversions error no longer ignored by unmarshaling.
+
 ## [0.1.0] 2021-09-21
 
 - `Added` First official version of `jl` command line.
