@@ -184,7 +184,7 @@ func (t *template) CreateRow(v interface{}) (Row, error) {
 		for key, val, ok := iter(); ok; key, val, ok = iter() {
 			target := result.Get(key)
 			if target != nil {
-				target = CloneValue(val)
+				target = NewValue(val.Raw(), target.GetFormat(), target.GetRawType())
 			} else {
 				target = NewValueAuto(val.Raw())
 			}

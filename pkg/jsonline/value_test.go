@@ -430,7 +430,7 @@ func TestValueImportBinary(t *testing.T) {
 		expected interface{}
 	}{
 		{nil, nil},
-		{"LTI=", "-2"},
+		{"LTI=", []byte{0x2d, 0x32}},
 	}
 
 	for _, td := range testdatas {
