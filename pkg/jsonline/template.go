@@ -54,7 +54,10 @@ type Template interface {
 
 	WithMappedString(string, interface{}) Template
 	WithMappedNumeric(string, interface{}) Template
+	WithMappedBoolean(string, interface{}) Template
 	WithMappedBinary(string, interface{}) Template
+	WithMappedDateTime(string, interface{}) Template
+	WithMappedTimestamp(string, interface{}) Template
 
 	CreateRow(interface{}) (Row, error)
 	CreateRowEmpty() Row
@@ -139,8 +142,26 @@ func (t *template) WithMappedNumeric(name string, rawtype interface{}) Template 
 	return t
 }
 
+func (t *template) WithMappedBoolean(name string, rawtype interface{}) Template {
+	t.empty.Set(name, NewValue(nil, Boolean, rawtype))
+
+	return t
+}
+
 func (t *template) WithMappedBinary(name string, rawtype interface{}) Template {
 	t.empty.Set(name, NewValue(nil, Binary, rawtype))
+
+	return t
+}
+
+func (t *template) WithMappedDateTime(name string, rawtype interface{}) Template {
+	t.empty.Set(name, NewValue(nil, DateTime, rawtype))
+
+	return t
+}
+
+func (t *template) WithMappedTimestamp(name string, rawtype interface{}) Template {
+	t.empty.Set(name, NewValue(nil, Timestamp, rawtype))
 
 	return t
 }
