@@ -26,7 +26,7 @@ import (
 
 	over "github.com/Trendyol/overlog"
 
-	"github.com/adrienaury/go-template/pkg/jsonline"
+	"github.com/cgi-fr/jsonline/pkg/jsonline"
 	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

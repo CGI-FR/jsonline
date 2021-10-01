@@ -119,7 +119,7 @@ Check the [examples](examples/) folder.
 
 ```go
 // Add in your go file
-import "github.com/adrienaury/go-template/pkg/jsonline"
+import "github.com/cgi-fr/jsonline/pkg/jsonline"
 ```
 
 ### Create rows
