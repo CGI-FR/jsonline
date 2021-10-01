@@ -55,4 +55,6 @@ var (
 	ErrUnableToCastToNumber  = errors.New("unable to cast value to number")
 	ErrUnableToCastToBool    = errors.New("unable to cast value to bool")
 	ErrUnableToCastToBinary  = errors.New("unable to cast value to binary")
+	ErrUnableToCastToTime    = errors.New("unable to cast value to time")
+	ErrUnableToCast          = errors.New("unable to cast value")
 )

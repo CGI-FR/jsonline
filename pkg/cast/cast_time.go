@@ -45,11 +45,11 @@ func ToTime(i interface{}) (interface{}, error) {
 		return val, nil
 	case string:
 		t, err := time.Parse(TimeStringFormat, val)
-		if err == nil {
-			return t.Format(TimeStringFormat), nil
+		if err != nil {
+			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToTime, i, i)
 		}
 
-		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToFloat64, i, i)
+		return t, nil
 	case []byte:
 		return ToTime(string(val))
 	case int64:
@@ -57,7 +57,7 @@ func ToTime(i interface{}) (interface{}, error) {
 	default:
 		i64, err := ToInt64(val)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToFloat64, i, i)
+			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToTime, i, i)
 		}
 
 		return ToTime(i64)
@@ -74,7 +74,7 @@ func ToTimestamp(i interface{}) (interface{}, error) {
 			return t.Unix(), nil
 		}
 
-		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToFloat64, i, i)
+		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToTime, i, i)
 	case []byte:
 		return ToTimestamp(string(val))
 	case time.Time:

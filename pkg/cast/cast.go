@@ -32,9 +32,49 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-package jsonline
+package cast
 
-const (
-	conversionBase = 10
-	conversionSize = 64
+import (
+	"fmt"
+	"time"
 )
+
+//nolint:cyclop
+func To(targetType interface{}, val interface{}) (interface{}, error) {
+	switch targetType.(type) {
+	case int:
+		return ToInt(val)
+	case int64:
+		return ToInt64(val)
+	case int32:
+		return ToInt32(val)
+	case int16:
+		return ToInt16(val)
+	case int8:
+		return ToInt8(val)
+	case uint:
+		return ToUint(val)
+	case uint64:
+		return ToUint64(val)
+	case uint32:
+		return ToUint32(val)
+	case uint16:
+		return ToUint16(val)
+	case uint8:
+		return ToUint8(val)
+	case float64:
+		return ToFloat64(val)
+	case float32:
+		return ToFloat32(val)
+	case bool:
+		return ToBool(val)
+	case string:
+		return ToString(val)
+	case []byte:
+		return ToBinary(val)
+	case time.Time:
+		return ToTime(val)
+	default:
+		return nil, fmt.Errorf("%w: %#v to %T", ErrUnableToCast, val, targetType)
+	}
+}

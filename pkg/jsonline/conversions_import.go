@@ -37,154 +37,71 @@ package jsonline
 import (
 	"encoding/base64"
 	"fmt"
-	"strconv"
-	"time"
 
 	"github.com/adrienaury/go-template/pkg/cast"
 )
 
+//nolint:wrapcheck
 func importFromString(val string, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
-		return val, nil
-	case string:
-		return val, nil
-	case []byte:
-		return []byte(val), nil
-	case int:
-		return strconv.ParseInt(val, conversionBase, conversionSize) //nolint
+		return cast.ToString(val)
 	default:
-		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
+		return cast.To(targetType, val)
 	}
 }
 
-//nolint:cyclop,wrapcheck
+//nolint:wrapcheck
 func importFromNumeric(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
-	case int:
-		return cast.ToInt(val)
-	case int64:
-		return cast.ToInt64(val)
-	case int32:
-		return cast.ToInt32(val)
-	case int16:
-		return cast.ToInt16(val)
-	case int8:
-		return cast.ToInt8(val)
-	case uint:
-		return cast.ToUint(val)
-	case uint64:
-		return cast.ToUint64(val)
-	case uint32:
-		return cast.ToUint32(val)
-	case uint16:
-		return cast.ToUint16(val)
-	case uint8:
-		return cast.ToUint8(val)
-	case nil, float64:
+	case nil:
 		return cast.ToFloat64(val)
-	case float32:
-		return cast.ToFloat32(val)
-	case bool:
-		return cast.ToBool(val)
-	case string:
-		return cast.ToString(val)
-	case []byte:
-		return cast.ToBinary(val)
-	case time.Time:
-		return cast.ToTime(val)
 	default:
-		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
+		return cast.To(targetType, val)
 	}
 }
 
+//nolint:wrapcheck
 func importFromBoolean(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
-		return val, nil
-	case string:
-		return val, nil
+		return cast.ToBool(val)
 	default:
-		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
+		return cast.To(targetType, val)
 	}
 }
 
+//nolint:wrapcheck
 func importFromBinary(val string, targetType interface{}) (interface{}, error) {
+	b, err := base64.StdEncoding.DecodeString(val)
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
 	switch targetType.(type) {
-	case string:
-		b, err := base64.StdEncoding.DecodeString(val)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return string(b), nil
-	case nil, []byte:
-		b, err := base64.StdEncoding.DecodeString(val)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return b, nil
+	case nil:
+		return cast.ToString(b)
 	default:
-		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
+		return cast.To(targetType, b)
 	}
 }
 
+//nolint:wrapcheck
 func importFromDateTime(val string, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
-	case nil, time.Time:
-		res, err := time.Parse(time.RFC3339, val)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return res, nil
+	case nil:
+		return cast.ToTime(val)
 	default:
-		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
+		return cast.To(targetType, val)
 	}
 }
 
-//nolint:cyclop,wrapcheck
+//nolint:wrapcheck
 func importFromTimestamp(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
-	case int:
-		return cast.ToInt(val)
-	case nil, int64:
+	case nil:
 		return cast.ToInt64(val)
-	case int32:
-		return cast.ToInt32(val)
-	case int16:
-		return cast.ToInt16(val)
-	case int8:
-		return cast.ToInt8(val)
-	case uint:
-		return cast.ToUint(val)
-	case uint64:
-		return cast.ToUint64(val)
-	case uint32:
-		return cast.ToUint32(val)
-	case uint16:
-		return cast.ToUint16(val)
-	case uint8:
-		return cast.ToUint8(val)
-	case float64:
-		return cast.ToFloat64(val)
-	case float32:
-		return cast.ToFloat32(val)
-	case bool:
-		return cast.ToBool(val)
-	case string:
-		return cast.ToString(val)
-	case []byte:
-		return cast.ToBinary(val)
-	case time.Time:
-		i64, err := cast.ToInt64(val)
-		if err != nil {
-			return nil, err
-		}
-
-		return time.Unix(i64.(int64), 0), nil
 	default:
-		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
+		return cast.To(targetType, val)
 	}
 }
