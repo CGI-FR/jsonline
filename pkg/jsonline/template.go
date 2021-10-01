@@ -135,19 +135,19 @@ func (t *template) WithRow(name string, rowt Template) Template {
 }
 
 func (t *template) WithMappedString(name string, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(rawtype, String))
+	t.empty.Set(name, NewValue(nil, String, rawtype))
 
 	return t
 }
 
 func (t *template) WithMappedNumeric(name string, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(rawtype, Numeric))
+	t.empty.Set(name, NewValue(nil, Numeric, rawtype))
 
 	return t
 }
 
 func (t *template) WithMappedBinary(name string, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(rawtype, Binary))
+	t.empty.Set(name, NewValue(nil, Binary, rawtype))
 
 	return t
 }
@@ -163,7 +163,7 @@ func (t *template) CreateRow(v interface{}) (Row, error) {
 		for i, val := range values {
 			target := result.GetAtIndex(i)
 			if target != nil {
-				target = NewValue(val, target.GetFormat())
+				target = NewValue(val, target.GetFormat(), target.GetRawType())
 			} else {
 				target = NewValueAuto(val)
 			}
@@ -176,7 +176,7 @@ func (t *template) CreateRow(v interface{}) (Row, error) {
 		for key, val := range values {
 			target := result.Get(key)
 			if target != nil {
-				target = NewValue(val, target.GetFormat())
+				target = NewValue(val, target.GetFormat(), target.GetRawType())
 			} else {
 				target = NewValueAuto(val)
 			}

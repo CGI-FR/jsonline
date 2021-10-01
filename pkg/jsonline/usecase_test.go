@@ -1,6 +1,7 @@
 package jsonline_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/adrienaury/go-template/pkg/jsonline"
@@ -13,14 +14,14 @@ func TestLinoUseCase(t *testing.T) {
 		"release_date": []byte("1999"),
 	}
 
-	expectedExport := map[string]interface{}{"release_date": float64(1999), "title": "The Matrix"}
+	expectedExport := map[string]interface{}{"release_date": json.Number("1999"), "title": "The Matrix"}
 	expectedMarshal := `{"title":"The Matrix","release_date":1999}`
 	expectedRawEmpty := map[string]interface{}{"release_date": nil, "title": nil}
 	expectedExportEmpty := `{"title":null,"release_date":null}`
 
 	template := jsonline.NewTemplate().
-		WithMappedString("title", jsonline.Binary).
-		WithMappedNumeric("release_date", jsonline.Binary)
+		WithMappedString("title", []byte{}).
+		WithMappedNumeric("release_date", []byte{})
 
 	row, err := template.CreateRow(data)
 	assert.NoError(t, err)
