@@ -376,32 +376,32 @@ func TestValueExportBinary(t *testing.T) {
 	}{
 		{nil, nil},
 		// signed integers
-		{int(-2), []byte{0xfe, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0}},
-		{int8(-1), []byte{0xff}},
-		{int16(0), []byte{0x0, 0x0}},
-		{int32(1), []byte{0x1, 0x0, 0x0, 0x0}}, // int32 is an alias of rune
-		{int64(2), []byte{0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}},
+		{int(-2), "LTI="},
+		{int8(-1), "LTE="},
+		{int16(0), "MA=="},
+		{int32(1), "MQ=="}, // int32 is an alias of rune
+		{int64(2), "Mg=="},
 		// unsigned integers
-		{uint(0), []byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}},
-		{uint8(1), []byte{0x1}},
-		{uint16(2), []byte{0x2, 0x0}},
-		{uint32(3), []byte{0x3, 0x0, 0x0, 0x0}},
-		{uint64(4), []byte{0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}},
+		{uint(0), "MA=="},
+		{uint8(1), "MQ=="},
+		{uint16(2), "Mg=="},
+		{uint32(3), "Mw=="},
+		{uint64(4), "NA=="},
 		// floats
-		{float32(1.2), []byte{0x9a, 0x99, 0x99, 0x3f}},
-		{float64(-1.2), []byte{0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0xf3, 0xbf}},
+		{float32(1.2), "MS4y"},
+		{float64(-1.2), "LTEuMg=="},
 		// complex numbers => NOT SUPPORTED YET
 		// {complex64(1.2i + 5), "KDUrMS4yaSk="},
 		// {complex128(-1.0i + 8), "KDgtMWkp"},
 		// booleans
-		{true, []byte{0x1}},
-		{false, []byte{0x0}},
+		{true, "dHJ1ZQ=="},
+		{false, "ZmFsc2U="},
 		// strings
-		{"string", []byte{0x73, 0x74, 0x72, 0x69, 0x6e, 0x67}},
-		{'r', []byte{0x72, 0x0, 0x0, 0x0}},
+		{"string", "c3RyaW5n"},
+		{'r', "MTE0"},
 		// binary
-		{byte(36), []byte{0x24}}, // byte is an alias for uint8
-		{[]byte("hello"), []byte{0x68, 0x65, 0x6c, 0x6c, 0x6f}},
+		{byte(36), "MzY="}, // byte is an alias for uint8
+		{[]byte("hello"), "aGVsbG8="},
 		// composite
 		// {stringArray, "W2EgYl0="},
 		// {struct {
@@ -451,31 +451,31 @@ func TestValueMarshalBinary(t *testing.T) {
 	}{
 		{nil, "null"},
 		// signed integers
-		{int(-2), `"/v///wAAAAA="`},
-		{int8(-1), `"/w=="`},
-		{int16(0), `"AAA="`},
-		{int32(1), `"AQAAAA=="`}, // int32 is an alias of rune
-		{int64(2), `"AgAAAAAAAAA="`},
+		{int(-2), `"LTI="`},
+		{int8(-1), `"LTE="`},
+		{int16(0), `"MA=="`},
+		{int32(1), `"MQ=="`}, // int32 is an alias of rune
+		{int64(2), `"Mg=="`},
 		// unsigned integers
-		{uint(0), `"AAAAAAAAAAA="`},
-		{uint8(1), `"AQ=="`},
-		{uint16(2), `"AgA="`},
-		{uint32(3), `"AwAAAA=="`},
-		{uint64(4), `"BAAAAAAAAAA="`},
+		{uint(0), `"MA=="`},
+		{uint8(1), `"MQ=="`},
+		{uint16(2), `"Mg=="`},
+		{uint32(3), `"Mw=="`},
+		{uint64(4), `"NA=="`},
 		// floats
-		{float32(1.2), `"mpmZPw=="`},
-		{float64(-1.2), `"MzMzMzMz878="`},
+		{float32(1.2), `"MS4y"`},
+		{float64(-1.2), `"LTEuMg=="`},
 		// complex numbers => NOT SUPPORTED YET
 		// {complex64(1.2i + 5), `"KDUrMS4yaSk="`},
 		// {complex128(-1.0i + 8), `"KDgtMWkp"`},
 		// booleans
-		{true, `"AQ=="`},
-		{false, `"AA=="`},
+		{true, `"dHJ1ZQ=="`},
+		{false, `"ZmFsc2U="`},
 		// strings
 		{"string", `"c3RyaW5n"`},
-		{'r', `"cgAAAA=="`},
+		{'r', `"MTE0"`},
 		// binary
-		{byte(36), `"JA=="`}, // byte is an alias for uint8
+		{byte(36), `"MzY="`}, // byte is an alias for uint8
 		{[]byte("hello"), `"aGVsbG8="`},
 		// composite => NOT SUPPORTED YET
 		// {stringArray, `"W2EgYl0="`},
@@ -569,78 +569,6 @@ func TestValueImportDateTime(t *testing.T) {
 	}
 }
 
-//nolint:dupl
-func TestValueExportTime(t *testing.T) {
-	tz, _ := time.LoadLocation("Asia/Shanghai")
-	testdatas := []struct {
-		value    interface{}
-		expected interface{}
-	}{
-		{nil, nil},
-		// signed integers
-		{int(1632823189), "11:59:49+02:00"},
-		{int8(127), "01:02:07+01:00"},
-		{int16(32767), "10:06:07+01:00"},
-		{int32(1632823189), "11:59:49+02:00"},
-		{int64(1632823189), "11:59:49+02:00"},
-		// unsigned integers
-		{uint(1632823189), "11:59:49+02:00"},
-		{uint8(255), "01:04:15+01:00"},
-		{uint16(65535), "19:12:15+01:00"},
-		{uint32(1632823189), "11:59:49+02:00"},
-		{uint64(1632823189), "11:59:49+02:00"},
-		// floats
-		{float32(1632823189.2), "11:59:28+02:00"},
-		{float64(-1632823189.2), "15:00:11+01:00"},
-		// complex numbers
-		// {complex64(1.2i + 5), "(5+1.2i)"}, => UNSUPPORTED
-		// {complex128(-1.0i + 8), "(8-1i)"}, => UNSUPPORTED
-		// booleans
-		// {true, "true"}, => UNSUPPORTED
-		// {false, "false"}, => UNSUPPORTED
-		// strings
-		{"15:04:05Z", "15:04:05Z"},
-		{"15:04:05+07:00", "15:04:05+07:00"},
-		// {'r', "r"}, = int32
-		// binary
-		// {byte(36), "36"}, // = uint8
-		{[]byte("15:04:05+07:00"), "15:04:05+07:00"},
-		// composite => UNSUPPORTED
-		// references (structs)
-		{time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC), "21:21:00Z"},
-		{time.Date(2021, time.December, 25, 0, 0, 0, 0, tz), "00:00:00+08:00"},
-		// interfaces
-	}
-
-	for _, td := range testdatas {
-		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValueTime(td.value)
-			result, err := value.Export()
-			assert.NoError(t, err)
-			assert.Equal(t, td.expected, result)
-		})
-	}
-}
-
-func TestValueImportTime(t *testing.T) {
-	testdatas := []struct {
-		value    interface{}
-		expected interface{}
-	}{
-		{nil, nil},
-		{"11:59:49Z", time.Date(0, time.January, 1, 11, 59, 49, 0, time.UTC)},
-	}
-
-	for _, td := range testdatas {
-		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
-			value := jsonline.NewValueTime(nil)
-			err := value.Import(td.value)
-			assert.NoError(t, err)
-			assert.Equal(t, td.expected, value.Raw())
-		})
-	}
-}
-
 func TestValueExportTimestamp(t *testing.T) {
 	tz, _ := time.LoadLocation("Asia/Shanghai")
 	testdatas := []struct {
@@ -649,17 +577,17 @@ func TestValueExportTimestamp(t *testing.T) {
 	}{
 		{nil, nil},
 		// signed integers
-		{int(1632823189), int(1632823189)},
-		{int8(127), int8(127)},
-		{int16(32767), int16(32767)},
-		{int32(1632823189), int32(1632823189)},
+		{int(1632823189), int64(1632823189)},
+		{int8(127), int64(127)},
+		{int16(32767), int64(32767)},
+		{int32(1632823189), int64(1632823189)},
 		{int64(1632823189), int64(1632823189)},
 		// unsigned integers
-		{uint(1632823189), uint(1632823189)},
-		{uint8(255), uint8(255)},
-		{uint16(65535), uint16(65535)},
-		{uint32(1632823189), uint32(1632823189)},
-		{uint64(1632823189), uint64(1632823189)},
+		{uint(1632823189), int64(1632823189)},
+		{uint8(255), int64(255)},
+		{uint16(65535), int64(65535)},
+		{uint32(1632823189), int64(1632823189)},
+		{uint64(1632823189), int64(1632823189)},
 		// floats
 		{float32(1632823189.2), int64(1632823168)}, // rounding error
 		{float64(-1632823189.2), int64(-1632823189)},
@@ -699,7 +627,7 @@ func TestValueImportTimestamp(t *testing.T) {
 		expected interface{}
 	}{
 		{nil, nil},
-		{"2021-09-28T11:59:49+02:00", time.Date(1970, time.January, 1, 1, 0, 0, 0, time.Local)},
+		{1136189045, int64(1136189045)},
 	}
 
 	for _, td := range testdatas {

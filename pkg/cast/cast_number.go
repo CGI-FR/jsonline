@@ -38,6 +38,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 //nolint:cyclop,gomnd
@@ -79,6 +80,8 @@ func ToNumber(i interface{}) (interface{}, error) {
 		return json.Number(string(val)), nil
 	case string:
 		return json.Number(val), nil
+	case time.Time:
+		return ToNumber(val.Unix())
 	default:
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToNumber, i, i)
 	}

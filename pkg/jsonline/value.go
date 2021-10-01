@@ -47,9 +47,8 @@ const (
 	String    format = iota // string representation, e.g. : "hello", "2.4", "true"
 	Numeric                 // integer or decimal, e.g. : 2.4, 1
 	Boolean                 // true or false
-	Binary                  // base64 encoded data
+	Binary                  // string representation encoded as base64
 	DateTime                // date and time as RFC3339, e.g. : "2006-01-02T15:04:05Z", "2006-01-02T15:04:05+07:00"
-	Time                    // time with timezone, e.g. : "15:04:05Z", "15:04:05-07:00"
 	Timestamp               // milliseconds since 1970
 	Auto                    // no specific format enforced
 	Hidden                  // will not be exported in jsonline
@@ -138,14 +137,6 @@ func NewValueDateTime(v interface{}) Value {
 	}
 }
 
-func NewValueTime(v interface{}) Value {
-	return &value{
-		raw: v,
-		f:   Time,
-		typ: nil,
-	}
-}
-
 func NewValueTimestamp(v interface{}) Value {
 	return &value{
 		raw: v,
@@ -179,24 +170,24 @@ func (v *value) Raw() interface{} {
 }
 
 func (v *value) Export() (interface{}, error) {
-	val := v.raw
+	if v.raw == nil {
+		return nil, nil
+	}
 
 	//nolint:wrapcheck
 	switch v.f {
 	case String:
-		return cast.ToString(val)
+		return cast.ToString(v.raw)
 	case Numeric:
-		return cast.ToNumber(val)
+		return cast.ToNumber(v.raw)
 	case Boolean:
-		return cast.ToBool(val)
+		return cast.ToBool(v.raw)
 	case Binary:
-		return cast.ToBinary(val)
+		return exportToBinary(v.raw)
 	case DateTime:
-		return exportToDateTime(val)
-	case Time:
-		return exportToTime(val)
+		return exportToDateTime(v.raw)
 	case Timestamp:
-		return exportToTimeStamp(val)
+		return cast.ToTimestamp(v.raw)
 	case Auto, Hidden:
 		return v.raw, nil
 	}
@@ -204,7 +195,6 @@ func (v *value) Export() (interface{}, error) {
 	return nil, fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.f)
 }
 
-//nolint:cyclop
 func (v *value) Import(val interface{}) error {
 	if val == nil {
 		v.raw = nil
@@ -225,8 +215,6 @@ func (v *value) Import(val interface{}) error {
 		v.raw, err = importFromBinary(val.(string), v.typ)
 	case DateTime:
 		v.raw, err = importFromDateTime(val.(string), v.typ)
-	case Time:
-		v.raw, err = importFromTime(val.(string), v.typ)
 	case Timestamp:
 		v.raw, err = importFromTimestamp(val, v.typ)
 	case Auto, Hidden:

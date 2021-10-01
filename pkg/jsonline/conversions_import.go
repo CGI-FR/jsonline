@@ -36,7 +36,6 @@ package jsonline
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
@@ -59,24 +58,41 @@ func importFromString(val string, targetType interface{}) (interface{}, error) {
 	}
 }
 
+//nolint:cyclop,wrapcheck
 func importFromNumeric(val interface{}, targetType interface{}) (interface{}, error) {
-	number, ok := val.(json.Number)
-	if !ok {
-		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
-	}
-
 	switch targetType.(type) {
+	case int:
+		return cast.ToInt(val)
+	case int64:
+		return cast.ToInt64(val)
+	case int32:
+		return cast.ToInt32(val)
+	case int16:
+		return cast.ToInt16(val)
+	case int8:
+		return cast.ToInt8(val)
+	case uint:
+		return cast.ToUint(val)
+	case uint64:
+		return cast.ToUint64(val)
+	case uint32:
+		return cast.ToUint32(val)
+	case uint16:
+		return cast.ToUint16(val)
+	case uint8:
+		return cast.ToUint8(val)
 	case nil, float64:
-		f64, err := cast.ToFloat64(number)
-		if err != nil {
-			return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
-		}
-
-		return f64, nil
+		return cast.ToFloat64(val)
+	case float32:
+		return cast.ToFloat32(val)
+	case bool:
+		return cast.ToBool(val)
 	case string:
-		return string(number), nil
+		return cast.ToString(val)
 	case []byte:
-		return []byte(number), nil
+		return cast.ToBinary(val)
+	case time.Time:
+		return cast.ToTime(val)
 	default:
 		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
 	}
@@ -128,41 +144,46 @@ func importFromDateTime(val string, targetType interface{}) (interface{}, error)
 	}
 }
 
-func importFromTime(val string, targetType interface{}) (interface{}, error) {
-	switch targetType.(type) {
-	case nil, time.Time:
-		res, err := time.Parse("15:04:05Z07:00", val)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return res, nil
-	default:
-		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
-	}
-}
-
+//nolint:cyclop,wrapcheck
 func importFromTimestamp(val interface{}, targetType interface{}) (interface{}, error) {
-	i, err := cast.ToInt64(val)
-	if err != nil {
-		return nil, fmt.Errorf("%w", err)
-	}
-
-	timestamp, ok := i.(int64)
-	if !ok {
-		return nil, ErrUnsupportedImportType
-	}
-
 	switch targetType.(type) {
-	case nil, time.Time:
-		return time.Unix(timestamp, 0), nil
+	case int:
+		return cast.ToInt(val)
+	case nil, int64:
+		return cast.ToInt64(val)
+	case int32:
+		return cast.ToInt32(val)
+	case int16:
+		return cast.ToInt16(val)
+	case int8:
+		return cast.ToInt8(val)
+	case uint:
+		return cast.ToUint(val)
+	case uint64:
+		return cast.ToUint64(val)
+	case uint32:
+		return cast.ToUint32(val)
+	case uint16:
+		return cast.ToUint16(val)
+	case uint8:
+		return cast.ToUint8(val)
+	case float64:
+		return cast.ToFloat64(val)
+	case float32:
+		return cast.ToFloat32(val)
+	case bool:
+		return cast.ToBool(val)
 	case string:
-		str, err := cast.ToString(timestamp)
+		return cast.ToString(val)
+	case []byte:
+		return cast.ToBinary(val)
+	case time.Time:
+		i64, err := cast.ToInt64(val)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
+			return nil, err
 		}
 
-		return str, nil
+		return time.Unix(i64.(int64), 0), nil
 	default:
 		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
 	}

@@ -32,68 +32,9 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
+//nolint:gochecknoglobals
 package cast
 
-import (
-	"encoding/json"
-	"fmt"
-	"strconv"
-	"time"
-)
+import "time"
 
-//nolint:cyclop,funlen
-func ToBool(i interface{}) (interface{}, error) {
-	switch val := i.(type) {
-	case nil, bool:
-		return val, nil
-	case float64:
-		return val != 0.0, nil
-	case float32:
-		return val != 0.0, nil
-	case int:
-		return val != 0, nil
-	case int64:
-		return val != 0, nil
-	case int32:
-		return val != 0, nil
-	case int16:
-		return val != 0, nil
-	case int8:
-		return val != 0, nil
-	case uint:
-		return val != 0, nil
-	case uint64:
-		return val != 0, nil
-	case uint32:
-		return val != 0, nil
-	case uint16:
-		return val != 0, nil
-	case uint8:
-		return val != 0, nil
-	case string:
-		b, err := strconv.ParseBool(val)
-		if err == nil {
-			return b, nil
-		}
-
-		f, err := ToFloat64(val)
-		if err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
-		}
-
-		return f != 0.0, nil
-	case json.Number:
-		f, err := ToFloat64(val)
-		if err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
-		}
-
-		return f != 0, nil
-	case []byte:
-		return ToBool(string(val))
-	case time.Time:
-		return ToBool(val.Unix())
-	default:
-		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
-	}
-}
+var TimeStringFormat = time.RFC3339

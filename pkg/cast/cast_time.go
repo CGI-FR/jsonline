@@ -35,65 +35,51 @@
 package cast
 
 import (
-	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 )
 
-//nolint:cyclop,funlen
-func ToBool(i interface{}) (interface{}, error) {
+func ToTime(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
-	case nil, bool:
+	case nil, time.Time:
 		return val, nil
-	case float64:
-		return val != 0.0, nil
-	case float32:
-		return val != 0.0, nil
-	case int:
-		return val != 0, nil
-	case int64:
-		return val != 0, nil
-	case int32:
-		return val != 0, nil
-	case int16:
-		return val != 0, nil
-	case int8:
-		return val != 0, nil
-	case uint:
-		return val != 0, nil
-	case uint64:
-		return val != 0, nil
-	case uint32:
-		return val != 0, nil
-	case uint16:
-		return val != 0, nil
-	case uint8:
-		return val != 0, nil
 	case string:
-		b, err := strconv.ParseBool(val)
+		t, err := time.Parse(TimeStringFormat, val)
 		if err == nil {
-			return b, nil
+			return t.Format(TimeStringFormat), nil
 		}
 
-		f, err := ToFloat64(val)
-		if err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
-		}
-
-		return f != 0.0, nil
-	case json.Number:
-		f, err := ToFloat64(val)
-		if err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
-		}
-
-		return f != 0, nil
+		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToFloat64, i, i)
 	case []byte:
-		return ToBool(string(val))
-	case time.Time:
-		return ToBool(val.Unix())
+		return ToTime(string(val))
+	case int64:
+		return time.Unix(val, 0), nil
 	default:
-		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
+		i64, err := ToInt64(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToFloat64, i, i)
+		}
+
+		return ToTime(i64)
+	}
+}
+
+func ToTimestamp(i interface{}) (interface{}, error) {
+	switch val := i.(type) {
+	case nil, int64:
+		return val, nil
+	case string:
+		t, err := time.Parse(TimeStringFormat, val)
+		if err == nil {
+			return t.Unix(), nil
+		}
+
+		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToFloat64, i, i)
+	case []byte:
+		return ToTimestamp(string(val))
+	case time.Time:
+		return val.Unix(), nil
+	default:
+		return ToInt64(val)
 	}
 }

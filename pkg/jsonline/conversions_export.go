@@ -35,125 +35,27 @@
 package jsonline
 
 import (
+	"encoding/base64"
 	"fmt"
-	"strconv"
-	"time"
+
+	"github.com/adrienaury/go-template/pkg/cast"
 )
 
-//nolint:cyclop
+func exportToBinary(val interface{}) (interface{}, error) {
+	str, err := cast.ToString(val)
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
+	return base64.StdEncoding.EncodeToString([]byte(str.(string))), nil
+}
+
+//nolint:wrapcheck
 func exportToDateTime(val interface{}) (interface{}, error) {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil, nil
-	case int64:
-		return exportToDateTime(time.Unix(typedValue, 0))
-	case int32:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case int16:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case int8:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case int:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case uint64:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case uint32:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case uint16:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case uint8:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case uint:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case float32:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case float64:
-		return exportToDateTime(time.Unix(int64(typedValue), 0))
-	case time.Time:
-		return typedValue.Format(time.RFC3339), nil
-	case string:
-		t, err := time.Parse(time.RFC3339, typedValue)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return exportToDateTime(t)
-	default:
-		return exportToDateTime(convertToString(val))
+	t, err := cast.ToTime(val)
+	if err != nil {
+		return nil, err
 	}
-}
 
-//nolint:cyclop
-func exportToTime(val interface{}) (interface{}, error) {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil, nil
-	case int64:
-		return exportToTime(time.Unix(typedValue, 0))
-	case int32:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case int16:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case int8:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case int:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case uint64:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case uint32:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case uint16:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case uint8:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case uint:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case float32:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case float64:
-		return exportToTime(time.Unix(int64(typedValue), 0))
-	case time.Time:
-		return typedValue.Format("15:04:05Z07:00"), nil
-	case string:
-		t, err := time.Parse("15:04:05Z07:00", typedValue)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return exportToTime(t)
-	default:
-		return exportToTime(convertToString(val))
-	}
-}
-
-func exportToTimeStamp(val interface{}) (interface{}, error) {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil, nil
-	case time.Time:
-		return typedValue.Unix(), nil
-	case int64, int32, int16, int8, int, uint64, uint32, uint16, uint8, uint:
-		return typedValue, nil
-	case float32, float64:
-		result, err := strconv.ParseInt(fmt.Sprintf("%.0f", typedValue), conversionBase, conversionSize)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return result, nil
-	case string:
-		t, err := time.Parse(time.RFC3339, typedValue)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return exportToTimeStamp(t)
-	default:
-		d, err := exportToDateTime(val)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return exportToTimeStamp(d)
-	}
+	return cast.ToString(t)
 }
