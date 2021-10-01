@@ -32,28 +32,65 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-package jsonline
+package cast
 
 import (
+	"encoding/json"
 	"fmt"
+	"strconv"
 )
 
-const (
-	conversionBase = 10
-	conversionSize = 64
-)
-
-func convertToString(val interface{}) interface{} {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil
+//nolint:cyclop,funlen
+func ToBool(i interface{}) (interface{}, error) {
+	switch val := i.(type) {
+	case nil, bool:
+		return val, nil
+	case float64:
+		return val != 0, nil
+	case float32:
+		return val != 0, nil
+	case int:
+		return val != 0, nil
+	case int64:
+		return val != 0, nil
+	case int32:
+		return val != 0, nil
+	case int16:
+		return val != 0, nil
+	case int8:
+		return val != 0, nil
+	case uint:
+		return val != 0, nil
+	case uint64:
+		return val != 0, nil
+	case uint32:
+		return val != 0, nil
+	case uint16:
+		return val != 0, nil
+	case uint8:
+		return val != 0, nil
 	case string:
-		return typedValue
-	case rune:
-		return string(typedValue)
+		b, err := strconv.ParseBool(val)
+		if err == nil {
+			return b, nil
+		}
+
+		f, err := ToFloat64(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
+		}
+
+		return f != 0.0, nil
+	case json.Number:
+		f, err := ToFloat64(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
+		}
+
+		return f != 0, nil
 	case []byte:
-		return string(typedValue)
+		return ToBool(string(val))
 	default:
-		return fmt.Sprintf("%v", val)
+		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
 	}
 }

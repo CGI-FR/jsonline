@@ -53,6 +53,10 @@ type Template interface {
 	WithHidden(string) Template
 	WithRow(string, Template) Template
 
+	WithMappedString(string, interface{}) Template
+	WithMappedNumeric(string, interface{}) Template
+	WithMappedBinary(string, interface{}) Template
+
 	CreateRow(interface{}) (Row, error)
 	CreateRowEmpty() Row
 
@@ -130,6 +134,24 @@ func (t *template) WithRow(name string, rowt Template) Template {
 	return t
 }
 
+func (t *template) WithMappedString(name string, rawtype interface{}) Template {
+	t.empty.Set(name, NewValue(rawtype, String))
+
+	return t
+}
+
+func (t *template) WithMappedNumeric(name string, rawtype interface{}) Template {
+	t.empty.Set(name, NewValue(rawtype, Numeric))
+
+	return t
+}
+
+func (t *template) WithMappedBinary(name string, rawtype interface{}) Template {
+	t.empty.Set(name, NewValue(rawtype, Binary))
+
+	return t
+}
+
 //nolint:cyclop,funlen
 func (t *template) CreateRow(v interface{}) (Row, error) {
 	result := CloneRow(t.empty)
@@ -169,7 +191,7 @@ func (t *template) CreateRow(v interface{}) (Row, error) {
 		for key, val, ok := iter(); ok; key, val, ok = iter() {
 			target := result.Get(key)
 			if target != nil {
-				target = NewValue(val.Raw(), target.GetFormat())
+				target = CloneValue(val)
 			} else {
 				target = NewValueAuto(val.Raw())
 			}

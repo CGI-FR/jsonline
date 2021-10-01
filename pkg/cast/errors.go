@@ -32,28 +32,27 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-package jsonline
+package cast
 
 import (
-	"fmt"
+	"errors"
 )
 
-const (
-	conversionBase = 10
-	conversionSize = 64
+var (
+	ErrUnableToCastToInt     = errors.New("unable to cast value to int")
+	ErrUnableToCastToInt64   = errors.New("unable to cast value to int64")
+	ErrUnableToCastToInt32   = errors.New("unable to cast value to int32")
+	ErrUnableToCastToInt16   = errors.New("unable to cast value to int16")
+	ErrUnableToCastToInt8    = errors.New("unable to cast value to int8")
+	ErrUnableToCastToUint    = errors.New("unable to cast value to uint")
+	ErrUnableToCastToUint64  = errors.New("unable to cast value to uint64")
+	ErrUnableToCastToUint32  = errors.New("unable to cast value to uint32")
+	ErrUnableToCastToUint16  = errors.New("unable to cast value to uint16")
+	ErrUnableToCastToUint8   = errors.New("unable to cast value to uint8")
+	ErrUnableToCastToFloat64 = errors.New("unable to cast value to float64")
+	ErrUnableToCastToFloat32 = errors.New("unable to cast value to float32")
+	ErrUnableToCastToString  = errors.New("unable to cast value to string")
+	ErrUnableToCastToNumber  = errors.New("unable to cast value to number")
+	ErrUnableToCastToBool    = errors.New("unable to cast value to bool")
+	ErrUnableToCastToBinary  = errors.New("unable to cast value to binary")
 )
-
-func convertToString(val interface{}) interface{} {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil
-	case string:
-		return typedValue
-	case rune:
-		return string(typedValue)
-	case []byte:
-		return string(typedValue)
-	default:
-		return fmt.Sprintf("%v", val)
-	}
-}

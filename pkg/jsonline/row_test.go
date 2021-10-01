@@ -18,6 +18,7 @@
 package jsonline_test
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -62,9 +63,9 @@ func TestExportImport(t *testing.T) {
 	m, _ := res.(map[string]interface{})
 
 	assert.Equal(t, "value", m["string"])
-	assert.Equal(t, float64(42.5), m["numeric"])
+	assert.Equal(t, json.Number("42.5"), m["numeric"])
 	assert.Equal(t, true, m["boolean"])
-	assert.Equal(t, "dmFsdWU=", m["binary"])
+	assert.Equal(t, []byte{0x76, 0x61, 0x6c, 0x75, 0x65}, m["binary"])
 	assert.Equal(t, "2021-09-24T21:21:00Z", m["datetime"])
 	assert.Equal(t, "21:21:00Z", m["time"])
 	assert.Equal(t, int64(1632518460), m["timestamp"])
@@ -81,9 +82,9 @@ func TestExportImport(t *testing.T) {
 	m, _ = res.(map[string]interface{})
 
 	assert.Equal(t, "value", m["string"])
-	assert.Equal(t, float64(42.5), m["numeric"])
+	assert.Equal(t, json.Number("42.5"), m["numeric"])
 	assert.Equal(t, true, m["boolean"])
-	assert.Equal(t, "dmFsdWU=", m["binary"])
+	assert.Equal(t, []byte{0x76, 0x61, 0x6c, 0x75, 0x65}, m["binary"])
 	assert.Equal(t, "2021-09-24T21:21:00Z", m["datetime"])
 	assert.Equal(t, "21:21:00Z", m["time"])
 	assert.Equal(t, int64(1632518460), m["timestamp"])

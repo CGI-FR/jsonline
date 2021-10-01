@@ -32,28 +32,50 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-package jsonline
+package cast
 
 import (
+	"encoding/json"
 	"fmt"
+	"strconv"
 )
 
-const (
-	conversionBase = 10
-	conversionSize = 64
-)
-
-func convertToString(val interface{}) interface{} {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil
-	case string:
-		return typedValue
-	case rune:
-		return string(typedValue)
+//nolint:cyclop,gomnd
+func ToString(i interface{}) (interface{}, error) {
+	switch val := i.(type) {
+	case nil, string:
+		return val, nil
+	case bool:
+		return strconv.FormatBool(val), nil
+	case float64:
+		return strconv.FormatFloat(val, 'f', -1, 64), nil
+	case float32:
+		return strconv.FormatFloat(float64(val), 'f', -1, 32), nil
+	case int:
+		return strconv.Itoa(val), nil
+	case int64:
+		return strconv.FormatInt(val, 10), nil
+	case int32:
+		return strconv.Itoa(int(val)), nil
+	case int16:
+		return strconv.FormatInt(int64(val), 10), nil
+	case int8:
+		return strconv.FormatInt(int64(val), 10), nil
+	case uint:
+		return strconv.FormatUint(uint64(val), 10), nil
+	case uint64:
+		return strconv.FormatUint(val, 10), nil
+	case uint32:
+		return strconv.FormatUint(uint64(val), 10), nil
+	case uint16:
+		return strconv.FormatUint(uint64(val), 10), nil
+	case uint8:
+		return strconv.FormatUint(uint64(val), 10), nil
 	case []byte:
-		return string(typedValue)
+		return string(val), nil
+	case json.Number:
+		return string(val), nil
 	default:
-		return fmt.Sprintf("%v", val)
+		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToString, i, i)
 	}
 }

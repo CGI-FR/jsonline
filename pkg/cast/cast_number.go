@@ -32,28 +32,54 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-package jsonline
+package cast
 
 import (
+	"encoding/json"
 	"fmt"
+	"strconv"
 )
 
-const (
-	conversionBase = 10
-	conversionSize = 64
-)
+//nolint:cyclop,gomnd
+func ToNumber(i interface{}) (interface{}, error) {
+	switch val := i.(type) {
+	case nil, json.Number:
+		return val, nil
+	case bool:
+		if val {
+			return json.Number("1"), nil
+		}
 
-func convertToString(val interface{}) interface{} {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil
-	case string:
-		return typedValue
-	case rune:
-		return string(typedValue)
+		return json.Number("0"), nil
+	case float64:
+		return json.Number(strconv.FormatFloat(val, 'f', -1, 64)), nil
+	case float32:
+		return json.Number(strconv.FormatFloat(float64(val), 'f', -1, 32)), nil
+	case int:
+		return json.Number(strconv.Itoa(val)), nil
+	case int64:
+		return json.Number(strconv.FormatInt(val, 10)), nil
+	case int32:
+		return json.Number(strconv.Itoa(int(val))), nil
+	case int16:
+		return json.Number(strconv.FormatInt(int64(val), 10)), nil
+	case int8:
+		return json.Number(strconv.FormatInt(int64(val), 10)), nil
+	case uint:
+		return json.Number(strconv.FormatUint(uint64(val), 10)), nil
+	case uint64:
+		return json.Number(strconv.FormatUint(val, 10)), nil
+	case uint32:
+		return json.Number(strconv.FormatUint(uint64(val), 10)), nil
+	case uint16:
+		return json.Number(strconv.FormatUint(uint64(val), 10)), nil
+	case uint8:
+		return json.Number(strconv.FormatUint(uint64(val), 10)), nil
 	case []byte:
-		return string(typedValue)
+		return json.Number(string(val)), nil
+	case string:
+		return json.Number(val), nil
 	default:
-		return fmt.Sprintf("%v", val)
+		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToNumber, i, i)
 	}
 }

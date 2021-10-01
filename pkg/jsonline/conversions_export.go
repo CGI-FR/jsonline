@@ -35,24 +35,10 @@
 package jsonline
 
 import (
-	"encoding/base64"
 	"fmt"
 	"strconv"
 	"time"
 )
-
-func exportToBinary(val interface{}) interface{} {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil
-	case []byte:
-		return base64.StdEncoding.EncodeToString(typedValue)
-	case string:
-		return base64.StdEncoding.EncodeToString([]byte(typedValue))
-	default:
-		return base64.StdEncoding.EncodeToString([]byte(convertToString(typedValue).(string)))
-	}
-}
 
 //nolint:cyclop
 func exportToDateTime(val interface{}) (interface{}, error) {
