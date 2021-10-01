@@ -44,7 +44,7 @@ import (
 type format int8
 
 const (
-	String    format = iota // default representation, e.g. : "hello", "2.4", "true"
+	String    format = iota // string representation, e.g. : "hello", "2.4", "true"
 	Numeric                 // integer or decimal, e.g. : 2.4, 1
 	Boolean                 // true or false
 	Binary                  // base64 encoded data
@@ -57,6 +57,7 @@ const (
 
 type Value interface {
 	GetFormat() format
+	GetRawType() interface{}
 
 	Raw() interface{}
 	Export() (interface{}, error)
@@ -70,12 +71,14 @@ type Value interface {
 type value struct {
 	raw interface{}
 	f   format
+	typ interface{}
 }
 
-func NewValue(v interface{}, f format) Value {
+func NewValue(v interface{}, f format, rawtype interface{}) Value {
 	return &value{
 		raw: v,
 		f:   f,
+		typ: rawtype,
 	}
 }
 
@@ -83,6 +86,7 @@ func NewValueNil(f format) Value {
 	return &value{
 		raw: nil,
 		f:   f,
+		typ: nil,
 	}
 }
 
@@ -90,6 +94,7 @@ func NewValueAuto(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Auto,
+		typ: nil,
 	}
 }
 
@@ -97,6 +102,7 @@ func NewValueString(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   String,
+		typ: nil,
 	}
 }
 
@@ -104,6 +110,7 @@ func NewValueNumeric(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Numeric,
+		typ: nil,
 	}
 }
 
@@ -111,6 +118,7 @@ func NewValueBoolean(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Boolean,
+		typ: nil,
 	}
 }
 
@@ -118,6 +126,7 @@ func NewValueBinary(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Binary,
+		typ: nil,
 	}
 }
 
@@ -125,6 +134,7 @@ func NewValueDateTime(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   DateTime,
+		typ: nil,
 	}
 }
 
@@ -132,6 +142,7 @@ func NewValueTime(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Time,
+		typ: nil,
 	}
 }
 
@@ -139,6 +150,7 @@ func NewValueTimestamp(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Timestamp,
+		typ: nil,
 	}
 }
 
@@ -146,15 +158,20 @@ func NewValueHidden(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Hidden,
+		typ: nil,
 	}
 }
 
 func CloneValue(v Value) Value {
-	return NewValue(v.Raw(), v.GetFormat())
+	return NewValue(v.Raw(), v.GetFormat(), v.GetRawType())
 }
 
 func (v *value) GetFormat() format {
 	return v.f
+}
+
+func (v *value) GetRawType() interface{} {
+	return v.typ
 }
 
 func (v *value) Raw() interface{} {
@@ -199,19 +216,19 @@ func (v *value) Import(val interface{}) error {
 
 	switch v.f {
 	case String:
-		v.raw, err = importFromString(val.(string), v.raw)
+		v.raw, err = importFromString(val.(string), v.typ)
 	case Numeric:
-		v.raw, err = importFromNumeric(val, v.raw)
+		v.raw, err = importFromNumeric(val, v.typ)
 	case Boolean:
-		v.raw, err = importFromBoolean(val, v.raw)
+		v.raw, err = importFromBoolean(val, v.typ)
 	case Binary:
-		v.raw, err = importFromBinary(val.(string), v.raw)
+		v.raw, err = importFromBinary(val.(string), v.typ)
 	case DateTime:
-		v.raw, err = importFromDateTime(val.(string), v.raw)
+		v.raw, err = importFromDateTime(val.(string), v.typ)
 	case Time:
-		v.raw, err = importFromTime(val.(string), v.raw)
+		v.raw, err = importFromTime(val.(string), v.typ)
 	case Timestamp:
-		v.raw, err = importFromTimestamp(val, v.raw)
+		v.raw, err = importFromTimestamp(val, v.typ)
 	case Auto, Hidden:
 		v.raw = val
 	default:

@@ -36,9 +36,12 @@ package jsonline
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/adrienaury/go-template/pkg/cast"
 )
 
 func importFromString(val string, targetType interface{}) (interface{}, error) {
@@ -47,21 +50,35 @@ func importFromString(val string, targetType interface{}) (interface{}, error) {
 		return val, nil
 	case string:
 		return val, nil
+	case []byte:
+		return []byte(val), nil
 	case int:
 		return strconv.ParseInt(val, conversionBase, conversionSize) //nolint
 	default:
-		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
 	}
 }
 
 func importFromNumeric(val interface{}, targetType interface{}) (interface{}, error) {
+	number, ok := val.(json.Number)
+	if !ok {
+		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
+	}
+
 	switch targetType.(type) {
-	case nil:
-		return val, nil
+	case nil, float64:
+		f64, err := cast.ToFloat64(number)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
+		}
+
+		return f64, nil
 	case string:
-		return val, nil
+		return string(number), nil
+	case []byte:
+		return []byte(number), nil
 	default:
-		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
 	}
 }
 
@@ -72,7 +89,7 @@ func importFromBoolean(val interface{}, targetType interface{}) (interface{}, er
 	case string:
 		return val, nil
 	default:
-		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
 	}
 }
 
@@ -93,7 +110,7 @@ func importFromBinary(val string, targetType interface{}) (interface{}, error) {
 
 		return b, nil
 	default:
-		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
 	}
 }
 
@@ -107,7 +124,7 @@ func importFromDateTime(val string, targetType interface{}) (interface{}, error)
 
 		return res, nil
 	default:
-		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
 	}
 }
 
@@ -121,62 +138,32 @@ func importFromTime(val string, targetType interface{}) (interface{}, error) {
 
 		return res, nil
 	default:
-		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
 	}
 }
 
 func importFromTimestamp(val interface{}, targetType interface{}) (interface{}, error) {
+	i, err := cast.ToInt64(val)
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
+	timestamp, ok := i.(int64)
+	if !ok {
+		return nil, ErrUnsupportedImportType
+	}
+
 	switch targetType.(type) {
 	case nil, time.Time:
-		return time.Unix(convertNumericToInt64(val), 0), nil
+		return time.Unix(timestamp, 0), nil
 	case string:
-		return val, nil
+		str, err := cast.ToString(timestamp)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
+		}
+
+		return str, nil
 	default:
-		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+		return nil, fmt.Errorf("%w: %T", ErrUnsupportedImportType, targetType)
 	}
-}
-
-//nolint:cyclop
-func convertNumericToInt64(val interface{}) int64 {
-	if v, ok := val.(int64); ok {
-		return v
-	}
-
-	if v, ok := val.(int32); ok {
-		return int64(v)
-	}
-
-	if v, ok := val.(int16); ok {
-		return int64(v)
-	}
-
-	if v, ok := val.(int8); ok {
-		return int64(v)
-	}
-
-	if v, ok := val.(int); ok {
-		return int64(v)
-	}
-
-	if v, ok := val.(uint64); ok {
-		return int64(v)
-	}
-
-	if v, ok := val.(uint32); ok {
-		return int64(v)
-	}
-
-	if v, ok := val.(uint16); ok {
-		return int64(v)
-	}
-
-	if v, ok := val.(uint8); ok {
-		return int64(v)
-	}
-
-	if v, ok := val.(uint); ok {
-		return int64(v)
-	}
-
-	return 0
 }

@@ -91,6 +91,10 @@ func (r *row) GetFormat() format {
 	return Auto
 }
 
+func (r *row) GetRawType() interface{} {
+	return nil
+}
+
 func (r *row) Raw() interface{} {
 	result := map[string]interface{}{}
 
