@@ -36,7 +36,6 @@ func TestTemplateCreateEmpty(t *testing.T) {
 		WithBoolean("boolean").
 		WithBinary("binary").
 		WithDateTime("datetime").
-		WithTime("time").
 		WithTimestamp("timestamp").
 		WithHidden("hidden").
 		WithAuto("auto").
@@ -44,9 +43,8 @@ func TestTemplateCreateEmpty(t *testing.T) {
 
 	row := template.CreateRowEmpty()
 
-	//nolint:lll
 	assert.Equal(t,
-		`{"string":null,"numeric":null,"boolean":null,"binary":null,"datetime":null,"time":null,"timestamp":null,"auto":null,"row":{}}`,
+		`{"string":null,"numeric":null,"boolean":null,"binary":null,"datetime":null,"timestamp":null,"auto":null,"row":{}}`,
 		row.String())
 }
 
@@ -57,7 +55,6 @@ func TestTemplateCreateFromSlice(t *testing.T) {
 		WithBoolean("boolean").
 		WithBinary("binary").
 		WithDateTime("datetime").
-		WithTime("time").
 		WithTimestamp("timestamp").
 		WithHidden("hidden").
 		WithAuto("auto").
@@ -67,12 +64,12 @@ func TestTemplateCreateFromSlice(t *testing.T) {
 		"first": 0,
 	}
 
-	row, err := template.CreateRow([]interface{}{"value", 0, true, "value", 1566844858, 1566844858, 1566844858, "hidden", "hello", sub, "extra1", "extra2"}) //nolint:lll
+	row, err := template.CreateRow([]interface{}{"value", 0, true, "value", 1566844858, 1566844858, "hidden", "hello", sub, "extra1", "extra2"}) //nolint:lll
 	assert.NoError(t, err)
 
 	//nolint:lll
 	assert.Equal(t,
-		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"":"extra2"}`,
+		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"":"extra2"}`,
 		row.String())
 }
 
@@ -83,7 +80,6 @@ func TestTemplateCreateFromMap(t *testing.T) {
 		WithBoolean("boolean").
 		WithBinary("binary").
 		WithDateTime("datetime").
-		WithTime("time").
 		WithTimestamp("timestamp").
 		WithHidden("hidden").
 		WithAuto("auto").
@@ -97,7 +93,6 @@ func TestTemplateCreateFromMap(t *testing.T) {
 		"datetime":  1566844858,
 		"numeric":   0,
 		"boolean":   true,
-		"time":      1566844858,
 		"extra":     "extra",
 		"timestamp": 1566844858,
 		"binary":    "value",
@@ -110,7 +105,7 @@ func TestTemplateCreateFromMap(t *testing.T) {
 
 	//nolint:lll
 	assert.Equal(t,
-		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
+		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
 		row.String())
 }
 
@@ -121,7 +116,6 @@ func TestTemplateCreateFromRow(t *testing.T) {
 		WithBoolean("boolean").
 		WithBinary("binary").
 		WithDateTime("datetime").
-		WithTime("time").
 		WithTimestamp("timestamp").
 		WithHidden("hidden").
 		WithAuto("auto").
@@ -135,7 +129,6 @@ func TestTemplateCreateFromRow(t *testing.T) {
 		Set("datetime", jsonline.NewValueDateTime(1566844858)).
 		Set("numeric", jsonline.NewValueNumeric(0)).
 		Set("boolean", jsonline.NewValueBoolean(true)).
-		Set("time", jsonline.NewValueTime(1566844858)).
 		Set("extra", jsonline.NewValueAuto("extra")).
 		Set("timestamp", jsonline.NewValueTimestamp(1566844858)).
 		Set("binary", jsonline.NewValueBinary("value")).
@@ -149,7 +142,7 @@ func TestTemplateCreateFromRow(t *testing.T) {
 
 	//nolint:lll
 	assert.Equal(t,
-		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
+		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
 		row.String())
 }
 
@@ -160,19 +153,18 @@ func TestTemplateCreateFromString(t *testing.T) {
 		WithBoolean("boolean").
 		WithBinary("binary").
 		WithDateTime("datetime").
-		WithTime("time").
 		WithTimestamp("timestamp").
 		WithHidden("hidden").
 		WithAuto("auto").
 		WithRow("row", jsonline.NewTemplate())
 
 	//nolint:lll
-	row, err := template.CreateRow(`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`)
+	row, err := template.CreateRow(`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`)
 	assert.NoError(t, err)
 
 	//nolint:lll
 	assert.Equal(t,
-		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
+		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
 		row.String())
 }
 
@@ -183,18 +175,17 @@ func TestTemplateCreateFromByteBuffer(t *testing.T) {
 		WithBoolean("boolean").
 		WithBinary("binary").
 		WithDateTime("datetime").
-		WithTime("time").
 		WithTimestamp("timestamp").
 		WithHidden("hidden").
 		WithAuto("auto").
 		WithRow("row", jsonline.NewTemplate())
 
 	//nolint:lll
-	row, err := template.CreateRow([]byte(`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`))
+	row, err := template.CreateRow([]byte(`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`))
 	assert.NoError(t, err)
 
 	//nolint:lll
 	assert.Equal(t,
-		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","time":"20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
+		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
 		row.String())
 }

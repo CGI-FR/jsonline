@@ -39,6 +39,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"time"
 	"unsafe"
 )
 
@@ -133,7 +134,9 @@ func ToBinary(i interface{}) (interface{}, error) {
 	case string:
 		return []byte(val), nil
 	case json.Number:
-		return ToBool(string(val))
+		return ToBinary(string(val))
+	case time.Time:
+		return ToBinary(val.Unix())
 	default:
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBinary, i, i)
 	}

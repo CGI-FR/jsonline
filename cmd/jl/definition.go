@@ -34,7 +34,6 @@ const (
 	Boolean   = "boolean"
 	Binary    = "binary"
 	DateTime  = "datetime"
-	Time      = "time"
 	Timestamp = "timestamp"
 	Auto      = "auto"
 	Hidden    = "hidden"
@@ -98,8 +97,6 @@ func parse(tmpl jsonline.Template, columns []ColumnDefinition) (jsonline.Templat
 			tmpl = tmpl.WithBinary(column.Name)
 		case DateTime:
 			tmpl = tmpl.WithDateTime(column.Name)
-		case Time:
-			tmpl = tmpl.WithTime(column.Name)
 		case Timestamp:
 			tmpl = tmpl.WithTimestamp(column.Name)
 		case Auto:
@@ -169,8 +166,6 @@ func setColumnInTemplate(tmpl jsonline.Template, coltype string, colname string)
 		tmpl = tmpl.WithBinary(colname)
 	case DateTime:
 		tmpl = tmpl.WithDateTime(colname)
-	case Time:
-		tmpl = tmpl.WithTime(colname)
 	case Timestamp:
 		tmpl = tmpl.WithTimestamp(colname)
 	case Auto:

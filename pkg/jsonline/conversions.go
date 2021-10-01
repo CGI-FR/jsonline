@@ -34,26 +34,7 @@
 
 package jsonline
 
-import (
-	"fmt"
-)
-
 const (
 	conversionBase = 10
 	conversionSize = 64
 )
-
-func convertToString(val interface{}) interface{} {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil
-	case string:
-		return typedValue
-	case rune:
-		return string(typedValue)
-	case []byte:
-		return string(typedValue)
-	default:
-		return fmt.Sprintf("%v", val)
-	}
-}

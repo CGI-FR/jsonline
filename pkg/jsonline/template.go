@@ -47,7 +47,6 @@ type Template interface {
 	WithBoolean(string) Template
 	WithBinary(string) Template
 	WithDateTime(string) Template
-	WithTime(string) Template
 	WithTimestamp(string) Template
 	WithAuto(string) Template
 	WithHidden(string) Template
@@ -100,12 +99,6 @@ func (t *template) WithBinary(name string) Template {
 
 func (t *template) WithDateTime(name string) Template {
 	t.empty.Set(name, NewValueDateTime(nil))
-
-	return t
-}
-
-func (t *template) WithTime(name string) Template {
-	t.empty.Set(name, NewValueTime(nil))
 
 	return t
 }
