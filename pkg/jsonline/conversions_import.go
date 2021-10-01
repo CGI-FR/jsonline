@@ -42,7 +42,7 @@ import (
 )
 
 //nolint:wrapcheck
-func importFromString(val string, targetType interface{}) (interface{}, error) {
+func importFromString(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
 		return cast.ToString(val)
@@ -55,7 +55,7 @@ func importFromString(val string, targetType interface{}) (interface{}, error) {
 func importFromNumeric(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
-		return cast.ToFloat64(val)
+		return cast.ToNumber(val)
 	default:
 		return cast.To(targetType, val)
 	}
@@ -72,8 +72,13 @@ func importFromBoolean(val interface{}, targetType interface{}) (interface{}, er
 }
 
 //nolint:wrapcheck
-func importFromBinary(val string, targetType interface{}) (interface{}, error) {
-	b, err := base64.StdEncoding.DecodeString(val)
+func importFromBinary(val interface{}, targetType interface{}) (interface{}, error) {
+	str, err := cast.ToString(val)
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
+	b, err := base64.StdEncoding.DecodeString(str.(string))
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
@@ -87,7 +92,7 @@ func importFromBinary(val string, targetType interface{}) (interface{}, error) {
 }
 
 //nolint:wrapcheck
-func importFromDateTime(val string, targetType interface{}) (interface{}, error) {
+func importFromDateTime(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
 		return cast.ToTime(val)

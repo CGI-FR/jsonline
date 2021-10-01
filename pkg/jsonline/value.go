@@ -207,15 +207,15 @@ func (v *value) Import(val interface{}) error {
 
 	switch v.f {
 	case String:
-		v.raw, err = importFromString(val.(string), v.typ)
+		v.raw, err = importFromString(val, v.typ)
 	case Numeric:
 		v.raw, err = importFromNumeric(val, v.typ)
 	case Boolean:
 		v.raw, err = importFromBoolean(val, v.typ)
 	case Binary:
-		v.raw, err = importFromBinary(val.(string), v.typ)
+		v.raw, err = importFromBinary(val, v.typ)
 	case DateTime:
-		v.raw, err = importFromDateTime(val.(string), v.typ)
+		v.raw, err = importFromDateTime(val, v.typ)
 	case Timestamp:
 		v.raw, err = importFromTimestamp(val, v.typ)
 	case Auto, Hidden:
