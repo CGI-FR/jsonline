@@ -35,6 +35,7 @@
 package cast
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -74,6 +75,13 @@ func To(targetType interface{}, val interface{}) (interface{}, error) {
 		return ToBinary(val)
 	case time.Time:
 		return ToTime(val)
+	case json.Number:
+		n, err := ToString(val)
+		if err != nil {
+			return nil, err
+		}
+
+		return json.Number(n.(string)), err
 	default:
 		return nil, fmt.Errorf("%w: %#v to %T", ErrUnableToCast, val, targetType)
 	}

@@ -37,6 +37,7 @@ package jsonline
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/adrienaury/go-template/pkg/cast"
 )
@@ -44,14 +45,14 @@ import (
 type format int8
 
 const (
-	String    format = iota // string representation, e.g. : "hello", "2.4", "true"
-	Numeric                 // integer or decimal, e.g. : 2.4, 1
-	Boolean                 // true or false
-	Binary                  // string representation encoded as base64
-	DateTime                // date and time as RFC3339, e.g. : "2006-01-02T15:04:05Z", "2006-01-02T15:04:05+07:00"
-	Timestamp               // milliseconds since 1970
-	Auto                    // no specific format enforced
-	Hidden                  // will not be exported in jsonline
+	String    format = iota // String representation, e.g. : "hello", "2.4", "true".
+	Numeric                 // Numeric (integer or decimal), e.g. : 2.4, 1.
+	Boolean                 // Boolean : true or false.
+	Binary                  // Binary representation encoded as base64.
+	DateTime                // DateTime as RFC3339, e.g. : "2006-01-02T15:04:05Z", "2006-01-02T15:04:05+07:00".
+	Timestamp               // Timestamp the number of seconds since 1970 ("UNIX time").
+	Auto                    // Auto columns have no specific format enforced.
+	Hidden                  // Hidden columns will not be exported in jsonline.
 )
 
 type Value interface {
@@ -101,7 +102,7 @@ func NewValueString(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   String,
-		typ: nil,
+		typ: string(""),
 	}
 }
 
@@ -109,7 +110,7 @@ func NewValueNumeric(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Numeric,
-		typ: nil,
+		typ: json.Number(""),
 	}
 }
 
@@ -117,7 +118,7 @@ func NewValueBoolean(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Boolean,
-		typ: nil,
+		typ: bool(true),
 	}
 }
 
@@ -125,7 +126,7 @@ func NewValueBinary(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Binary,
-		typ: nil,
+		typ: []byte{},
 	}
 }
 
@@ -133,7 +134,7 @@ func NewValueDateTime(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   DateTime,
-		typ: nil,
+		typ: time.Time{},
 	}
 }
 
@@ -141,7 +142,7 @@ func NewValueTimestamp(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Timestamp,
-		typ: nil,
+		typ: int64(0),
 	}
 }
 
