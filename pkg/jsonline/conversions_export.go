@@ -38,7 +38,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/adrienaury/go-template/pkg/cast"
+	"github.com/cgi-fr/jsonline/pkg/cast"
 )
 
 func exportToBinary(val interface{}) (interface{}, error) {

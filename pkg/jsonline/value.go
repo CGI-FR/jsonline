@@ -39,7 +39,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/adrienaury/go-template/pkg/cast"
+	"github.com/cgi-fr/jsonline/pkg/cast"
 )
 
 type format int8

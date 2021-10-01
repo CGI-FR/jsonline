@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/adrienaury/go-template/pkg/jsonline"
+	"github.com/cgi-fr/jsonline/pkg/jsonline"
 	"github.com/stretchr/testify/assert"
 )
 

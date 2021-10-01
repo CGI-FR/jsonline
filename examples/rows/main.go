@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/adrienaury/go-template/pkg/jsonline"
+	"github.com/cgi-fr/jsonline/pkg/jsonline"
 )
 
 func main() {
