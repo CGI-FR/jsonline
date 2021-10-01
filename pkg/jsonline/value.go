@@ -37,6 +37,8 @@ package jsonline
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/adrienaury/go-template/pkg/cast"
 )
 
 type format int8
@@ -162,15 +164,16 @@ func (v *value) Raw() interface{} {
 func (v *value) Export() (interface{}, error) {
 	val := v.raw
 
+	//nolint:wrapcheck
 	switch v.f {
 	case String:
-		return convertToString(val), nil
+		return cast.ToString(val)
 	case Numeric:
-		return convertToNumeric(val)
+		return cast.ToNumber(val)
 	case Boolean:
-		return convertToBoolean(val)
+		return cast.ToBool(val)
 	case Binary:
-		return exportToBinary(val), nil
+		return cast.ToBinary(val)
 	case DateTime:
 		return exportToDateTime(val)
 	case Time:
@@ -184,28 +187,35 @@ func (v *value) Export() (interface{}, error) {
 	return nil, fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.f)
 }
 
+//nolint:cyclop
 func (v *value) Import(val interface{}) error {
+	if val == nil {
+		v.raw = nil
+
+		return nil
+	}
+
 	var err error
 
 	switch v.f {
 	case String:
-		v.raw = convertToString(val)
+		v.raw, err = importFromString(val.(string), v.raw)
 	case Numeric:
-		v.raw, err = convertToNumeric(val)
+		v.raw, err = importFromNumeric(val, v.raw)
 	case Boolean:
-		v.raw, err = convertToBoolean(val)
+		v.raw, err = importFromBoolean(val, v.raw)
 	case Binary:
-		v.raw, err = importToBinary(val)
+		v.raw, err = importFromBinary(val.(string), v.raw)
 	case DateTime:
-		v.raw, err = importToDateTime(val)
+		v.raw, err = importFromDateTime(val.(string), v.raw)
 	case Time:
-		v.raw, err = importToTime(val)
+		v.raw, err = importFromTime(val.(string), v.raw)
 	case Timestamp:
-		v.raw, err = importToTimestamp(val)
+		v.raw, err = importFromTimestamp(val, v.raw)
 	case Auto, Hidden:
 		v.raw = val
 	default:
-		return fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.f)
+		err = fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.f)
 	}
 
 	return err

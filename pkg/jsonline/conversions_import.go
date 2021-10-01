@@ -37,89 +37,146 @@ package jsonline
 import (
 	"encoding/base64"
 	"fmt"
+	"strconv"
 	"time"
 )
 
-func importToBinary(val interface{}) (interface{}, error) {
-	if val == nil {
-		return nil, nil
+func importFromString(val string, targetType interface{}) (interface{}, error) {
+	switch targetType.(type) {
+	case nil:
+		return val, nil
+	case string:
+		return val, nil
+	case int:
+		return strconv.ParseInt(val, conversionBase, conversionSize) //nolint
+	default:
+		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
 	}
-
-	b, err := base64.StdEncoding.DecodeString(convertToString(val).(string))
-	if err != nil {
-		return nil, fmt.Errorf("%w", err)
-	}
-
-	return b, nil
 }
 
-func importToDateTime(val interface{}) (interface{}, error) {
-	switch typedValue := val.(type) {
+func importFromNumeric(val interface{}, targetType interface{}) (interface{}, error) {
+	switch targetType.(type) {
 	case nil:
-		return nil, nil
+		return val, nil
 	case string:
-		res, err := time.Parse(time.RFC3339, typedValue)
+		return val, nil
+	default:
+		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+	}
+}
+
+func importFromBoolean(val interface{}, targetType interface{}) (interface{}, error) {
+	switch targetType.(type) {
+	case nil:
+		return val, nil
+	case string:
+		return val, nil
+	default:
+		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+	}
+}
+
+func importFromBinary(val string, targetType interface{}) (interface{}, error) {
+	switch targetType.(type) {
+	case string:
+		b, err := base64.StdEncoding.DecodeString(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w", err)
+		}
+
+		return string(b), nil
+	case nil, []byte:
+		b, err := base64.StdEncoding.DecodeString(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w", err)
+		}
+
+		return b, nil
+	default:
+		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+	}
+}
+
+func importFromDateTime(val string, targetType interface{}) (interface{}, error) {
+	switch targetType.(type) {
+	case nil, time.Time:
+		res, err := time.Parse(time.RFC3339, val)
 		if err != nil {
 			return nil, fmt.Errorf("%w", err)
 		}
 
 		return res, nil
 	default:
-		return importToDateTime(convertToString(val))
+		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
 	}
 }
 
-func importToTime(val interface{}) (interface{}, error) {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil, nil
-	case string:
-		res, err := time.Parse("15:04:05Z07:00", typedValue)
+func importFromTime(val string, targetType interface{}) (interface{}, error) {
+	switch targetType.(type) {
+	case nil, time.Time:
+		res, err := time.Parse("15:04:05Z07:00", val)
 		if err != nil {
 			return nil, fmt.Errorf("%w", err)
 		}
 
 		return res, nil
 	default:
-		return importToTime(convertToString(val))
+		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
+	}
+}
+
+func importFromTimestamp(val interface{}, targetType interface{}) (interface{}, error) {
+	switch targetType.(type) {
+	case nil, time.Time:
+		return time.Unix(convertNumericToInt64(val), 0), nil
+	case string:
+		return val, nil
+	default:
+		return nil, fmt.Errorf("%w", ErrUnsupportedImportType)
 	}
 }
 
 //nolint:cyclop
-func importToTimestamp(val interface{}) (interface{}, error) {
-	switch typedValue := val.(type) {
-	case nil:
-		return nil, nil
-	case int64:
-		return typedValue, nil
-	case int32:
-		return int64(typedValue), nil
-	case int16:
-		return int64(typedValue), nil
-	case int8:
-		return int64(typedValue), nil
-	case int:
-		return int64(typedValue), nil
-	case uint64:
-		return int64(typedValue), nil
-	case uint32:
-		return int64(typedValue), nil
-	case uint16:
-		return int64(typedValue), nil
-	case uint8:
-		return int64(typedValue), nil
-	case uint:
-		return int64(typedValue), nil
-	default:
-		if res, err := convertToNumeric(typedValue); err == nil {
-			return res, nil
-		}
-
-		t, err := importToDateTime(typedValue)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		return t.(time.Time).Unix(), nil
+func convertNumericToInt64(val interface{}) int64 {
+	if v, ok := val.(int64); ok {
+		return v
 	}
+
+	if v, ok := val.(int32); ok {
+		return int64(v)
+	}
+
+	if v, ok := val.(int16); ok {
+		return int64(v)
+	}
+
+	if v, ok := val.(int8); ok {
+		return int64(v)
+	}
+
+	if v, ok := val.(int); ok {
+		return int64(v)
+	}
+
+	if v, ok := val.(uint64); ok {
+		return int64(v)
+	}
+
+	if v, ok := val.(uint32); ok {
+		return int64(v)
+	}
+
+	if v, ok := val.(uint16); ok {
+		return int64(v)
+	}
+
+	if v, ok := val.(uint8); ok {
+		return int64(v)
+	}
+
+	if v, ok := val.(uint); ok {
+		return int64(v)
+	}
+
+	return 0
 }
