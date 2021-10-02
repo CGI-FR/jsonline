@@ -37,7 +37,6 @@ package jsonline
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/cgi-fr/jsonline/pkg/cast"
 )
@@ -102,7 +101,7 @@ func NewValueString(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   String,
-		typ: string(""),
+		typ: nil,
 	}
 }
 
@@ -110,7 +109,7 @@ func NewValueNumeric(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Numeric,
-		typ: json.Number(""),
+		typ: nil,
 	}
 }
 
@@ -118,7 +117,7 @@ func NewValueBoolean(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Boolean,
-		typ: bool(true),
+		typ: nil,
 	}
 }
 
@@ -126,7 +125,7 @@ func NewValueBinary(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Binary,
-		typ: []byte{},
+		typ: nil,
 	}
 }
 
@@ -134,7 +133,7 @@ func NewValueDateTime(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   DateTime,
-		typ: time.Time{},
+		typ: nil,
 	}
 }
 
@@ -142,7 +141,7 @@ func NewValueTimestamp(v interface{}) Value {
 	return &value{
 		raw: v,
 		f:   Timestamp,
-		typ: int64(0),
+		typ: nil,
 	}
 }
 
