@@ -50,7 +50,8 @@ testcases:
   - name: convert to datetime
     steps:
       - script: |-
-          TZ="Europe/Paris" echo '{"string": "2021-09-28T11:59:49+02:00", "numeric": 1632823189, "nil": null}' | jl -t '{"string":"datetime","numeric":"datetime","nil":"datetime"}'
+          export TZ="Europe/Paris"
+          echo '{"string": "2021-09-28T11:59:49+02:00", "numeric": 1632823189, "nil": null}' | jl -t '{"string":"datetime","numeric":"datetime","nil":"datetime"}'
         assertions:
           - result.systemout ShouldEqual '{"string":"2021-09-28T11:59:49+02:00","numeric":"2021-09-28T11:59:49+02:00","nil":null}'
           - result.systemerr ShouldBeEmpty
