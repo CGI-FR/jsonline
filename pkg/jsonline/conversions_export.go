@@ -42,12 +42,12 @@ import (
 )
 
 func exportToBinary(val interface{}) (interface{}, error) {
-	str, err := cast.ToString(val)
+	b, err := cast.ToBinary(val)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	return base64.StdEncoding.EncodeToString([]byte(str.(string))), nil
+	return base64.StdEncoding.EncodeToString(b.([]byte)), nil
 }
 
 //nolint:wrapcheck
