@@ -58,6 +58,7 @@ type Template interface {
 	WithMappedBinary(string, interface{}) Template
 	WithMappedDateTime(string, interface{}) Template
 	WithMappedTimestamp(string, interface{}) Template
+	WithMappedAuto(string, interface{}) Template
 
 	CreateRow(interface{}) (Row, error)
 	CreateRowEmpty() Row
@@ -162,6 +163,12 @@ func (t *template) WithMappedDateTime(name string, rawtype interface{}) Template
 
 func (t *template) WithMappedTimestamp(name string, rawtype interface{}) Template {
 	t.empty.Set(name, NewValue(nil, Timestamp, rawtype))
+
+	return t
+}
+
+func (t *template) WithMappedAuto(name string, rawtype interface{}) Template {
+	t.empty.Set(name, NewValue(nil, Auto, rawtype))
 
 	return t
 }

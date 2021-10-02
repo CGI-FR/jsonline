@@ -20,8 +20,8 @@ func TestLinoUseCase(t *testing.T) {
 	expectedExportEmpty := `{"title":null,"release_date":null}`
 
 	template := jsonline.NewTemplate().
-		WithMappedString("title", []byte{}).
-		WithMappedNumeric("release_date", []byte{})
+		WithString("title").
+		WithNumeric("release_date")
 
 	row, err := template.CreateRow(data)
 	assert.NoError(t, err)
@@ -34,6 +34,10 @@ func TestLinoUseCase(t *testing.T) {
 	b, err := row.MarshalJSON()
 	assert.NoError(t, err)
 	assert.Equal(t, expectedMarshal, string(b))
+
+	template = jsonline.NewTemplate().
+		WithMappedAuto("title", []byte{}).
+		WithMappedAuto("release_date", []byte{})
 
 	result := template.CreateRowEmpty()
 	assert.Equal(t, expectedRawEmpty, result.Raw())
