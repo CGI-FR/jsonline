@@ -215,7 +215,7 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	importer := jsonline.NewImporter(os.Stdin)
+	importer := t.GetImporter(os.Stdin)
 	exporter := t.GetExporter(os.Stdout)
 	streamer := jsonline.NewStreamer(importer, exporter)
 

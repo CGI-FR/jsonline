@@ -41,9 +41,9 @@ testcases:
   - name: convert to binary
     steps:
       - script: |-
-          echo '{"string": "0.0", "numeric": 0.1, "nil": null}' | jl -t '{"string":"binary","numeric":"binary","nil":"binary"}'
+          echo '{"string": "aGVsbG8=", "numeric": "BAAAAAAAAAA=", "nil": null}' | jl -t '{"string":"binary","numeric":"binary","nil":"binary"}'
         assertions:
-          - result.systemout ShouldEqual '{"string":"MC4w","numeric":"MC4x","nil":null}'
+          - result.systemout ShouldEqual '{"string":"aGVsbG8=","numeric":"BAAAAAAAAAA=","nil":null}'
           - result.systemerr ShouldBeEmpty
           - result.code ShouldEqual 0
 
@@ -59,7 +59,7 @@ testcases:
   - name: convert to timestamp
     steps:
       - script: |-
-          echo '{"string": "2021-09-28T11:59:49+02:00", "numeric": 1632823189, "nil": null}' | jl -t '{"string":"timestamp","numeric":"timestamp","nil":"timestamp"}'
+          echo '{"string": "1632823189", "numeric": 1632823189, "nil": null}' | jl -t '{"string":"timestamp","numeric":"timestamp","nil":"timestamp"}'
         assertions:
           - result.systemout ShouldEqual '{"string":1632823189,"numeric":1632823189,"nil":null}'
           - result.systemerr ShouldBeEmpty
