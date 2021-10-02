@@ -19,6 +19,7 @@ Types of changes
 - **`Added`** cast values to specific raw type on row import with `template.WithMapped*` or `value.NewValue(v interface{}, f Format, rawtype interface{})`.
 - **`Added`** `value.GetRawType()` return the raw type that will be used on import.
 - **`Added`** new package `cast` to expose all type cast-related functions.
+- **`Added`** improved logging, `trace` level gives full information about rows.
 - **`Changed`** `template.Create()` renamed in `template.CreateRow()` for readability.
 - **`Changed`** default raw type and export value for `Number` format is `json.Number`.
 - **`Changed`** module name to `github.com/cgi-fr/jsonline`.
@@ -28,6 +29,7 @@ Types of changes
 - **`Fixed`** `Format` type now correctly exported by jsonline package.
 - **`Fixed`** `row.Raw()` now return the correct value (a `map[string]interface{}` of raw values).
 - **`Fixed`** conversions error no longer ignored by unmarshaling.
+- **`Fixed`** jl command line did not handle `Binary` column format properly.
 
 ## [0.1.0] 2021-09-21
 
