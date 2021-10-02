@@ -85,12 +85,12 @@ func TestExportImport(t *testing.T) {
 	assert.Equal(t, int64(1632518460), m["timestamp"])
 
 	r3 := jsonline.NewRow()
-	r3.Set("string", jsonline.NewValueNil(jsonline.String))
-	r3.Set("numeric", jsonline.NewValueNil(jsonline.Numeric))
-	r3.Set("boolean", jsonline.NewValueNil(jsonline.Boolean))
-	r3.Set("binary", jsonline.NewValueNil(jsonline.Binary))
-	r3.Set("datetime", jsonline.NewValueNil(jsonline.DateTime))
-	r3.Set("timestamp", jsonline.NewValueNil(jsonline.Timestamp))
+	r3.Set("string", jsonline.NewValueString(nil))
+	r3.Set("numeric", jsonline.NewValueNumeric(nil))
+	r3.Set("boolean", jsonline.NewValueBoolean(nil))
+	r3.Set("binary", jsonline.NewValueBinary(nil))
+	r3.Set("datetime", jsonline.NewValueDateTime(nil))
+	r3.Set("timestamp", jsonline.NewValueTimestamp(nil))
 
 	err = r3.Import([]interface{}{"value", 42.5, true, "dmFsdWU=", "2021-09-24T21:21:00Z", 1632518460})
 	assert.NoError(t, err)

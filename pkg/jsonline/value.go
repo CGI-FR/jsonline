@@ -82,11 +82,11 @@ func NewValue(v interface{}, f format, rawtype interface{}) Value {
 	}
 }
 
-func NewValueNil(f format) Value {
+func NewValueNil(f format, rawtype interface{}) Value {
 	return &value{
 		raw: nil,
 		f:   f,
-		typ: nil,
+		typ: rawtype,
 	}
 }
 
