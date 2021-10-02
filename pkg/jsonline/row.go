@@ -87,7 +87,7 @@ func CloneRow(r Row) Row {
 	return result
 }
 
-func (r *row) GetFormat() format {
+func (r *row) GetFormat() Format {
 	return Auto
 }
 

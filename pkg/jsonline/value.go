@@ -41,10 +41,10 @@ import (
 	"github.com/cgi-fr/jsonline/pkg/cast"
 )
 
-type format int8
+type Format int8
 
 const (
-	String    format = iota // String representation, e.g. : "hello", "2.4", "true".
+	String    Format = iota // String representation, e.g. : "hello", "2.4", "true".
 	Numeric                 // Numeric (integer or decimal), e.g. : 2.4, 1.
 	Boolean                 // Boolean : true or false.
 	Binary                  // Binary representation encoded as base64.
@@ -55,7 +55,7 @@ const (
 )
 
 type Value interface {
-	GetFormat() format
+	GetFormat() Format
 	GetRawType() interface{}
 
 	Raw() interface{}
@@ -69,11 +69,11 @@ type Value interface {
 
 type value struct {
 	raw interface{}
-	f   format
+	f   Format
 	typ interface{}
 }
 
-func NewValue(v interface{}, f format, rawtype interface{}) Value {
+func NewValue(v interface{}, f Format, rawtype interface{}) Value {
 	return &value{
 		raw: v,
 		f:   f,
@@ -81,7 +81,7 @@ func NewValue(v interface{}, f format, rawtype interface{}) Value {
 	}
 }
 
-func NewValueNil(f format, rawtype interface{}) Value {
+func NewValueNil(f Format, rawtype interface{}) Value {
 	return &value{
 		raw: nil,
 		f:   f,
@@ -157,7 +157,7 @@ func CloneValue(v Value) Value {
 	return NewValue(v.Raw(), v.GetFormat(), v.GetRawType())
 }
 
-func (v *value) GetFormat() format {
+func (v *value) GetFormat() Format {
 	return v.f
 }
 
