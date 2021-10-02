@@ -218,7 +218,7 @@ func (v *value) Import(val interface{}) error {
 	case Timestamp:
 		v.raw, err = importFromTimestamp(val, v.typ)
 	case Auto, Hidden:
-		v.raw = val
+		v.raw, err = cast.To(v.typ, val)
 	default:
 		err = fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.f)
 	}

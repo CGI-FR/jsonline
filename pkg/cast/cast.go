@@ -40,9 +40,11 @@ import (
 	"time"
 )
 
-//nolint:cyclop
+//nolint:cyclop,funlen
 func To(targetType interface{}, val interface{}) (interface{}, error) {
 	switch targetType.(type) {
+	case nil:
+		return val, nil
 	case int:
 		return ToInt(val)
 	case int64:
