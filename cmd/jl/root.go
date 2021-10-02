@@ -231,6 +231,8 @@ func run(cmd *cobra.Command, args []string) {
 			log.Error().Err(err).Msg("failed to process JSON line")
 		}
 
+		log.Trace().Str("raw", row.DebugString()).RawJSON("export", []byte(row.String())).Msg("processed JSON line")
+
 		return nil
 	}
 
@@ -273,7 +275,7 @@ func getTemplateFlags(cmd *cobra.Command) (*templateFlags, error) {
 
 	log.Debug().
 		Str("filename", tf.filename).
-		Str("template", tf.template).
+		RawJSON("template", []byte(tf.template)).
 		Str("columns", fmt.Sprintf("%v", tf.columns)).
 		Msg("template flags")
 

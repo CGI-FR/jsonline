@@ -65,6 +65,8 @@ type Value interface {
 	json.Unmarshaler
 	json.Marshaler
 	fmt.Stringer
+
+	DebugString() string
 }
 
 type value struct {
@@ -251,4 +253,8 @@ func (v *value) String() string {
 	}
 
 	return string(b)
+}
+
+func (v *value) DebugString() string {
+	return fmt.Sprintf("%T(%#v)", v.raw, v.raw)
 }

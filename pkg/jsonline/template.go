@@ -37,8 +37,6 @@ package jsonline
 import (
 	"fmt"
 	"io"
-
-	"github.com/rs/zerolog/log"
 )
 
 type Template interface {
@@ -173,14 +171,12 @@ func (t *template) WithMappedAuto(name string, rawtype interface{}) Template {
 	return t
 }
 
-//nolint:cyclop,funlen
+//nolint:cyclop
 func (t *template) CreateRow(v interface{}) (Row, error) {
 	result := CloneRow(t.empty)
 
 	switch values := v.(type) {
 	case []interface{}:
-		log.Debug().Msg("create new row from slice")
-
 		for i, val := range values {
 			target := result.GetAtIndex(i)
 			if target != nil {
@@ -192,8 +188,6 @@ func (t *template) CreateRow(v interface{}) (Row, error) {
 			result.SetAtIndex(i, target)
 		}
 	case map[string]interface{}:
-		log.Debug().Msg("create new row from map")
-
 		for key, val := range values {
 			target := result.Get(key)
 			if target != nil {
@@ -205,8 +199,6 @@ func (t *template) CreateRow(v interface{}) (Row, error) {
 			result.Set(key, target)
 		}
 	case Row:
-		log.Debug().Msg("create new row from row")
-
 		iter := values.Iter()
 
 		for key, val, ok := iter(); ok; key, val, ok = iter() {
@@ -221,15 +213,11 @@ func (t *template) CreateRow(v interface{}) (Row, error) {
 		}
 
 	case []byte:
-		log.Debug().Msg("create new row from byte buffer")
-
 		if err := result.UnmarshalJSON(values); err != nil {
 			return nil, fmt.Errorf("%w", err)
 		}
 
 	case string:
-		log.Debug().Msg("create new row from JSON string")
-
 		if err := result.UnmarshalJSON([]byte(values)); err != nil {
 			return nil, fmt.Errorf("%w", err)
 		}
