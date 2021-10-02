@@ -189,3 +189,19 @@ func TestTemplateCreateFromByteBuffer(t *testing.T) {
 		`{"string":"value","numeric":0,"boolean":true,"binary":"dmFsdWU=","datetime":"2019-08-26T20:40:58+02:00","timestamp":1566844858,"auto":"hello","row":{"first":0},"extra":"extra"}`,
 		row.String())
 }
+
+func TestChaining(t *testing.T) {
+	t1 := jsonline.NewTemplate().WithMappedBinary("input", int64(0))
+	t2 := jsonline.NewTemplate().WithNumeric("input")
+
+	row1, err := t1.CreateRow(`{"input":"AgAAAAAAAAA="}`)
+	assert.NoError(t, err)
+	assert.Equal(t, row1.DebugString(), "input={int64(2)}")
+
+	row2 := t2.CreateRowEmpty()
+	err = row2.Import(row1.Raw())
+	assert.NoError(t, err)
+	assert.Equal(t, row2.DebugString(), "input={json.Number(`2`)}")
+
+	assert.Equal(t, row2.String(), `{"input":2}`)
+}
