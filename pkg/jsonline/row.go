@@ -40,6 +40,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 )
 
 // Row of data.
@@ -273,6 +274,19 @@ func (r *row) String() string {
 	}
 
 	return string(b)
+}
+
+func (r *row) DebugString() string {
+	sb := strings.Builder{}
+	iter := r.Iter()
+
+	sep := ""
+	for k, v, ok := iter(); ok; k, v, ok = iter() {
+		sb.WriteString(fmt.Sprintf(`%v%v={%v}`, sep, k, v.DebugString()))
+		sep = ";"
+	}
+
+	return strings.ReplaceAll(sb.String(), `"`, "`")
 }
 
 //nolint

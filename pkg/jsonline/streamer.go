@@ -36,23 +36,17 @@ package jsonline
 
 import (
 	"fmt"
-
-	"github.com/rs/zerolog/log"
 )
 
 type (
 	Processor func(Row, error) error
 )
 
-//nolint:gochecknoglobals
-var (
-	DefaultProcessor   Processor = func(r Row, e error) error { return e }
-	NoFailureProcessor Processor = func(r Row, e error) error {
-		log.Warn().Interface("row", r).Msg("failed to process row")
+func DefaultProcessor(r Row, e error) error { return e }
 
-		return nil
-	}
-)
+func NoFailureProcessor(r Row, e error) error {
+	return nil
+}
 
 type Streamer interface {
 	WithProcessor(Processor) Streamer
