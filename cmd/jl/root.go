@@ -18,6 +18,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"runtime"
@@ -77,7 +78,7 @@ func NewRootCommand() (*RootCommand, error) {
 
 	tf := templateFlags{
 		columns:  nil,
-		template: "",
+		template: "{}",
 		filename: "./row.yml",
 	}
 
@@ -269,15 +270,24 @@ func getTemplateFlags(cmd *cobra.Command) (*templateFlags, error) {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	if len(tf.columns) > 0 && len(tf.template) > 0 {
+	if len(tf.columns) > 0 && len(tf.template) > 0 && tf.template != "{}" {
 		return nil, ErrForbiddenTemplateAndColumnFlags
 	}
 
-	log.Debug().
-		Str("filename", tf.filename).
-		RawJSON("template", []byte(tf.template)).
-		Str("columns", fmt.Sprintf("%v", tf.columns)).
-		Msg("template flags")
+	var js json.RawMessage
+	if json.Unmarshal([]byte(tf.template), &js) != nil {
+		log.Debug().
+			Str("filename", tf.filename).
+			Str("template", tf.template).
+			Str("columns", fmt.Sprintf("%v", tf.columns)).
+			Msg("template flags")
+	} else {
+		log.Debug().
+			Str("filename", tf.filename).
+			RawJSON("template", []byte(tf.template)).
+			Str("columns", fmt.Sprintf("%v", tf.columns)).
+			Msg("template flags")
+	}
 
 	return tf, nil
 }
@@ -311,7 +321,7 @@ func createTemplate(cmd *cobra.Command) (jsonline.Template, error) {
 		if err != nil {
 			return nil, err
 		}
-	} else if len(tf.template) > 0 {
+	} else if len(tf.template) > 0 && tf.template != "{}" {
 		t, err = createTemplateFromString(tf.template)
 		if err != nil {
 			return nil, err

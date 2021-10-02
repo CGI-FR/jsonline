@@ -30,6 +30,7 @@ Types of changes
 - **`Fixed`** `row.Raw()` now return the correct value (a `map[string]interface{}` of raw values).
 - **`Fixed`** conversions error no longer ignored by unmarshaling.
 - **`Fixed`** jl command line did not handle `Binary` column format properly.
+- **`Fixed`** jl command line did not handle invalid `template` flag properly.
 
 ## [0.1.0] 2021-09-21
 
