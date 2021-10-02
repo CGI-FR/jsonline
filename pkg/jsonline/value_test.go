@@ -376,31 +376,31 @@ func TestValueExportBinary(t *testing.T) {
 	}{
 		{nil, nil},
 		// signed integers
-		{int(-2), "LTI="},
-		{int8(-1), "LTE="},
-		{int16(0), "MA=="},
-		{int32(1), "MQ=="}, // int32 is an alias of rune
-		{int64(2), "Mg=="},
+		{int(-2), "/v///wAAAAA="},
+		{int8(-1), "/w=="},
+		{int16(0), "AAA="},
+		{int32(1), "AQAAAA=="}, // int32 is an alias of rune
+		{int64(2), "AgAAAAAAAAA="},
 		// unsigned integers
-		{uint(0), "MA=="},
-		{uint8(1), "MQ=="},
-		{uint16(2), "Mg=="},
-		{uint32(3), "Mw=="},
-		{uint64(4), "NA=="},
+		{uint(0), "AAAAAAAAAAA="},
+		{uint8(1), "AQ=="},
+		{uint16(2), "AgA="},
+		{uint32(3), "AwAAAA=="},
+		{uint64(4), "BAAAAAAAAAA="},
 		// floats
-		{float32(1.2), "MS4y"},
-		{float64(-1.2), "LTEuMg=="},
+		{float32(1.2), "mpmZPw=="},
+		{float64(-1.2), "MzMzMzMz878="},
 		// complex numbers => NOT SUPPORTED YET
 		// {complex64(1.2i + 5), "KDUrMS4yaSk="},
 		// {complex128(-1.0i + 8), "KDgtMWkp"},
 		// booleans
-		{true, "dHJ1ZQ=="},
-		{false, "ZmFsc2U="},
+		{true, "AQ=="},
+		{false, "AA=="},
 		// strings
 		{"string", "c3RyaW5n"},
-		{'r', "MTE0"},
+		{'r', "cgAAAA=="},
 		// binary
-		{byte(36), "MzY="}, // byte is an alias for uint8
+		{byte(36), "JA=="}, // byte is an alias for uint8
 		{[]byte("hello"), "aGVsbG8="},
 		// composite
 		// {stringArray, "W2EgYl0="},
@@ -430,7 +430,7 @@ func TestValueImportBinary(t *testing.T) {
 		expected interface{}
 	}{
 		{nil, nil},
-		{"LTI=", "-2"},
+		{"LTI=", []byte{0x2d, 0x32}},
 	}
 
 	for _, td := range testdatas {
@@ -451,31 +451,31 @@ func TestValueMarshalBinary(t *testing.T) {
 	}{
 		{nil, "null"},
 		// signed integers
-		{int(-2), `"LTI="`},
-		{int8(-1), `"LTE="`},
-		{int16(0), `"MA=="`},
-		{int32(1), `"MQ=="`}, // int32 is an alias of rune
-		{int64(2), `"Mg=="`},
+		{int(-2), `"/v///wAAAAA="`},
+		{int8(-1), `"/w=="`},
+		{int16(0), `"AAA="`},
+		{int32(1), `"AQAAAA=="`}, // int32 is an alias of rune
+		{int64(2), `"AgAAAAAAAAA="`},
 		// unsigned integers
-		{uint(0), `"MA=="`},
-		{uint8(1), `"MQ=="`},
-		{uint16(2), `"Mg=="`},
-		{uint32(3), `"Mw=="`},
-		{uint64(4), `"NA=="`},
+		{uint(0), `"AAAAAAAAAAA="`},
+		{uint8(1), `"AQ=="`},
+		{uint16(2), `"AgA="`},
+		{uint32(3), `"AwAAAA=="`},
+		{uint64(4), `"BAAAAAAAAAA="`},
 		// floats
-		{float32(1.2), `"MS4y"`},
-		{float64(-1.2), `"LTEuMg=="`},
+		{float32(1.2), `"mpmZPw=="`},
+		{float64(-1.2), `"MzMzMzMz878="`},
 		// complex numbers => NOT SUPPORTED YET
 		// {complex64(1.2i + 5), `"KDUrMS4yaSk="`},
 		// {complex128(-1.0i + 8), `"KDgtMWkp"`},
 		// booleans
-		{true, `"dHJ1ZQ=="`},
-		{false, `"ZmFsc2U="`},
+		{true, `"AQ=="`},
+		{false, `"AA=="`},
 		// strings
 		{"string", `"c3RyaW5n"`},
-		{'r', `"MTE0"`},
+		{'r', `"cgAAAA=="`},
 		// binary
-		{byte(36), `"MzY="`}, // byte is an alias for uint8
+		{byte(36), `"JA=="`}, // byte is an alias for uint8
 		{[]byte("hello"), `"aGVsbG8="`},
 		// composite => NOT SUPPORTED YET
 		// {stringArray, `"W2EgYl0="`},

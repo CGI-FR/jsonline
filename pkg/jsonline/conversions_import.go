@@ -85,7 +85,7 @@ func importFromBinary(val interface{}, targetType interface{}) (interface{}, err
 
 	switch targetType.(type) {
 	case nil:
-		return cast.ToString(b)
+		return b, nil
 	default:
 		return cast.To(targetType, b)
 	}
