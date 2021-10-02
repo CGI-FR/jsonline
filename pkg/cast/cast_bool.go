@@ -88,7 +88,7 @@ func ToBool(i interface{}) (interface{}, error) {
 			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
 		}
 
-		return f != 0, nil
+		return f != 0.0, nil
 	case []byte:
 		return ToBool(string(val))
 	case time.Time:
