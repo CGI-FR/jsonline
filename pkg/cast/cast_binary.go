@@ -32,6 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
+//nolint:cyclop,funlen,gomnd
 package cast
 
 import (
@@ -43,7 +44,6 @@ import (
 	"unsafe"
 )
 
-//nolint:cyclop,funlen,gomnd
 func ToBinary(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil, []byte:

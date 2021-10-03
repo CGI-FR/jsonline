@@ -32,6 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
+//nolint:cyclop,funlen,gomnd
 package cast
 
 import (
@@ -42,7 +43,6 @@ import (
 	"strconv"
 )
 
-//nolint:cyclop,funlen
 func ToFloat64(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil:
@@ -78,7 +78,7 @@ func ToFloat64(i interface{}) (interface{}, error) {
 
 		return float64(0), nil
 	case string:
-		v, err := strconv.ParseFloat(val, 64) //nolint:gomnd
+		v, err := strconv.ParseFloat(val, 64)
 		if err == nil {
 			return v, nil
 		}
@@ -100,7 +100,6 @@ func ToFloat64(i interface{}) (interface{}, error) {
 	}
 }
 
-//nolint:cyclop,funlen
 func ToFloat32(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil:
@@ -136,7 +135,7 @@ func ToFloat32(i interface{}) (interface{}, error) {
 
 		return float32(0), nil
 	case string:
-		v, err := strconv.ParseFloat(val, 32) //nolint:gomnd
+		v, err := strconv.ParseFloat(val, 32)
 		if err == nil {
 			return float32(v), nil
 		}

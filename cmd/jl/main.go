@@ -25,7 +25,7 @@ import (
 )
 
 // Provisioned by ldflags
-// nolint: gochecknoglobals
+//nolint:gochecknoglobals
 var (
 	name      string
 	version   string
@@ -35,8 +35,7 @@ var (
 )
 
 func main() {
-	// nolint: exhaustivestruct
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) //nolint:exhaustivestruct
 
 	cmd, err := NewRootCommand()
 	if err != nil {

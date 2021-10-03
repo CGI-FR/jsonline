@@ -54,8 +54,7 @@ type RootCommand struct {
 }
 
 func NewRootCommand() (*RootCommand, error) {
-	// nolint: exhaustivestruct
-	rootCmd := cobra.Command{
+	rootCmd := cobra.Command{ //nolint:exhaustivestruct
 		Use:     fmt.Sprintf("%v", name),
 		Short:   "JSONLine templating",
 		Long:    `Order keys and enforce format of JSON lines.`,
@@ -144,8 +143,7 @@ func initConfig() {
 	if jsonlog {
 		log.Logger = zerolog.New(os.Stderr)
 	} else {
-		// nolint: exhaustivestruct
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: !color})
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: !color}) //nolint:exhaustivestruct
 	}
 
 	debug := viper.GetBool("debug")
@@ -232,7 +230,11 @@ func run(cmd *cobra.Command, args []string) {
 			log.Error().Err(err).Msg("failed to process JSON line")
 		}
 
-		log.Trace().Str("raw", row.DebugString()).RawJSON("export", []byte(row.String())).Msg("processed JSON line")
+		if row != nil {
+			log.Trace().Str("raw", row.DebugString()).RawJSON("export", []byte(row.String())).Msg("processed JSON line")
+		} else {
+			log.Trace().Str("raw", "<nil>").Str("export", "<nil>").Msg("processed JSON line")
+		}
 
 		return nil
 	}

@@ -40,5 +40,6 @@ import (
 
 var (
 	ErrUnsupportedFormat     = errors.New("unsupported format")
-	ErrUnsupportedImportType = errors.New("can't import from this type")
+	ErrUnsupportedImportType = errors.New("can't import type")
+	ErrUnsupportedExportType = errors.New("can't export type")
 )
