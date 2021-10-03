@@ -32,6 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
+//nolint:cyclop,funlen,gomnd
 package cast
 
 import (
@@ -42,7 +43,6 @@ import (
 	"strconv"
 )
 
-//nolint:cyclop,funlen
 func ToInt(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil:
@@ -100,7 +100,6 @@ func ToInt(i interface{}) (interface{}, error) {
 	}
 }
 
-//nolint:cyclop,funlen
 func ToInt64(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil:
@@ -136,7 +135,7 @@ func ToInt64(i interface{}) (interface{}, error) {
 
 		return int64(0), nil
 	case string:
-		v, err := strconv.ParseInt(val, 0, 64) //nolint:gomnd
+		v, err := strconv.ParseInt(val, 0, 64)
 		if err == nil {
 			return v, nil
 		}
@@ -158,7 +157,6 @@ func ToInt64(i interface{}) (interface{}, error) {
 	}
 }
 
-//nolint:cyclop,funlen
 func ToInt32(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil:
@@ -194,7 +192,7 @@ func ToInt32(i interface{}) (interface{}, error) {
 
 		return int32(0), nil
 	case string:
-		v, err := strconv.ParseInt(val, 0, 32) //nolint:gomnd
+		v, err := strconv.ParseInt(val, 0, 32)
 		if err == nil {
 			return int32(v), nil
 		}
@@ -216,7 +214,6 @@ func ToInt32(i interface{}) (interface{}, error) {
 	}
 }
 
-//nolint:cyclop,funlen
 func ToInt16(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil:
@@ -252,7 +249,7 @@ func ToInt16(i interface{}) (interface{}, error) {
 
 		return int16(0), nil
 	case string:
-		v, err := strconv.ParseInt(val, 0, 16) //nolint:gomnd
+		v, err := strconv.ParseInt(val, 0, 16)
 		if err == nil {
 			return int16(v), nil
 		}
@@ -274,7 +271,6 @@ func ToInt16(i interface{}) (interface{}, error) {
 	}
 }
 
-//nolint:cyclop,funlen
 func ToInt8(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil:
@@ -310,7 +306,7 @@ func ToInt8(i interface{}) (interface{}, error) {
 
 		return int8(0), nil
 	case string:
-		v, err := strconv.ParseInt(val, 0, 8) //nolint:gomnd
+		v, err := strconv.ParseInt(val, 0, 8)
 		if err == nil {
 			return int8(v), nil
 		}

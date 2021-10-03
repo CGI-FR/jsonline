@@ -41,21 +41,61 @@ import (
 	"github.com/cgi-fr/jsonline/pkg/cast"
 )
 
+func exportToString(val interface{}) (interface{}, error) {
+	str, err := cast.ToString(val)
+	if err != nil {
+		return nil, fmt.Errorf("%w %T to String format: %v", ErrUnsupportedExportType, val, err)
+	}
+
+	return str, nil
+}
+
+func exportToNumber(val interface{}) (interface{}, error) {
+	nb, err := cast.ToNumber(val)
+	if err != nil {
+		return nil, fmt.Errorf("%w %T to Number format: %v", ErrUnsupportedExportType, val, err)
+	}
+
+	return nb, nil
+}
+
+func exportToBool(val interface{}) (interface{}, error) {
+	b, err := cast.ToBool(val)
+	if err != nil {
+		return nil, fmt.Errorf("%w %T to Boolean format: %v", ErrUnsupportedExportType, val, err)
+	}
+
+	return b, nil
+}
+
 func exportToBinary(val interface{}) (interface{}, error) {
 	b, err := cast.ToBinary(val)
 	if err != nil {
-		return nil, fmt.Errorf("%w", err)
+		return nil, fmt.Errorf("%w %T to Binary format: %v", ErrUnsupportedExportType, val, err)
 	}
 
 	return base64.StdEncoding.EncodeToString(b.([]byte)), nil
 }
 
-//nolint:wrapcheck
 func exportToDateTime(val interface{}) (interface{}, error) {
 	t, err := cast.ToTime(val)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w %T to DateTime format: %v", ErrUnsupportedExportType, val, err)
 	}
 
-	return cast.ToString(t)
+	str, err := cast.ToString(t)
+	if err != nil {
+		return nil, fmt.Errorf("%w %T to DateTime format: %v", ErrUnsupportedExportType, val, err)
+	}
+
+	return str, nil
+}
+
+func exportToTimestamp(val interface{}) (interface{}, error) {
+	i64, err := cast.ToTimestamp(val)
+	if err != nil {
+		return nil, fmt.Errorf("%w %T to Timestamp format: %v", ErrUnsupportedExportType, val, err)
+	}
+
+	return i64, nil
 }

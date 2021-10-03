@@ -176,20 +176,19 @@ func (v *value) Export() (interface{}, error) {
 		return nil, nil
 	}
 
-	//nolint:wrapcheck
 	switch v.f {
 	case String:
-		return cast.ToString(v.raw)
+		return exportToString(v.raw)
 	case Numeric:
-		return cast.ToNumber(v.raw)
+		return exportToNumber(v.raw)
 	case Boolean:
-		return cast.ToBool(v.raw)
+		return exportToBool(v.raw)
 	case Binary:
 		return exportToBinary(v.raw)
 	case DateTime:
 		return exportToDateTime(v.raw)
 	case Timestamp:
-		return cast.ToTimestamp(v.raw)
+		return exportToTimestamp(v.raw)
 	case Auto, Hidden:
 		return v.raw, nil
 	}
@@ -243,7 +242,12 @@ func (v *value) MarshalJSON() ([]byte, error) {
 }
 
 func (v *value) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &v.raw) //nolint
+	err := json.Unmarshal(data, &v.raw)
+	if err != nil {
+		return fmt.Errorf("can't unmarshal JSON data: %w", err)
+	}
+
+	return nil
 }
 
 func (v *value) String() string {

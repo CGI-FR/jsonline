@@ -99,7 +99,6 @@ func TestValueFormatString(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestValueMarshalString(t *testing.T) {
 	testdatas := []struct {
 		value    interface{}
@@ -201,7 +200,6 @@ func TestValueFormatNumeric(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestValueMarshalNumeric(t *testing.T) {
 	testdatas := []struct {
 		value    interface{}
@@ -368,7 +366,6 @@ func TestValueMarshalBoolean(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestValueExportBinary(t *testing.T) {
 	testdatas := []struct {
 		value    interface{}
@@ -443,7 +440,6 @@ func TestValueImportBinary(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestValueMarshalBinary(t *testing.T) {
 	testdatas := []struct {
 		value    interface{}
@@ -497,7 +493,6 @@ func TestValueMarshalBinary(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestValueExportDateTime(t *testing.T) {
 	tz, _ := time.LoadLocation("Asia/Shanghai")
 	testdatas := []struct {

@@ -41,72 +41,127 @@ import (
 	"github.com/cgi-fr/jsonline/pkg/cast"
 )
 
-//nolint:wrapcheck
 func importFromString(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
-		return cast.ToString(val)
+		str, err := cast.ToString(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return str, nil
+
 	default:
-		return cast.To(targetType, val)
+		i, err := cast.To(targetType, val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return i, nil
 	}
 }
 
-//nolint:wrapcheck
 func importFromNumeric(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
-		return cast.ToNumber(val)
+		nb, err := cast.ToNumber(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return nb, nil
+
 	default:
-		return cast.To(targetType, val)
+		i, err := cast.To(targetType, val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return i, nil
 	}
 }
 
-//nolint:wrapcheck
 func importFromBoolean(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
-		return cast.ToBool(val)
+		b, err := cast.ToBool(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return b, nil
+
 	default:
-		return cast.To(targetType, val)
+		i, err := cast.To(targetType, val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return i, nil
 	}
 }
 
-//nolint:wrapcheck
 func importFromBinary(val interface{}, targetType interface{}) (interface{}, error) {
 	str, err := cast.ToString(val)
 	if err != nil {
-		return nil, fmt.Errorf("%w", err)
+		return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
 	}
 
 	b, err := base64.StdEncoding.DecodeString(str.(string))
 	if err != nil {
-		return nil, fmt.Errorf("%w", err)
+		return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
 	}
 
 	switch targetType.(type) {
 	case nil:
 		return b, nil
+
 	default:
-		return cast.To(targetType, b)
+		i, err := cast.To(targetType, b)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, b, targetType, err)
+		}
+
+		return i, nil
 	}
 }
 
-//nolint:wrapcheck
 func importFromDateTime(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
-		return cast.ToTime(val)
+		t, err := cast.ToTime(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return t, nil
+
 	default:
-		return cast.To(targetType, val)
+		i, err := cast.To(targetType, val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return i, nil
 	}
 }
 
-//nolint:wrapcheck
 func importFromTimestamp(val interface{}, targetType interface{}) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
-		return cast.ToInt64(val)
+		i64, err := cast.ToInt64(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return i64, nil
+
 	default:
-		return cast.To(targetType, val)
+		i, err := cast.To(targetType, val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return i, nil
 	}
 }

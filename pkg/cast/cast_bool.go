@@ -32,6 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
+//nolint:cyclop,funlen
 package cast
 
 import (
@@ -41,7 +42,6 @@ import (
 	"time"
 )
 
-//nolint:cyclop,funlen
 func ToBool(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil, bool:
