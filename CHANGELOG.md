@@ -26,6 +26,7 @@ Types of changes
 - **`Changed`** exporting `int32` or `rune` to `String` format will no longer convert the value to the corresponding unicode character, but rather print the numeric value.
 - **`Changed`** exporting to `Binary` format will no longer convert the value to a `string` before base64 encoding, but will be encoded to in-memory byte representation.
 - **`Changed`** exporting or importing to `Timestamp` format will always produce an `int64` (if not specified otherwise).
+- **`Removed`** `Time` format because it is a special case of the `DateTime` format with different `time.Parse` format string, the same result can be achieved by calling `cast.TimeStringFormat = "15:04:05Z07:00"`.
 - **`Fixed`** `Format` type now correctly exported by jsonline package.
 - **`Fixed`** `row.Raw()` now return the correct value (a `map[string]interface{}` of raw values).
 - **`Fixed`** conversions error no longer ignored by unmarshaling.
