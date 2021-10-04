@@ -57,10 +57,10 @@ func TestCastToInt(t *testing.T) {
 		{int8(math.MaxInt8), int(math.MaxInt8), nil},
 		// from uint
 		{uint(0), int(0), nil},
-		{uint(math.MaxUint), nil, cast.ErrUnableToCastToInt}, // expected eror
+		{uint(math.MaxUint), nil, cast.ErrUnableToCastToInt}, // expected error
 		// from uint64
 		{uint64(0), int(0), nil},
-		{uint64(math.MaxUint64), nil, cast.ErrUnableToCastToInt}, // expected eror
+		{uint64(math.MaxUint64), nil, cast.ErrUnableToCastToInt}, // expected error
 		// from uint32
 		{uint32(0), int(0), nil},
 		{uint32(math.MaxUint32), int(math.MaxUint32), nil},
@@ -71,52 +71,52 @@ func TestCastToInt(t *testing.T) {
 		{uint8(0), int(0), nil},
 		{uint8(math.MaxUint8), int(math.MaxUint8), nil},
 		// from float64
-		{float64(-math.MaxFloat64), nil, cast.ErrUnableToCastToInt}, // expected eror
+		{float64(-math.MaxFloat64), nil, cast.ErrUnableToCastToInt}, // expected error
 		{float64(-math.SmallestNonzeroFloat64), int(0), nil},
 		{float64(0.0), int(0), nil},
 		{float64(math.SmallestNonzeroFloat64), int(0), nil},
-		{float64(math.MaxFloat64), nil, cast.ErrUnableToCastToInt}, // expected eror
+		{float64(math.MaxFloat64), nil, cast.ErrUnableToCastToInt}, // expected error
 		// from float32
-		{float32(-math.MaxFloat32), nil, cast.ErrUnableToCastToInt}, // expected eror
+		{float32(-math.MaxFloat32), nil, cast.ErrUnableToCastToInt}, // expected error
 		{float32(-math.SmallestNonzeroFloat32), int(0), nil},
 		{float32(0.0), int(0), nil},
 		{float32(math.SmallestNonzeroFloat32), int(0), nil},
-		{float32(math.MaxFloat32), nil, cast.ErrUnableToCastToInt}, // expected eror
+		{float32(math.MaxFloat32), nil, cast.ErrUnableToCastToInt}, // expected error
 		// from bool
 		{bool(true), int(1), nil},
 		{bool(false), int(0), nil},
 		// from string
-		{string("-9223372036854775809"), nil, cast.ErrUnableToCastToInt}, // expected eror
+		{string("-9223372036854775809"), nil, cast.ErrUnableToCastToInt}, // expected error
 		{string("-9223372036854775808"), int(math.MinInt), nil},
 		{string("-1"), int(-1), nil},
 		{string("0"), int(0), nil},
 		{string("1"), int(1), nil},
 		{string("9223372036854775807"), int(math.MaxInt), nil},
-		{string("9223372036854775808"), nil, cast.ErrUnableToCastToInt},      // expected eror
-		{string("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt}, // expected eror ?
-		{string("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt}, // expected eror ?
-		{string("-1.4"), nil, cast.ErrUnableToCastToInt},                     // expected eror ?
-		{string("0.0"), nil, cast.ErrUnableToCastToInt},                      // expected eror ?
-		{string("1.4"), nil, cast.ErrUnableToCastToInt},                      // expected eror ?
-		{string("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt},  // expected eror ?
-		{string("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt},  // expected eror
-		{string("hello"), nil, cast.ErrUnableToCastToInt},                    // expected eror
+		{string("9223372036854775808"), nil, cast.ErrUnableToCastToInt},      // expected error
+		{string("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt}, // expected error ?
+		{string("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt}, // expected error ?
+		{string("-1.4"), nil, cast.ErrUnableToCastToInt},                     // expected error ?
+		{string("0.0"), nil, cast.ErrUnableToCastToInt},                      // expected error ?
+		{string("1.4"), nil, cast.ErrUnableToCastToInt},                      // expected error ?
+		{string("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt},  // expected error ?
+		{string("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt},  // expected error
+		{string("hello"), nil, cast.ErrUnableToCastToInt},                    // expected error
 		// from []byte
-		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToInt},     // expected eror
-		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToInt},     // expected eror
-		{[]byte("-1"), nil, cast.ErrUnableToCastToInt},                       // expected eror
-		{[]byte("0"), nil, cast.ErrUnableToCastToInt},                        // expected eror
-		{[]byte("1"), nil, cast.ErrUnableToCastToInt},                        // expected eror
-		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToInt},      // expected eror
-		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToInt},      // expected eror
-		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt}, // expected eror
-		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt}, // expected eror
-		{[]byte("-1.4"), nil, cast.ErrUnableToCastToInt},                     // expected eror
-		{[]byte("0.0"), nil, cast.ErrUnableToCastToInt},                      // expected eror
-		{[]byte("1.4"), nil, cast.ErrUnableToCastToInt},                      // expected eror
-		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt},  // expected eror
-		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt},  // expected eror
-		{[]byte("hello"), nil, cast.ErrUnableToCastToInt},                    // expected eror
+		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToInt},     // expected error
+		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToInt},     // expected error
+		{[]byte("-1"), nil, cast.ErrUnableToCastToInt},                       // expected error
+		{[]byte("0"), nil, cast.ErrUnableToCastToInt},                        // expected error
+		{[]byte("1"), nil, cast.ErrUnableToCastToInt},                        // expected error
+		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToInt},      // expected error
+		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToInt},      // expected error
+		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt}, // expected error
+		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt}, // expected error
+		{[]byte("-1.4"), nil, cast.ErrUnableToCastToInt},                     // expected error
+		{[]byte("0.0"), nil, cast.ErrUnableToCastToInt},                      // expected error
+		{[]byte("1.4"), nil, cast.ErrUnableToCastToInt},                      // expected error
+		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt},  // expected error
+		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt},  // expected error
+		{[]byte("hello"), nil, cast.ErrUnableToCastToInt},                    // expected error
 		{[]byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x80}, int(math.MinInt), nil},
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, int(-1), nil},
 		{[]byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, int(0), nil},
@@ -124,19 +124,19 @@ func TestCastToInt(t *testing.T) {
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f}, int(math.MaxInt), nil},
 		// from number
 		{json.Number("9223372036854775807"), int(math.MaxInt), nil},
-		{json.Number("9223372036854775808"), nil, cast.ErrUnableToCastToInt},      // expected eror
-		{json.Number("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt}, // expected eror ?
-		{json.Number("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt}, // expected eror ?
-		{json.Number("-1.4"), nil, cast.ErrUnableToCastToInt},                     // expected eror ?
-		{json.Number("0.0"), nil, cast.ErrUnableToCastToInt},                      // expected eror ?
-		{json.Number("1.4"), nil, cast.ErrUnableToCastToInt},                      // expected eror ?
-		{json.Number("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt},  // expected eror ?
-		{json.Number("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt},  // expected eror ?
-		{json.Number("hello"), nil, cast.ErrUnableToCastToInt},                    // expected eror
+		{json.Number("9223372036854775808"), nil, cast.ErrUnableToCastToInt},      // expected error
+		{json.Number("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt}, // expected error ?
+		{json.Number("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt}, // expected error ?
+		{json.Number("-1.4"), nil, cast.ErrUnableToCastToInt},                     // expected error ?
+		{json.Number("0.0"), nil, cast.ErrUnableToCastToInt},                      // expected error ?
+		{json.Number("1.4"), nil, cast.ErrUnableToCastToInt},                      // expected error ?
+		{json.Number("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt},  // expected error ?
+		{json.Number("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt},  // expected error ?
+		{json.Number("hello"), nil, cast.ErrUnableToCastToInt},                    // expected error
 		// from anything else
-		{struct{ string }{""}, nil, cast.ErrUnableToCastToInt},  // expected eror
-		{[]int{1}, nil, cast.ErrUnableToCastToInt},              // expected eror
-		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToInt}, // expected eror
+		{struct{ string }{""}, nil, cast.ErrUnableToCastToInt},  // expected error
+		{[]int{1}, nil, cast.ErrUnableToCastToInt},              // expected error
+		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToInt}, // expected error
 	}
 
 	for _, td := range testdatas {
@@ -177,10 +177,10 @@ func TestCastToInt64(t *testing.T) {
 		{int8(math.MaxInt8), int64(math.MaxInt8), nil},
 		// from uint
 		{uint(0), int64(0), nil},
-		{uint(math.MaxUint), nil, cast.ErrUnableToCastToInt64}, // expected eror
+		{uint(math.MaxUint), nil, cast.ErrUnableToCastToInt64}, // expected error
 		// from uint64
 		{uint64(0), int64(0), nil},
-		{uint64(math.MaxUint64), nil, cast.ErrUnableToCastToInt64}, // expected eror
+		{uint64(math.MaxUint64), nil, cast.ErrUnableToCastToInt64}, // expected error
 		// from uint32
 		{uint32(0), int64(0), nil},
 		{uint32(math.MaxUint32), int64(math.MaxUint32), nil},
@@ -191,52 +191,52 @@ func TestCastToInt64(t *testing.T) {
 		{uint8(0), int64(0), nil},
 		{uint8(math.MaxUint8), int64(math.MaxUint8), nil},
 		// from float64
-		{float64(-math.MaxFloat64), nil, cast.ErrUnableToCastToInt64}, // expected eror
+		{float64(-math.MaxFloat64), nil, cast.ErrUnableToCastToInt64}, // expected error
 		{float64(-math.SmallestNonzeroFloat64), int64(0), nil},
 		{float64(0.0), int64(0), nil},
 		{float64(math.SmallestNonzeroFloat64), int64(0), nil},
-		{float64(math.MaxFloat64), nil, cast.ErrUnableToCastToInt64}, // expected eror
+		{float64(math.MaxFloat64), nil, cast.ErrUnableToCastToInt64}, // expected error
 		// from float32
-		{float32(-math.MaxFloat32), nil, cast.ErrUnableToCastToInt64}, // expected eror
+		{float32(-math.MaxFloat32), nil, cast.ErrUnableToCastToInt64}, // expected error
 		{float32(-math.SmallestNonzeroFloat32), int64(0), nil},
 		{float32(0.0), int64(0), nil},
 		{float32(math.SmallestNonzeroFloat32), int64(0), nil},
-		{float32(math.MaxFloat32), nil, cast.ErrUnableToCastToInt64}, // expected eror
+		{float32(math.MaxFloat32), nil, cast.ErrUnableToCastToInt64}, // expected error
 		// from bool
 		{bool(true), int64(1), nil},
 		{bool(false), int64(0), nil},
 		// from string
-		{string("-9223372036854775809"), nil, cast.ErrUnableToCastToInt64}, // expected eror
+		{string("-9223372036854775809"), nil, cast.ErrUnableToCastToInt64}, // expected error
 		{string("-9223372036854775808"), int64(math.MinInt64), nil},
 		{string("-1"), int64(-1), nil},
 		{string("0"), int64(0), nil},
 		{string("1"), int64(1), nil},
 		{string("9223372036854775807"), int64(math.MaxInt64), nil},
-		{string("9223372036854775808"), nil, cast.ErrUnableToCastToInt64},      // expected eror
-		{string("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64}, // expected eror ?
-		{string("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64}, // expected eror ?
-		{string("-1.4"), nil, cast.ErrUnableToCastToInt64},                     // expected eror ?
-		{string("0.0"), nil, cast.ErrUnableToCastToInt64},                      // expected eror ?
-		{string("1.4"), nil, cast.ErrUnableToCastToInt64},                      // expected eror ?
-		{string("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64},  // expected eror ?
-		{string("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64},  // expected eror
-		{string("hello"), nil, cast.ErrUnableToCastToInt64},                    // expected eror
+		{string("9223372036854775808"), nil, cast.ErrUnableToCastToInt64},      // expected error
+		{string("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64}, // expected error ?
+		{string("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64}, // expected error ?
+		{string("-1.4"), nil, cast.ErrUnableToCastToInt64},                     // expected error ?
+		{string("0.0"), nil, cast.ErrUnableToCastToInt64},                      // expected error ?
+		{string("1.4"), nil, cast.ErrUnableToCastToInt64},                      // expected error ?
+		{string("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64},  // expected error ?
+		{string("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64},  // expected error
+		{string("hello"), nil, cast.ErrUnableToCastToInt64},                    // expected error
 		// from []byte
-		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToInt64},     // expected eror
-		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToInt64},     // expected eror
-		{[]byte("-1"), nil, cast.ErrUnableToCastToInt64},                       // expected eror
-		{[]byte("0"), nil, cast.ErrUnableToCastToInt64},                        // expected eror
-		{[]byte("1"), nil, cast.ErrUnableToCastToInt64},                        // expected eror
-		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToInt64},      // expected eror
-		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToInt64},      // expected eror
-		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64}, // expected eror
-		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64}, // expected eror
-		{[]byte("-1.4"), nil, cast.ErrUnableToCastToInt64},                     // expected eror
-		{[]byte("0.0"), nil, cast.ErrUnableToCastToInt64},                      // expected eror
-		{[]byte("1.4"), nil, cast.ErrUnableToCastToInt64},                      // expected eror
-		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64},  // expected eror
-		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64},  // expected eror
-		{[]byte("hello"), nil, cast.ErrUnableToCastToInt64},                    // expected eror
+		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToInt64},     // expected error
+		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToInt64},     // expected error
+		{[]byte("-1"), nil, cast.ErrUnableToCastToInt64},                       // expected error
+		{[]byte("0"), nil, cast.ErrUnableToCastToInt64},                        // expected error
+		{[]byte("1"), nil, cast.ErrUnableToCastToInt64},                        // expected error
+		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToInt64},      // expected error
+		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToInt64},      // expected error
+		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64}, // expected error
+		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64}, // expected error
+		{[]byte("-1.4"), nil, cast.ErrUnableToCastToInt64},                     // expected error
+		{[]byte("0.0"), nil, cast.ErrUnableToCastToInt64},                      // expected error
+		{[]byte("1.4"), nil, cast.ErrUnableToCastToInt64},                      // expected error
+		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64},  // expected error
+		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64},  // expected error
+		{[]byte("hello"), nil, cast.ErrUnableToCastToInt64},                    // expected error
 		{[]byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x80}, int64(math.MinInt64), nil},
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, int64(-1), nil},
 		{[]byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, int64(0), nil},
@@ -244,19 +244,19 @@ func TestCastToInt64(t *testing.T) {
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f}, int64(math.MaxInt64), nil},
 		// from number
 		{json.Number("9223372036854775807"), int64(math.MaxInt64), nil},
-		{json.Number("9223372036854775808"), nil, cast.ErrUnableToCastToInt64},      // expected eror
-		{json.Number("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64}, // expected eror ?
-		{json.Number("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64}, // expected eror ?
-		{json.Number("-1.4"), nil, cast.ErrUnableToCastToInt64},                     // expected eror ?
-		{json.Number("0.0"), nil, cast.ErrUnableToCastToInt64},                      // expected eror ?
-		{json.Number("1.4"), nil, cast.ErrUnableToCastToInt64},                      // expected eror ?
-		{json.Number("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64},  // expected eror ?
-		{json.Number("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64},  // expected eror ?
-		{json.Number("hello"), nil, cast.ErrUnableToCastToInt64},                    // expected eror
+		{json.Number("9223372036854775808"), nil, cast.ErrUnableToCastToInt64},      // expected error
+		{json.Number("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64}, // expected error ?
+		{json.Number("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64}, // expected error ?
+		{json.Number("-1.4"), nil, cast.ErrUnableToCastToInt64},                     // expected error ?
+		{json.Number("0.0"), nil, cast.ErrUnableToCastToInt64},                      // expected error ?
+		{json.Number("1.4"), nil, cast.ErrUnableToCastToInt64},                      // expected error ?
+		{json.Number("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt64},  // expected error ?
+		{json.Number("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt64},  // expected error ?
+		{json.Number("hello"), nil, cast.ErrUnableToCastToInt64},                    // expected error
 		// from anything else
-		{struct{ string }{""}, nil, cast.ErrUnableToCastToInt64},  // expected eror
-		{[]int{1}, nil, cast.ErrUnableToCastToInt64},              // expected eror
-		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToInt64}, // expected eror
+		{struct{ string }{""}, nil, cast.ErrUnableToCastToInt64},  // expected error
+		{[]int{1}, nil, cast.ErrUnableToCastToInt64},              // expected error
+		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToInt64}, // expected error
 	}
 
 	for _, td := range testdatas {
@@ -276,13 +276,13 @@ func TestCastToInt32(t *testing.T) {
 	}{
 		{nil, nil, nil},
 		// from int
-		{int(math.MinInt), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{int(math.MinInt), nil, cast.ErrUnableToCastToInt32}, // expected error
 		{int(0), int32(0), nil},
-		{int(math.MaxInt), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{int(math.MaxInt), nil, cast.ErrUnableToCastToInt32}, // expected error
 		// from int64
-		{int64(math.MinInt64), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{int64(math.MinInt64), nil, cast.ErrUnableToCastToInt32}, // expected error
 		{int64(0), int32(0), nil},
-		{int64(math.MaxInt64), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{int64(math.MaxInt64), nil, cast.ErrUnableToCastToInt32}, // expected error
 		// from int32
 		{int32(math.MinInt32), int32(math.MinInt32), nil},
 		{int32(0), int32(0), nil},
@@ -297,13 +297,13 @@ func TestCastToInt32(t *testing.T) {
 		{int8(math.MaxInt8), int32(math.MaxInt8), nil},
 		// from uint
 		{uint(0), int32(0), nil},
-		{uint(math.MaxUint), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{uint(math.MaxUint), nil, cast.ErrUnableToCastToInt32}, // expected error
 		// from uint64
 		{uint64(0), int32(0), nil},
-		{uint64(math.MaxUint64), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{uint64(math.MaxUint64), nil, cast.ErrUnableToCastToInt32}, // expected error
 		// from uint32
 		{uint32(0), int32(0), nil},
-		{uint32(math.MaxUint32), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{uint32(math.MaxUint32), nil, cast.ErrUnableToCastToInt32}, // expected error
 		// from iunt16
 		{uint16(0), int32(0), nil},
 		{uint16(math.MaxUint16), int32(math.MaxUint16), nil},
@@ -311,52 +311,52 @@ func TestCastToInt32(t *testing.T) {
 		{uint8(0), int32(0), nil},
 		{uint8(math.MaxUint8), int32(math.MaxUint8), nil},
 		// from float64
-		{float64(-math.MaxFloat64), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{float64(-math.MaxFloat64), nil, cast.ErrUnableToCastToInt32}, // expected error
 		{float64(-math.SmallestNonzeroFloat64), int32(0), nil},
 		{float64(0.0), int32(0), nil},
 		{float64(math.SmallestNonzeroFloat64), int32(0), nil},
-		{float64(math.MaxFloat64), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{float64(math.MaxFloat64), nil, cast.ErrUnableToCastToInt32}, // expected error
 		// from float32
-		{float32(-math.MaxFloat32), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{float32(-math.MaxFloat32), nil, cast.ErrUnableToCastToInt32}, // expected error
 		{float32(-math.SmallestNonzeroFloat32), int32(0), nil},
 		{float32(0.0), int32(0), nil},
 		{float32(math.SmallestNonzeroFloat32), int32(0), nil},
-		{float32(math.MaxFloat32), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{float32(math.MaxFloat32), nil, cast.ErrUnableToCastToInt32}, // expected error
 		// from bool
 		{bool(true), int32(1), nil},
 		{bool(false), int32(0), nil},
 		// from string
-		{string("-9223372036854775809"), nil, cast.ErrUnableToCastToInt32}, // expected eror
-		{string("-9223372036854775808"), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{string("-9223372036854775809"), nil, cast.ErrUnableToCastToInt32}, // expected error
+		{string("-9223372036854775808"), nil, cast.ErrUnableToCastToInt32}, // expected error
 		{string("-1"), int32(-1), nil},
 		{string("0"), int32(0), nil},
 		{string("1"), int32(1), nil},
 		{string(fmt.Sprintf("%v", math.MaxInt32)), int32(math.MaxInt32), nil},
-		{string("9223372036854775808"), nil, cast.ErrUnableToCastToInt32},      // expected eror
-		{string("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32}, // expected eror ?
-		{string("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32}, // expected eror ?
-		{string("-1.4"), nil, cast.ErrUnableToCastToInt32},                     // expected eror ?
-		{string("0.0"), nil, cast.ErrUnableToCastToInt32},                      // expected eror ?
-		{string("1.4"), nil, cast.ErrUnableToCastToInt32},                      // expected eror ?
-		{string("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32},  // expected eror ?
-		{string("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32},  // expected eror
-		{string("hello"), nil, cast.ErrUnableToCastToInt32},                    // expected eror
+		{string("9223372036854775808"), nil, cast.ErrUnableToCastToInt32},      // expected error
+		{string("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32}, // expected error ?
+		{string("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32}, // expected error ?
+		{string("-1.4"), nil, cast.ErrUnableToCastToInt32},                     // expected error ?
+		{string("0.0"), nil, cast.ErrUnableToCastToInt32},                      // expected error ?
+		{string("1.4"), nil, cast.ErrUnableToCastToInt32},                      // expected error ?
+		{string("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32},  // expected error ?
+		{string("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32},  // expected error
+		{string("hello"), nil, cast.ErrUnableToCastToInt32},                    // expected error
 		// from []byte
-		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToInt32},     // expected eror
-		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToInt32},     // expected eror
-		{[]byte("-1"), nil, cast.ErrUnableToCastToInt32},                       // expected eror
-		{[]byte("0"), nil, cast.ErrUnableToCastToInt32},                        // expected eror
-		{[]byte("1"), nil, cast.ErrUnableToCastToInt32},                        // expected eror
-		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToInt32},      // expected eror
-		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToInt32},      // expected eror
-		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32}, // expected eror
-		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToInt32},     // expected error
+		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToInt32},     // expected error
+		{[]byte("-1"), nil, cast.ErrUnableToCastToInt32},                       // expected error
+		{[]byte("0"), nil, cast.ErrUnableToCastToInt32},                        // expected error
+		{[]byte("1"), nil, cast.ErrUnableToCastToInt32},                        // expected error
+		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToInt32},      // expected error
+		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToInt32},      // expected error
+		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32}, // expected error
+		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32}, // expected error
 		{[]byte("-1.4"), int32(875442477), nil},                                // technically it's on 4 bytes
-		{[]byte("0.0"), nil, cast.ErrUnableToCastToInt32},                      // expected eror
-		{[]byte("1.4"), nil, cast.ErrUnableToCastToInt32},                      // expected eror
-		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32},  // expected eror
-		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32},  // expected eror
-		{[]byte("hello"), nil, cast.ErrUnableToCastToInt32},                    // expected eror
+		{[]byte("0.0"), nil, cast.ErrUnableToCastToInt32},                      // expected error
+		{[]byte("1.4"), nil, cast.ErrUnableToCastToInt32},                      // expected error
+		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32},  // expected error
+		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32},  // expected error
+		{[]byte("hello"), nil, cast.ErrUnableToCastToInt32},                    // expected error
 		{[]byte{0x0, 0x0, 0x0, 0x80}, int32(math.MinInt32), nil},
 		{[]byte{0xff, 0xff, 0xff, 0xff}, int32(-1), nil},
 		{[]byte{0x0, 0x0, 0x0, 0x0}, int32(0), nil},
@@ -364,19 +364,19 @@ func TestCastToInt32(t *testing.T) {
 		{[]byte{0xff, 0xff, 0xff, 0x7f}, int32(math.MaxInt32), nil},
 		// from number
 		{json.Number(fmt.Sprintf("%v", math.MaxInt32)), int32(math.MaxInt32), nil},
-		{json.Number("9223372036854775808"), nil, cast.ErrUnableToCastToInt32},      // expected eror
-		{json.Number("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32}, // expected eror ?
-		{json.Number("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32}, // expected eror ?
-		{json.Number("-1.4"), nil, cast.ErrUnableToCastToInt32},                     // expected eror ?
-		{json.Number("0.0"), nil, cast.ErrUnableToCastToInt32},                      // expected eror ?
-		{json.Number("1.4"), nil, cast.ErrUnableToCastToInt32},                      // expected eror ?
-		{json.Number("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32},  // expected eror ?
-		{json.Number("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32},  // expected eror ?
-		{json.Number("hello"), nil, cast.ErrUnableToCastToInt32},                    // expected eror
+		{json.Number("9223372036854775808"), nil, cast.ErrUnableToCastToInt32},      // expected error
+		{json.Number("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32}, // expected error ?
+		{json.Number("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32}, // expected error ?
+		{json.Number("-1.4"), nil, cast.ErrUnableToCastToInt32},                     // expected error ?
+		{json.Number("0.0"), nil, cast.ErrUnableToCastToInt32},                      // expected error ?
+		{json.Number("1.4"), nil, cast.ErrUnableToCastToInt32},                      // expected error ?
+		{json.Number("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt32},  // expected error ?
+		{json.Number("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt32},  // expected error ?
+		{json.Number("hello"), nil, cast.ErrUnableToCastToInt32},                    // expected error
 		// from anything else
-		{struct{ string }{""}, nil, cast.ErrUnableToCastToInt32},  // expected eror
-		{[]int{1}, nil, cast.ErrUnableToCastToInt32},              // expected eror
-		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToInt32}, // expected eror
+		{struct{ string }{""}, nil, cast.ErrUnableToCastToInt32},  // expected error
+		{[]int{1}, nil, cast.ErrUnableToCastToInt32},              // expected error
+		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToInt32}, // expected error
 	}
 
 	for _, td := range testdatas {
@@ -396,17 +396,17 @@ func TestCastToInt16(t *testing.T) {
 	}{
 		{nil, nil, nil},
 		// from int
-		{int(math.MinInt), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{int(math.MinInt), nil, cast.ErrUnableToCastToInt16}, // expected error
 		{int(0), int16(0), nil},
-		{int(math.MaxInt), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{int(math.MaxInt), nil, cast.ErrUnableToCastToInt16}, // expected error
 		// from int64
-		{int64(math.MinInt64), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{int64(math.MinInt64), nil, cast.ErrUnableToCastToInt16}, // expected error
 		{int64(0), int16(0), nil},
-		{int64(math.MaxInt64), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{int64(math.MaxInt64), nil, cast.ErrUnableToCastToInt16}, // expected error
 		// from int32
-		{int32(math.MinInt32), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{int32(math.MinInt32), nil, cast.ErrUnableToCastToInt16}, // expected error
 		{int32(0), int16(0), nil},
-		{int32(math.MaxInt32), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{int32(math.MaxInt32), nil, cast.ErrUnableToCastToInt16}, // expected error
 		// from int16
 		{int16(math.MinInt16), int16(math.MinInt16), nil},
 		{int16(0), int16(0), nil},
@@ -417,66 +417,66 @@ func TestCastToInt16(t *testing.T) {
 		{int8(math.MaxInt8), int16(math.MaxInt8), nil},
 		// from uint
 		{uint(0), int16(0), nil},
-		{uint(math.MaxUint), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{uint(math.MaxUint), nil, cast.ErrUnableToCastToInt16}, // expected error
 		// from uint64
 		{uint64(0), int16(0), nil},
-		{uint64(math.MaxUint64), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{uint64(math.MaxUint64), nil, cast.ErrUnableToCastToInt16}, // expected error
 		// from uint32
 		{uint32(0), int16(0), nil},
-		{uint32(math.MaxUint32), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{uint32(math.MaxUint32), nil, cast.ErrUnableToCastToInt16}, // expected error
 		// from uint16
 		{uint16(0), int16(0), nil},
-		{uint16(math.MaxUint16), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{uint16(math.MaxUint16), nil, cast.ErrUnableToCastToInt16}, // expected error
 		// from uint8
 		{uint8(0), int16(0), nil},
 		{uint8(math.MaxUint8), int16(math.MaxUint8), nil},
 		// from float64
-		{float64(-math.MaxFloat64), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{float64(-math.MaxFloat64), nil, cast.ErrUnableToCastToInt16}, // expected error
 		{float64(-math.SmallestNonzeroFloat64), int16(0), nil},
 		{float64(0.0), int16(0), nil},
 		{float64(math.SmallestNonzeroFloat64), int16(0), nil},
-		{float64(math.MaxFloat64), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{float64(math.MaxFloat64), nil, cast.ErrUnableToCastToInt16}, // expected error
 		// from float32
-		{float32(-math.MaxFloat32), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{float32(-math.MaxFloat32), nil, cast.ErrUnableToCastToInt16}, // expected error
 		{float32(-math.SmallestNonzeroFloat32), int16(0), nil},
 		{float32(0.0), int16(0), nil},
 		{float32(math.SmallestNonzeroFloat32), int16(0), nil},
-		{float32(math.MaxFloat32), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{float32(math.MaxFloat32), nil, cast.ErrUnableToCastToInt16}, // expected error
 		// from bool
 		{bool(true), int16(1), nil},
 		{bool(false), int16(0), nil},
 		// from string
-		{string("-9223372036854775809"), nil, cast.ErrUnableToCastToInt16}, // expected eror
-		{string("-9223372036854775808"), nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{string("-9223372036854775809"), nil, cast.ErrUnableToCastToInt16}, // expected error
+		{string("-9223372036854775808"), nil, cast.ErrUnableToCastToInt16}, // expected error
 		{string("-1"), int16(-1), nil},
 		{string("0"), int16(0), nil},
 		{string("1"), int16(1), nil},
 		{string(fmt.Sprintf("%v", math.MaxInt16)), int16(math.MaxInt16), nil},
-		{string("9223372036854775808"), nil, cast.ErrUnableToCastToInt16},      // expected eror
-		{string("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16}, // expected eror ?
-		{string("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16}, // expected eror ?
-		{string("-1.4"), nil, cast.ErrUnableToCastToInt16},                     // expected eror ?
-		{string("0.0"), nil, cast.ErrUnableToCastToInt16},                      // expected eror ?
-		{string("1.4"), nil, cast.ErrUnableToCastToInt16},                      // expected eror ?
-		{string("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16},  // expected eror ?
-		{string("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16},  // expected eror
-		{string("hello"), nil, cast.ErrUnableToCastToInt16},                    // expected eror
+		{string("9223372036854775808"), nil, cast.ErrUnableToCastToInt16},      // expected error
+		{string("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16}, // expected error ?
+		{string("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16}, // expected error ?
+		{string("-1.4"), nil, cast.ErrUnableToCastToInt16},                     // expected error ?
+		{string("0.0"), nil, cast.ErrUnableToCastToInt16},                      // expected error ?
+		{string("1.4"), nil, cast.ErrUnableToCastToInt16},                      // expected error ?
+		{string("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16},  // expected error ?
+		{string("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16},  // expected error
+		{string("hello"), nil, cast.ErrUnableToCastToInt16},                    // expected error
 		// from []byte
-		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToInt16},     // expected eror
-		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToInt16},     // expected eror
+		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToInt16},     // expected error
+		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToInt16},     // expected error
 		{[]byte("-1"), int16(12589), nil},                                      // technically it's on 2 bytes
-		{[]byte("0"), nil, cast.ErrUnableToCastToInt16},                        // expected eror
-		{[]byte("1"), nil, cast.ErrUnableToCastToInt16},                        // expected eror
-		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToInt16},      // expected eror
-		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToInt16},      // expected eror
-		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16}, // expected eror
-		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16}, // expected eror
-		{[]byte("-1.4"), nil, cast.ErrUnableToCastToInt16},                     // expected eror
-		{[]byte("0.0"), nil, cast.ErrUnableToCastToInt16},                      // expected eror
-		{[]byte("1.4"), nil, cast.ErrUnableToCastToInt16},                      // expected eror
-		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16},  // expected eror
-		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16},  // expected eror
-		{[]byte("hello"), nil, cast.ErrUnableToCastToInt16},                    // expected eror
+		{[]byte("0"), nil, cast.ErrUnableToCastToInt16},                        // expected error
+		{[]byte("1"), nil, cast.ErrUnableToCastToInt16},                        // expected error
+		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToInt16},      // expected error
+		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToInt16},      // expected error
+		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16}, // expected error
+		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16}, // expected error
+		{[]byte("-1.4"), nil, cast.ErrUnableToCastToInt16},                     // expected error
+		{[]byte("0.0"), nil, cast.ErrUnableToCastToInt16},                      // expected error
+		{[]byte("1.4"), nil, cast.ErrUnableToCastToInt16},                      // expected error
+		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16},  // expected error
+		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16},  // expected error
+		{[]byte("hello"), nil, cast.ErrUnableToCastToInt16},                    // expected error
 		{[]byte{0x0, 0x80}, int16(math.MinInt16), nil},
 		{[]byte{0xff, 0xff}, int16(-1), nil},
 		{[]byte{0x0, 0x0}, int16(0), nil},
@@ -484,19 +484,19 @@ func TestCastToInt16(t *testing.T) {
 		{[]byte{0xff, 0x7f}, int16(math.MaxInt16), nil},
 		// from number
 		{json.Number(fmt.Sprintf("%v", math.MaxInt16)), int16(math.MaxInt16), nil},
-		{json.Number("9223372036854775808"), nil, cast.ErrUnableToCastToInt16},      // expected eror
-		{json.Number("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16}, // expected eror ?
-		{json.Number("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16}, // expected eror ?
-		{json.Number("-1.4"), nil, cast.ErrUnableToCastToInt16},                     // expected eror ?
-		{json.Number("0.0"), nil, cast.ErrUnableToCastToInt16},                      // expected eror ?
-		{json.Number("1.4"), nil, cast.ErrUnableToCastToInt16},                      // expected eror ?
-		{json.Number("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16},  // expected eror ?
-		{json.Number("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16},  // expected eror ?
-		{json.Number("hello"), nil, cast.ErrUnableToCastToInt16},                    // expected eror
+		{json.Number("9223372036854775808"), nil, cast.ErrUnableToCastToInt16},      // expected error
+		{json.Number("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16}, // expected error ?
+		{json.Number("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16}, // expected error ?
+		{json.Number("-1.4"), nil, cast.ErrUnableToCastToInt16},                     // expected error ?
+		{json.Number("0.0"), nil, cast.ErrUnableToCastToInt16},                      // expected error ?
+		{json.Number("1.4"), nil, cast.ErrUnableToCastToInt16},                      // expected error ?
+		{json.Number("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt16},  // expected error ?
+		{json.Number("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt16},  // expected error ?
+		{json.Number("hello"), nil, cast.ErrUnableToCastToInt16},                    // expected error
 		// from anything else
-		{struct{ string }{""}, nil, cast.ErrUnableToCastToInt16},  // expected eror
-		{[]int{1}, nil, cast.ErrUnableToCastToInt16},              // expected eror
-		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToInt16}, // expected eror
+		{struct{ string }{""}, nil, cast.ErrUnableToCastToInt16},  // expected error
+		{[]int{1}, nil, cast.ErrUnableToCastToInt16},              // expected error
+		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToInt16}, // expected error
 	}
 
 	for _, td := range testdatas {
@@ -516,87 +516,87 @@ func TestCastToInt8(t *testing.T) {
 	}{
 		{nil, nil, nil},
 		// from int
-		{int(math.MinInt), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{int(math.MinInt), nil, cast.ErrUnableToCastToInt8}, // expected error
 		{int(0), int8(0), nil},
-		{int(math.MaxInt), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{int(math.MaxInt), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from int64
-		{int64(math.MinInt64), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{int64(math.MinInt64), nil, cast.ErrUnableToCastToInt8}, // expected error
 		{int64(0), int8(0), nil},
-		{int64(math.MaxInt64), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{int64(math.MaxInt64), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from int32
-		{int32(math.MinInt32), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{int32(math.MinInt32), nil, cast.ErrUnableToCastToInt8}, // expected error
 		{int32(0), int8(0), nil},
-		{int32(math.MaxInt32), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{int32(math.MaxInt32), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from int16
-		{int16(math.MinInt16), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{int16(math.MinInt16), nil, cast.ErrUnableToCastToInt8}, // expected error
 		{int16(0), int8(0), nil},
-		{int16(math.MaxInt16), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{int16(math.MaxInt16), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from int8
 		{int8(math.MinInt8), int8(math.MinInt8), nil},
 		{int8(0), int8(0), nil},
 		{int8(math.MaxInt8), int8(math.MaxInt8), nil},
 		// from uint
 		{uint(0), int8(0), nil},
-		{uint(math.MaxUint), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{uint(math.MaxUint), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from uint64
 		{uint64(0), int8(0), nil},
-		{uint64(math.MaxUint64), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{uint64(math.MaxUint64), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from uint32
 		{uint32(0), int8(0), nil},
-		{uint32(math.MaxUint32), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{uint32(math.MaxUint32), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from uint16
 		{uint16(0), int8(0), nil},
-		{uint16(math.MaxUint16), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{uint16(math.MaxUint16), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from uint8
 		{uint8(0), int8(0), nil},
-		{uint8(math.MaxUint8), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{uint8(math.MaxUint8), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from float64
-		{float64(-math.MaxFloat64), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{float64(-math.MaxFloat64), nil, cast.ErrUnableToCastToInt8}, // expected error
 		{float64(-math.SmallestNonzeroFloat64), int8(0), nil},
 		{float64(0.0), int8(0), nil},
 		{float64(math.SmallestNonzeroFloat64), int8(0), nil},
-		{float64(math.MaxFloat64), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{float64(math.MaxFloat64), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from float32
-		{float32(-math.MaxFloat32), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{float32(-math.MaxFloat32), nil, cast.ErrUnableToCastToInt8}, // expected error
 		{float32(-math.SmallestNonzeroFloat32), int8(0), nil},
 		{float32(0.0), int8(0), nil},
 		{float32(math.SmallestNonzeroFloat32), int8(0), nil},
-		{float32(math.MaxFloat32), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{float32(math.MaxFloat32), nil, cast.ErrUnableToCastToInt8}, // expected error
 		// from bool
 		{bool(true), int8(1), nil},
 		{bool(false), int8(0), nil},
 		// from string
-		{string("-9223372036854775809"), nil, cast.ErrUnableToCastToInt8}, // expected eror
-		{string("-9223372036854775808"), nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{string("-9223372036854775809"), nil, cast.ErrUnableToCastToInt8}, // expected error
+		{string("-9223372036854775808"), nil, cast.ErrUnableToCastToInt8}, // expected error
 		{string("-1"), int8(-1), nil},
 		{string("0"), int8(0), nil},
 		{string("1"), int8(1), nil},
 		{string(fmt.Sprintf("%v", math.MaxInt8)), int8(math.MaxInt8), nil},
-		{string("9223372036854775808"), nil, cast.ErrUnableToCastToInt8},      // expected eror
-		{string("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8}, // expected eror ?
-		{string("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8}, // expected eror ?
-		{string("-1.4"), nil, cast.ErrUnableToCastToInt8},                     // expected eror ?
-		{string("0.0"), nil, cast.ErrUnableToCastToInt8},                      // expected eror ?
-		{string("1.4"), nil, cast.ErrUnableToCastToInt8},                      // expected eror ?
-		{string("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8},  // expected eror ?
-		{string("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8},  // expected eror
-		{string("hello"), nil, cast.ErrUnableToCastToInt8},                    // expected eror
+		{string("9223372036854775808"), nil, cast.ErrUnableToCastToInt8},      // expected error
+		{string("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8}, // expected error ?
+		{string("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8}, // expected error ?
+		{string("-1.4"), nil, cast.ErrUnableToCastToInt8},                     // expected error ?
+		{string("0.0"), nil, cast.ErrUnableToCastToInt8},                      // expected error ?
+		{string("1.4"), nil, cast.ErrUnableToCastToInt8},                      // expected error ?
+		{string("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8},  // expected error ?
+		{string("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8},  // expected error
+		{string("hello"), nil, cast.ErrUnableToCastToInt8},                    // expected error
 		// from []byte
-		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToInt8},     // expected eror
-		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToInt8},     // expected eror
-		{[]byte("-1"), nil, cast.ErrUnableToCastToInt8},                       // expected eror
+		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToInt8},     // expected error
+		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToInt8},     // expected error
+		{[]byte("-1"), nil, cast.ErrUnableToCastToInt8},                       // expected error
 		{[]byte("0"), int8(48), nil},                                          // technically it's 1 byte
 		{[]byte("1"), int8(49), nil},                                          // technically it's 1 byte
-		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToInt8},      // expected eror
-		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToInt8},      // expected eror
-		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8}, // expected eror
-		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8}, // expected eror
-		{[]byte("-1.4"), nil, cast.ErrUnableToCastToInt8},                     // expected eror
-		{[]byte("0.0"), nil, cast.ErrUnableToCastToInt8},                      // expected eror
-		{[]byte("1.4"), nil, cast.ErrUnableToCastToInt8},                      // expected eror
-		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8},  // expected eror
-		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8},  // expected eror
-		{[]byte("hello"), nil, cast.ErrUnableToCastToInt8},                    // expected eror
+		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToInt8},      // expected error
+		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToInt8},      // expected error
+		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8}, // expected error
+		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8}, // expected error
+		{[]byte("-1.4"), nil, cast.ErrUnableToCastToInt8},                     // expected error
+		{[]byte("0.0"), nil, cast.ErrUnableToCastToInt8},                      // expected error
+		{[]byte("1.4"), nil, cast.ErrUnableToCastToInt8},                      // expected error
+		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8},  // expected error
+		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8},  // expected error
+		{[]byte("hello"), nil, cast.ErrUnableToCastToInt8},                    // expected error
 		{[]byte{0x80}, int8(math.MinInt8), nil},
 		{[]byte{0xff}, int8(-1), nil},
 		{[]byte{0x0}, int8(0), nil},
@@ -604,19 +604,19 @@ func TestCastToInt8(t *testing.T) {
 		{[]byte{0x7f}, int8(math.MaxInt8), nil},
 		// from number
 		{json.Number(fmt.Sprintf("%v", math.MaxInt8)), int8(math.MaxInt8), nil},
-		{json.Number("9223372036854775808"), nil, cast.ErrUnableToCastToInt8},      // expected eror
-		{json.Number("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8}, // expected eror ?
-		{json.Number("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8}, // expected eror ?
-		{json.Number("-1.4"), nil, cast.ErrUnableToCastToInt8},                     // expected eror ?
-		{json.Number("0.0"), nil, cast.ErrUnableToCastToInt8},                      // expected eror ?
-		{json.Number("1.4"), nil, cast.ErrUnableToCastToInt8},                      // expected eror ?
-		{json.Number("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8},  // expected eror ?
-		{json.Number("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8},  // expected eror ?
-		{json.Number("hello"), nil, cast.ErrUnableToCastToInt8},                    // expected eror
+		{json.Number("9223372036854775808"), nil, cast.ErrUnableToCastToInt8},      // expected error
+		{json.Number("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8}, // expected error ?
+		{json.Number("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8}, // expected error ?
+		{json.Number("-1.4"), nil, cast.ErrUnableToCastToInt8},                     // expected error ?
+		{json.Number("0.0"), nil, cast.ErrUnableToCastToInt8},                      // expected error ?
+		{json.Number("1.4"), nil, cast.ErrUnableToCastToInt8},                      // expected error ?
+		{json.Number("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToInt8},  // expected error ?
+		{json.Number("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToInt8},  // expected error ?
+		{json.Number("hello"), nil, cast.ErrUnableToCastToInt8},                    // expected error
 		// from anything else
-		{struct{ string }{""}, nil, cast.ErrUnableToCastToInt8},  // expected eror
-		{[]int{1}, nil, cast.ErrUnableToCastToInt8},              // expected eror
-		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToInt8}, // expected eror
+		{struct{ string }{""}, nil, cast.ErrUnableToCastToInt8},  // expected error
+		{[]int{1}, nil, cast.ErrUnableToCastToInt8},              // expected error
+		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToInt8}, // expected error
 	}
 
 	for _, td := range testdatas {

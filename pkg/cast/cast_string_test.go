@@ -137,9 +137,9 @@ func TestCastToString(t *testing.T) {
 		// from time
 		{time.Date(2021, time.October, 4, 13, 3, 56, 0, time.UTC), string("2021-10-04T13:03:56Z"), nil},
 		// from anything else
-		{struct{ string }{""}, nil, cast.ErrUnableToCastToString},  // expected eror
-		{[]int{1}, nil, cast.ErrUnableToCastToString},              // expected eror
-		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToString}, // expected eror
+		{struct{ string }{""}, nil, cast.ErrUnableToCastToString},  // expected error
+		{[]int{1}, nil, cast.ErrUnableToCastToString},              // expected error
+		{map[string]int{"": 1}, nil, cast.ErrUnableToCastToString}, // expected error
 	}
 
 	for _, td := range testdatas {
@@ -152,6 +152,10 @@ func TestCastToString(t *testing.T) {
 }
 
 func BenchmarkCastToStringEmpty(b *testing.B) { castToString(b, 0) }
+
+func BenchmarkCastToStringTime(b *testing.B) {
+	castToString(b, time.Date(2021, time.October, 4, 13, 3, 56, 0, time.UTC))
+}
 
 func BenchmarkCastToStringMaxInt64(b *testing.B) { castToString(b, int64(math.MaxInt64)) }
 
