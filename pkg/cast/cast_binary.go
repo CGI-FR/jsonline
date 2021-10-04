@@ -41,7 +41,6 @@ import (
 	"fmt"
 	"math"
 	"time"
-	"unsafe"
 )
 
 func ToBinary(i interface{}) (interface{}, error) {
@@ -49,41 +48,36 @@ func ToBinary(i interface{}) (interface{}, error) {
 	case nil, []byte:
 		return val, nil
 	case float64:
-		bits := math.Float64bits(val)
-		bytes := make([]byte, 8)
-		binary.LittleEndian.PutUint64(bytes, bits)
+		bytes := make([]byte, sizeOfFloat64)
+		binary.LittleEndian.PutUint64(bytes, math.Float64bits(val))
 
 		return bytes, nil
 	case float32:
-		bits := math.Float32bits(val)
-		bytes := make([]byte, 4)
-		binary.LittleEndian.PutUint32(bytes, bits)
+		bytes := make([]byte, sizeOfFloat32)
+		binary.LittleEndian.PutUint32(bytes, math.Float32bits(val))
 
 		return bytes, nil
 	case int:
-		size := unsafe.Sizeof(val)
-		bytes := make([]byte, size)
-
-		switch size {
-		case 64:
+		bytes := make([]byte, sizeOfInt)
+		if sizeOfInt == 8 {
 			binary.LittleEndian.PutUint64(bytes, uint64(val))
-		default: // case 32:
+		} else {
 			binary.LittleEndian.PutUint32(bytes, uint32(val))
 		}
 
 		return bytes, nil
 	case int64:
-		bytes := make([]byte, 8)
+		bytes := make([]byte, sizeOfInt64)
 		binary.LittleEndian.PutUint64(bytes, uint64(val))
 
 		return bytes, nil
 	case int32:
-		bytes := make([]byte, 4)
+		bytes := make([]byte, sizeOfInt32)
 		binary.LittleEndian.PutUint32(bytes, uint32(val))
 
 		return bytes, nil
 	case int16:
-		bytes := make([]byte, 2)
+		bytes := make([]byte, sizeOfInt16)
 		binary.LittleEndian.PutUint16(bytes, uint16(val))
 
 		return bytes, nil
@@ -93,29 +87,26 @@ func ToBinary(i interface{}) (interface{}, error) {
 
 		return bytes, nil
 	case uint:
-		size := unsafe.Sizeof(val)
-		bytes := make([]byte, size)
-
-		switch size {
-		case 64:
+		bytes := make([]byte, sizeOfUint)
+		if sizeOfUint == sizeOfUint64 {
 			binary.LittleEndian.PutUint64(bytes, uint64(val))
-		default: // case 32:
+		} else {
 			binary.LittleEndian.PutUint32(bytes, uint32(val))
 		}
 
 		return bytes, nil
 	case uint64:
-		bytes := make([]byte, 8)
+		bytes := make([]byte, sizeOfUint64)
 		binary.LittleEndian.PutUint64(bytes, val)
 
 		return bytes, nil
 	case uint32:
-		bytes := make([]byte, 4)
+		bytes := make([]byte, sizeOfUint32)
 		binary.LittleEndian.PutUint32(bytes, val)
 
 		return bytes, nil
 	case uint16:
-		bytes := make([]byte, 2)
+		bytes := make([]byte, sizeOfUint16)
 		binary.LittleEndian.PutUint16(bytes, val)
 
 		return bytes, nil
@@ -125,12 +116,12 @@ func ToBinary(i interface{}) (interface{}, error) {
 
 		return bytes, nil
 	case bool:
-		b := byte(0)
+		bytes := make([]byte, 1)
 		if val {
-			b = 1
+			bytes[0] = 1
 		}
 
-		return []byte{b}, nil
+		return bytes, nil
 	case string:
 		return []byte(val), nil
 	case json.Number:

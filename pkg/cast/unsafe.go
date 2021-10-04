@@ -35,69 +35,65 @@
 package cast
 
 import (
+	"encoding/binary"
 	"fmt"
 	"unsafe"
 )
 
 const (
-	sizeOfInt64  = 8
-	sizeOfInt32  = 4
-	sizeOfInt16  = 2
-	sizeOfUint64 = 8
-	sizeOfUint32 = 4
-	sizeOfUint16 = 2
+	sizeOfInt64   = 8
+	sizeOfInt32   = 4
+	sizeOfInt16   = 2
+	sizeOfUint64  = 8
+	sizeOfUint32  = 4
+	sizeOfUint16  = 2
+	sizeOfFloat64 = 8
+	sizeOfFloat32 = 4
+	sizeOfInt     = int(unsafe.Sizeof(int(0)))
+	sizeOfUint    = int(unsafe.Sizeof(uint(0)))
 )
 
-func intToBytes(num int) []byte {
-	size := int(unsafe.Sizeof(num))
-	arr := make([]byte, size)
-
-	for i := 0; i < size; i++ {
-		byt := *(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&num)) + uintptr(i)))
-		arr[i] = byt
+func intToBytes(val int) []byte {
+	bytes := make([]byte, sizeOfInt)
+	if sizeOfInt == sizeOfInt64 {
+		binary.LittleEndian.PutUint64(bytes, uint64(val))
+	} else {
+		binary.LittleEndian.PutUint32(bytes, uint32(val))
 	}
 
-	return arr
+	return bytes
 }
 
-func intFromBytes(arr []byte) (interface{}, error) {
+func intFromBytes(bytes []byte) (interface{}, error) {
 	var val int
-	size := int(unsafe.Sizeof(val))
 
-	if arr == nil || len(arr) != size {
-		return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToInt, arr, arr)
+	if bytes == nil || len(bytes) != sizeOfInt {
+		return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToInt, bytes, bytes)
 	}
 
-	for i := 0; i < size; i++ {
-		*(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&val)) + uintptr(i))) = arr[i]
+	if sizeOfInt == sizeOfInt64 {
+		val = int(binary.LittleEndian.Uint64(bytes))
+	} else {
+		val = int(binary.LittleEndian.Uint32(bytes))
 	}
 
 	return val, nil
 }
 
-func int64ToBytes(num int64) []byte {
-	arr := make([]byte, sizeOfInt64)
+func int64ToBytes(val int64) []byte {
+	bytes := make([]byte, sizeOfInt64)
 
-	for i := 0; i < sizeOfInt64; i++ {
-		byt := *(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&num)) + uintptr(i)))
-		arr[i] = byt
-	}
+	binary.LittleEndian.PutUint64(bytes, uint64(val))
 
-	return arr
+	return bytes
 }
 
-func int64FromBytes(arr []byte) (interface{}, error) {
-	var val int64
-
-	if arr == nil || len(arr) != sizeOfInt64 {
-		return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToInt64, arr, arr)
+func int64FromBytes(bytes []byte) (interface{}, error) {
+	if bytes == nil || len(bytes) != sizeOfInt64 {
+		return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToInt64, bytes, bytes)
 	}
 
-	for i := 0; i < sizeOfInt64; i++ {
-		*(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&val)) + uintptr(i))) = arr[i]
-	}
-
-	return val, nil
+	return int64(binary.LittleEndian.Uint64(bytes)), nil
 }
 
 func int32ToBytes(num int32) []byte {
@@ -151,10 +147,9 @@ func int16FromBytes(arr []byte) (interface{}, error) {
 }
 
 func uintToBytes(num uint) []byte {
-	size := int(unsafe.Sizeof(num))
-	arr := make([]byte, size)
+	arr := make([]byte, sizeOfUint)
 
-	for i := 0; i < size; i++ {
+	for i := 0; i < sizeOfUint; i++ {
 		byt := *(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&num)) + uintptr(i)))
 		arr[i] = byt
 	}
@@ -164,13 +159,12 @@ func uintToBytes(num uint) []byte {
 
 func uintFromBytes(arr []byte) (interface{}, error) {
 	var val uint
-	size := int(unsafe.Sizeof(val))
 
-	if arr == nil || len(arr) != size {
+	if arr == nil || len(arr) != sizeOfUint {
 		return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint, arr, arr)
 	}
 
-	for i := 0; i < size; i++ {
+	for i := 0; i < sizeOfUint; i++ {
 		*(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&val)) + uintptr(i))) = arr[i]
 	}
 
