@@ -68,6 +68,8 @@ func TestCastBack(t *testing.T) {
 		{uint16(1), []byte{}},
 		{uint8(0), []byte{}},
 		{uint8(1), []byte{}},
+		{bool(true), []byte{}},
+		{bool(false), []byte{}},
 		{"2021-10-04T13:03:56Z", time.Now()},
 		// {time.Now(), string("")}, drop nanosecs
 		{1, nil},

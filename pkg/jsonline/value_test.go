@@ -290,8 +290,8 @@ func TestValueFormatBoolean(t *testing.T) {
 		{'r', true},
 		// binary
 		{byte(36), true}, // byte is an alias for uint8
-		{[]byte("true"), true},
-		{[]byte("false"), false},
+		// {[]byte("true"), true}, => NOT SUPPORTED
+		// {[]byte("false"), false}, => NOT SUPPORTED
 		// composite => NOT SUPPORTED
 		// references (slices, maps) => NOT SUPPORTED
 		// interfaces => NOT SUPPORTED
@@ -351,8 +351,8 @@ func TestValueMarshalBoolean(t *testing.T) {
 		{'r', `true`},
 		// binary
 		{byte(36), `true`}, // byte is an alias for uint8
-		{[]byte("true"), `true`},
-		{[]byte("false"), `false`},
+		// {[]byte("true"), `true`},
+		// {[]byte("false"), `false`},
 		// composite => NOT SUPPORTED
 		// references (slices, maps) => NOT SUPPORTED
 		// interfaces => NOT SUPPORTED
@@ -373,7 +373,7 @@ func TestValueExportBinary(t *testing.T) {
 	}{
 		{nil, nil},
 		// signed integers
-		{int(-2), "/v///wAAAAA="},
+		{int(-2), "/v////////8="},
 		{int8(-1), "/w=="},
 		{int16(0), "AAA="},
 		{int32(1), "AQAAAA=="}, // int32 is an alias of rune
@@ -412,7 +412,7 @@ func TestValueExportBinary(t *testing.T) {
 	}
 
 	for _, td := range testdatas {
-		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%T(%#v)", td.value, td.value), func(t *testing.T) {
 			value := jsonline.NewValueBinary(td.value)
 			result, err := value.Export()
 			assert.NoError(t, err)
@@ -447,7 +447,7 @@ func TestValueMarshalBinary(t *testing.T) {
 	}{
 		{nil, "null"},
 		// signed integers
-		{int(-2), `"/v///wAAAAA="`},
+		{int(-2), `"/v////////8="`},
 		{int8(-1), `"/w=="`},
 		{int16(0), `"AAA="`},
 		{int32(1), `"AQAAAA=="`}, // int32 is an alias of rune

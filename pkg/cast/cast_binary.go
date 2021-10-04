@@ -32,14 +32,12 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-//nolint:cyclop,funlen,gomnd
+//nolint:cyclop
 package cast
 
 import (
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"math"
 	"time"
 )
 
@@ -48,84 +46,35 @@ func ToBinary(i interface{}) (interface{}, error) {
 	case nil, []byte:
 		return val, nil
 	case float64:
-		bytes := make([]byte, sizeOfFloat64)
-		binary.LittleEndian.PutUint64(bytes, math.Float64bits(val))
-
-		return bytes, nil
+		return float64ToBytes(val), nil
 	case float32:
-		bytes := make([]byte, sizeOfFloat32)
-		binary.LittleEndian.PutUint32(bytes, math.Float32bits(val))
-
-		return bytes, nil
+		return float32ToBytes(val), nil
 	case int:
-		bytes := make([]byte, sizeOfInt)
-		if sizeOfInt == 8 {
-			binary.LittleEndian.PutUint64(bytes, uint64(val))
-		} else {
-			binary.LittleEndian.PutUint32(bytes, uint32(val))
-		}
-
-		return bytes, nil
+		return intToBytes(val), nil
 	case int64:
-		bytes := make([]byte, sizeOfInt64)
-		binary.LittleEndian.PutUint64(bytes, uint64(val))
-
-		return bytes, nil
+		return int64ToBytes(val), nil
 	case int32:
-		bytes := make([]byte, sizeOfInt32)
-		binary.LittleEndian.PutUint32(bytes, uint32(val))
-
-		return bytes, nil
+		return int32ToBytes(val), nil
 	case int16:
-		bytes := make([]byte, sizeOfInt16)
-		binary.LittleEndian.PutUint16(bytes, uint16(val))
-
-		return bytes, nil
+		return int16ToBytes(val), nil
 	case int8:
-		bytes := make([]byte, 1)
-		bytes[0] = byte(val)
-
-		return bytes, nil
+		return int8ToBytes(val), nil
 	case uint:
-		bytes := make([]byte, sizeOfUint)
-		if sizeOfUint == sizeOfUint64 {
-			binary.LittleEndian.PutUint64(bytes, uint64(val))
-		} else {
-			binary.LittleEndian.PutUint32(bytes, uint32(val))
-		}
-
-		return bytes, nil
+		return uintToBytes(val), nil
 	case uint64:
-		bytes := make([]byte, sizeOfUint64)
-		binary.LittleEndian.PutUint64(bytes, val)
-
-		return bytes, nil
+		return uint64ToBytes(val), nil
 	case uint32:
-		bytes := make([]byte, sizeOfUint32)
-		binary.LittleEndian.PutUint32(bytes, val)
-
-		return bytes, nil
+		return uint32ToBytes(val), nil
 	case uint16:
-		bytes := make([]byte, sizeOfUint16)
-		binary.LittleEndian.PutUint16(bytes, val)
-
-		return bytes, nil
+		return uint16ToBytes(val), nil
 	case uint8:
-		bytes := make([]byte, 1)
-		bytes[0] = val
-
-		return bytes, nil
+		return uint8ToBytes(val), nil
 	case bool:
-		bytes := make([]byte, 1)
-		if val {
-			bytes[0] = 1
-		}
-
-		return bytes, nil
+		return boolToBytes(val), nil
 	case string:
 		return []byte(val), nil
 	case json.Number:
-		return ToBinary(string(val))
+		return []byte(val), nil
 	case time.Time:
 		return ToBinary(val.Unix())
 	default:

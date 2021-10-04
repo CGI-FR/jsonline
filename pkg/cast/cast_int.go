@@ -425,11 +425,8 @@ func ToInt8(i interface{}) (interface{}, error) {
 
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToInt8, i, i)
 	case []byte:
-		if len(val) != 1 {
-			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToInt8, i, i)
-		}
+		return int8FromBytes(val)
 
-		return int8(val[0]), nil
 	case json.Number:
 		return ToInt8(string(val))
 	default:

@@ -90,7 +90,7 @@ func ToBool(i interface{}) (interface{}, error) {
 
 		return f != 0.0, nil
 	case []byte:
-		return ToBool(string(val))
+		return boolFromBytes(val)
 	case time.Time:
 		return ToBool(val.Unix())
 	default:

@@ -105,26 +105,28 @@ func TestCastToBool(t *testing.T) {
 		{string("true"), bool(true), nil},
 		{string("false"), bool(false), nil},
 		// from []byte
-		{[]byte("-9223372036854775809"), bool(true), nil},
-		{[]byte("-9223372036854775808"), bool(true), nil},
-		{[]byte("-1"), bool(true), nil},
-		{[]byte("0"), bool(false), nil},
-		{[]byte("1"), bool(true), nil},
-		{[]byte("9223372036854775807"), bool(true), nil},
-		{[]byte("9223372036854775808"), bool(true), nil},
-		{[]byte("-1.7976931348623158e+308"), bool(true), nil},
-		{[]byte("-1.7976931348623157e+308"), bool(true), nil},
-		{[]byte("-1.4"), bool(true), nil},
-		{[]byte("0.0"), bool(false), nil},
-		{[]byte("1.4"), bool(true), nil},
-		{[]byte("1.7976931348623157e+308"), bool(true), nil},
-		{[]byte("1.7976931348623158e+308"), bool(true), nil},
+		{[]byte("-9223372036854775809"), nil, cast.ErrUnableToCastToBool},                         // expected error
+		{[]byte("-9223372036854775808"), nil, cast.ErrUnableToCastToBool},                         // expected error
+		{[]byte("-1"), nil, cast.ErrUnableToCastToBool},                                           // expected error
+		{[]byte("0"), bool(true), nil},                                                            // technically ok
+		{[]byte("1"), bool(true), nil},                                                            // technically ok
+		{[]byte("9223372036854775807"), nil, cast.ErrUnableToCastToBool},                          // expected error
+		{[]byte("9223372036854775808"), nil, cast.ErrUnableToCastToBool},                          // expected error
+		{[]byte("-1.7976931348623158e+308"), nil, cast.ErrUnableToCastToBool},                     // expected error
+		{[]byte("-1.7976931348623157e+308"), nil, cast.ErrUnableToCastToBool},                     // expected error
+		{[]byte("-1.4"), nil, cast.ErrUnableToCastToBool},                                         // expected error
+		{[]byte("0.0"), nil, cast.ErrUnableToCastToBool},                                          // expected error
+		{[]byte("1.4"), nil, cast.ErrUnableToCastToBool},                                          // expected error
+		{[]byte("1.7976931348623157e+308"), nil, cast.ErrUnableToCastToBool},                      // expected error
+		{[]byte("1.7976931348623158e+308"), nil, cast.ErrUnableToCastToBool},                      // expected error
 		{[]byte("hello"), nil, cast.ErrUnableToCastToBool},                                        // expected error
 		{[]byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x80}, nil, cast.ErrUnableToCastToBool},        // expected error
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, nil, cast.ErrUnableToCastToBool}, // expected error
 		{[]byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, nil, cast.ErrUnableToCastToBool},         // expected error
 		{[]byte{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, nil, cast.ErrUnableToCastToBool},         // expected error
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f}, nil, cast.ErrUnableToCastToBool}, // expected error
+		{[]byte{0x00}, bool(false), nil},
+		{[]byte{0x01}, bool(true), nil},
 		// from number
 		{json.Number("9223372036854775807"), bool(true), nil},
 		{json.Number("9223372036854775808"), bool(true), nil},

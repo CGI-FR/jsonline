@@ -460,11 +460,7 @@ func ToUint8(i interface{}) (interface{}, error) {
 
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint8, i, i)
 	case []byte:
-		if len(val) != 1 {
-			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
-		}
-
-		return val[0], nil
+		return uint8FromBytes(val)
 	case json.Number:
 		return ToUint8(string(val))
 	default:
