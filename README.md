@@ -22,10 +22,10 @@ Examples:
   jl -o '{"first":"string","second":"string"}' <dirty.jsonl
 
 Flags:
-  -i, --in string          row template definition in JSON for input lines (-t {"name":"format"} or -t {"name":"format:type"})
+  -i, --in string          row template definition in JSON for input lines (-i {"name":"format"} or -i {"name":"format:type"})
                            possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden
                            possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number (default "{}")
-  -o, --out string         row template definition in JSON for output lines (-t {"name":"format"} or -t {"name":"format:type"})
+  -o, --out string         row template definition in JSON for output lines (-o {"name":"format"} or -o {"name":"format:type"})
                            possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden
                            possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number (default "{}")
   -f, --filename string    name of row template filename (default "./row.yml")
@@ -74,7 +74,7 @@ Columns definition can also be defined by argument in command line.
 
 ```bash
 # give the same result as previous command
-jl -t '{"title":"string","year":"numeric","director":"string","running-time":"numeric"}' <movies.jsonl
+jl -o '{"title":"string","year":"numeric","director":"string","running-time":"numeric"}' <movies.jsonl
 ```
 
 ### Sub rows use case
@@ -98,7 +98,7 @@ output:
 
 ```bash
 # template version
-jl -t '{"title":"string","year":"numeric","director":{"first_name":"string","last_name":"string"}}' <movies.jsonl
+jl -o '{"title":"string","year":"numeric","director":{"first_name":"string","last_name":"string"}}' <movies.jsonl
 ```
 
 ### Specify the underlying struct
@@ -106,33 +106,33 @@ jl -t '{"title":"string","year":"numeric","director":{"first_name":"string","las
 Check this file, it stores int64 integers in binary format.
 
 ```json
-{"int64":"AgAAAAAAAAA="}
-{"int64":"KgAAAAAAAAA="}
-{"int64":"aGVsbG8="}
+{"value":"AgAAAAAAAAA="}
+{"value":"KgAAAAAAAAA="}
+{"value":"aGVsbG8="}
 ```
 
-But one of the lines is invalid.
+But one of the lines is invalid (3rd line can't be an integer 64bit because it's only 5 bytes).
 
 ```bash
 $ # this command doesn't catch the invalid value
-$ jl -t '{"int64":"binary"}' < file.jsonl
-{"int64":"AgAAAAAAAAA="}
-{"int64":"KgAAAAAAAAA="}
-{"int64":"aGVsbG8="}
+$ jl -o '{"value":"binary"}' < file.jsonl
+{"value":"AgAAAAAAAAA="}
+{"value":"KgAAAAAAAAA="}
+{"value":"aGVsbG8="}
 ```
 
 ```bash
 $ # this command will catch the invalid value because the value will be cast to int64
-$ jl -t '{"int64":"binary:int64"}' < file.jsonl
-{"int64":"AgAAAAAAAAA="}
-{"int64":"KgAAAAAAAAA="}
+$ jl -o '{"value":"binary:int64"}' < file.jsonl
+{"value":"AgAAAAAAAAA="}
+{"value":"KgAAAAAAAAA="}
 3:54PM ERR failed to process JSON line error="can't import type []uint8 to int64 format: unable to cast value to int64: []uint8([104 101 108 108 111])" line-number=2
 ```
 
 ```yaml
 # same effect but with YAML configuration
 output:
-  - name: "int64"
+  - name: "value"
     format: "binary"
     type: "int64"
 ```

@@ -89,11 +89,11 @@ func NewRootCommand() (*RootCommand, error) {
 	rootCmd.PersistentFlags().SortFlags = false
 
 	rootCmd.Flags().StringVarP(&tf.templatein, "in", "i", tf.templatein,
-		`row template definition in JSON for input lines (-t {"name":"format"} or -t {"name":"format:type"})`+"\n"+
+		`row template definition in JSON for input lines (-i {"name":"format"} or -i {"name":"format:type"})`+"\n"+
 			`possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`+"\n"+
 			`possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number`) //nolint:lll
 	rootCmd.Flags().StringVarP(&tf.templateout, "out", "o", tf.templateout,
-		`row template definition in JSON for output lines (-t {"name":"format"} or -t {"name":"format:type"})`+"\n"+
+		`row template definition in JSON for output lines (-o {"name":"format"} or -o {"name":"format:type"})`+"\n"+
 			`possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`+"\n"+
 			`possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number`) //nolint:lll
 	rootCmd.Flags().StringVarP(&tf.filename, "filename", "f", tf.filename, "name of row template filename")
