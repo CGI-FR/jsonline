@@ -1,9 +1,9 @@
-columns:
+output:
   - name: "title"
-    type: "string"
+    format: "string"
   - name: "year"
-    type: "numeric"
+    format: "numeric"
   - name: "director"
-    type: "string"
+    format: "string"
   - name: "running-time"
-    type: "numeric"
+    format: "numeric"

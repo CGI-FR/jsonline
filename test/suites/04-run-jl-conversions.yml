@@ -5,7 +5,7 @@ testcases:
   - name: convert to string
     steps:
       - script: |-
-          echo '{"string": "0.0", "numeric": 0.1, "nil": null}' | jl -t '{"string":"string","numeric":"string","nil":"string"}'
+          echo '{"string": "0.0", "numeric": 0.1, "nil": null}' | jl -o '{"string":"string","numeric":"string","nil":"string"}'
         assertions:
           - result.systemout ShouldEqual '{"string":"0.0","numeric":"0.1","nil":null}'
           - result.systemerr ShouldBeEmpty
@@ -14,7 +14,7 @@ testcases:
   - name: convert to numeric
     steps:
       - script: |-
-          echo '{"string": "0.0", "numeric": 0.1, "nil": null}' | jl -t '{"string":"numeric","numeric":"numeric","nil":"numeric"}'
+          echo '{"string": "0.0", "numeric": 0.1, "nil": null}' | jl -o '{"string":"numeric","numeric":"numeric","nil":"numeric"}'
         assertions:
           - result.systemout ShouldEqual '{"string":0.0,"numeric":0.1,"nil":null}'
           - result.systemerr ShouldBeEmpty
@@ -23,7 +23,7 @@ testcases:
   - name: convert to boolean true
     steps:
       - script: |-
-          echo '{"string": "true", "numeric": 0.1, "nil": null}' | jl -t '{"string":"boolean","numeric":"boolean","nil":"boolean"}'
+          echo '{"string": "true", "numeric": 0.1, "nil": null}' | jl -o '{"string":"boolean","numeric":"boolean","nil":"boolean"}'
         assertions:
           - result.systemout ShouldEqual '{"string":true,"numeric":true,"nil":null}'
           - result.systemerr ShouldBeEmpty
@@ -32,7 +32,7 @@ testcases:
   - name: convert to boolean false
     steps:
       - script: |-
-          echo '{"string": "false", "numeric": 0.0, "nil": null}' | jl -t '{"string":"boolean","numeric":"boolean","nil":"boolean"}'
+          echo '{"string": "false", "numeric": 0.0, "nil": null}' | jl -o '{"string":"boolean","numeric":"boolean","nil":"boolean"}'
         assertions:
           - result.systemout ShouldEqual '{"string":false,"numeric":false,"nil":null}'
           - result.systemerr ShouldBeEmpty
@@ -41,7 +41,7 @@ testcases:
   - name: convert to binary
     steps:
       - script: |-
-          echo '{"string": "aGVsbG8=", "numeric": "BAAAAAAAAAA=", "nil": null}' | jl -t '{"string":"binary","numeric":"binary","nil":"binary"}'
+          echo '{"string": "aGVsbG8=", "numeric": "BAAAAAAAAAA=", "nil": null}' | jl -o '{"string":"binary","numeric":"binary","nil":"binary"}'
         assertions:
           - result.systemout ShouldEqual '{"string":"aGVsbG8=","numeric":"BAAAAAAAAAA=","nil":null}'
           - result.systemerr ShouldBeEmpty
@@ -51,7 +51,7 @@ testcases:
     steps:
       - script: |-
           export TZ="Europe/Paris"
-          echo '{"string": "2021-09-28T11:59:49+02:00", "numeric": 1632823189, "nil": null}' | jl -t '{"string":"datetime","numeric":"datetime","nil":"datetime"}'
+          echo '{"string": "2021-09-28T11:59:49+02:00", "numeric": 1632823189, "nil": null}' | jl -o '{"string":"datetime","numeric":"datetime","nil":"datetime"}'
         assertions:
           - result.systemout ShouldEqual '{"string":"2021-09-28T11:59:49+02:00","numeric":"2021-09-28T11:59:49+02:00","nil":null}'
           - result.systemerr ShouldBeEmpty
@@ -60,7 +60,7 @@ testcases:
   - name: convert to timestamp
     steps:
       - script: |-
-          echo '{"string": "1632823189", "numeric": 1632823189, "nil": null}' | jl -t '{"string":"timestamp","numeric":"timestamp","nil":"timestamp"}'
+          echo '{"string": "1632823189", "numeric": 1632823189, "nil": null}' | jl -o '{"string":"timestamp","numeric":"timestamp","nil":"timestamp"}'
         assertions:
           - result.systemout ShouldEqual '{"string":1632823189,"numeric":1632823189,"nil":null}'
           - result.systemerr ShouldBeEmpty
@@ -69,7 +69,7 @@ testcases:
   - name: convert to auto
     steps:
       - script: |-
-          echo '{"string": "2021-09-28T11:59:49+02:00", "numeric": 1632823189, "nil": null}' | jl -t '{"string":"auto","numeric":"auto","nil":"auto"}'
+          echo '{"string": "2021-09-28T11:59:49+02:00", "numeric": 1632823189, "nil": null}' | jl -o '{"string":"auto","numeric":"auto","nil":"auto"}'
         assertions:
           - result.systemout ShouldEqual '{"string":"2021-09-28T11:59:49+02:00","numeric":1632823189,"nil":null}'
           - result.systemerr ShouldBeEmpty
@@ -78,7 +78,7 @@ testcases:
   - name: convert to hidden
     steps:
       - script: |-
-          echo '{"string": "0.0", "numeric": 0.1, "nil": null}' | jl -t '{"string":"hidden","numeric":"hidden","nil":"hidden"}'
+          echo '{"string": "0.0", "numeric": 0.1, "nil": null}' | jl -o '{"string":"hidden","numeric":"hidden","nil":"hidden"}'
         assertions:
           - result.systemout ShouldEqual '{}'
           - result.systemerr ShouldBeEmpty

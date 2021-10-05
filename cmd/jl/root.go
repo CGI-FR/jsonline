@@ -33,7 +33,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v3"
 )
 
 type globalFlags struct {
@@ -44,9 +43,9 @@ type globalFlags struct {
 }
 
 type templateFlags struct {
-	columns  []string
-	template string
-	filename string
+	templatein  string
+	templateout string
+	filename    string
 }
 
 type RootCommand struct {
@@ -62,8 +61,7 @@ func NewRootCommand() (*RootCommand, error) {
 		Run:     run,
 		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)", version, commit, buildDate, builtBy),
 		Example: "" +
-			fmt.Sprintf(`  %s -c '{name: first, format: string}' -c '{name: second, format: string}' <dirty.jsonl`, name) + "\n" +
-			fmt.Sprintf(`  %s -t '{"first":"string","second":"string"}' <dirty.jsonl`, name),
+			fmt.Sprintf(`  %s -o '{"first":"string","second":"string"}' <dirty.jsonl`, name),
 	}
 
 	cobra.OnInitialize(initConfig)
@@ -76,9 +74,9 @@ func NewRootCommand() (*RootCommand, error) {
 	}
 
 	tf := templateFlags{
-		columns:  nil,
-		template: "{}",
-		filename: "./row.yml",
+		templatein:  "{}",
+		templateout: "{}",
+		filename:    "./row.yml",
 	}
 
 	rootCmd.PersistentFlags().StringVarP(&gf.verbosity, "verbosity", "v", gf.verbosity,
@@ -90,13 +88,14 @@ func NewRootCommand() (*RootCommand, error) {
 
 	rootCmd.PersistentFlags().SortFlags = false
 
-	rootCmd.Flags().StringArrayVarP(&tf.columns, "column", "c", tf.columns,
-		`inline column definition in minified YAML (-c {name: title, format: string})`+"\n"+
-			`use this flag multiple times, one for each column`+"\n"+
-			`possible formats : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden`)
-	rootCmd.Flags().StringVarP(&tf.template, "template", "t", tf.template,
-		`row template definition in JSON (-t {"title":"string"})`+"\n"+
-			`possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`)
+	rootCmd.Flags().StringVarP(&tf.templatein, "in", "i", tf.templatein,
+		`row template definition in JSON for input lines (-t {"name":"format"} or -t {"name":"format:type"})`+"\n"+
+			`possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`+"\n"+
+			`possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number`) //nolint:lll
+	rootCmd.Flags().StringVarP(&tf.templateout, "out", "o", tf.templateout,
+		`row template definition in JSON for output lines (-t {"name":"format"} or -t {"name":"format:type"})`+"\n"+
+			`possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`+"\n"+
+			`possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number`) //nolint:lll
 	rootCmd.Flags().StringVarP(&tf.filename, "filename", "f", tf.filename, "name of row template filename")
 
 	rootCmd.Flags().SortFlags = false
@@ -104,8 +103,6 @@ func NewRootCommand() (*RootCommand, error) {
 	if err := bindViper(rootCmd); err != nil {
 		return nil, err
 	}
-
-	// rootCmd.AddCommand(<package>.NewCommand(rootCmd.CommandPath()))
 
 	return &RootCommand{rootCmd}, nil
 }
@@ -208,14 +205,14 @@ func initViper() {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	t, err := createTemplate(cmd)
+	ti, to, err := createTemplate(cmd)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to parse row template")
 		os.Exit(1)
 	}
 
-	importer := t.GetImporter(os.Stdin)
-	exporter := t.GetExporter(os.Stdout)
+	importer := ti.GetImporter(os.Stdin)
+	exporter := to.GetExporter(os.Stdout)
 	streamer := jsonline.NewStreamer(importer, exporter)
 
 	over.AddGlobalFields("line-number")
@@ -250,9 +247,9 @@ func run(cmd *cobra.Command, args []string) {
 
 func getTemplateFlags(cmd *cobra.Command) (*templateFlags, error) {
 	tf := &templateFlags{
-		columns:  []string{},
-		template: "",
-		filename: "",
+		templatein:  "",
+		templateout: "",
+		filename:    "",
 	}
 
 	var err error
@@ -262,78 +259,70 @@ func getTemplateFlags(cmd *cobra.Command) (*templateFlags, error) {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	tf.columns, err = cmd.Flags().GetStringArray("column")
+	tf.templatein, err = cmd.Flags().GetString("in")
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	tf.template, err = cmd.Flags().GetString("template")
+	tf.templateout, err = cmd.Flags().GetString("out")
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	if len(tf.columns) > 0 && len(tf.template) > 0 && tf.template != "{}" {
-		return nil, ErrForbiddenTemplateAndColumnFlags
+	if tf.templatein == "{}" {
+		tf.templatein = tf.templateout
 	}
 
-	var js json.RawMessage
-	if json.Unmarshal([]byte(tf.template), &js) != nil {
-		log.Debug().
-			Str("filename", tf.filename).
-			Str("template", tf.template).
-			Str("columns", fmt.Sprintf("%v", tf.columns)).
-			Msg("template flags")
-	} else {
-		log.Debug().
-			Str("filename", tf.filename).
-			RawJSON("template", []byte(tf.template)).
-			Str("columns", fmt.Sprintf("%v", tf.columns)).
-			Msg("template flags")
-	}
+	logFlags(tf)
 
 	return tf, nil
 }
 
-func createTemplate(cmd *cobra.Command) (jsonline.Template, error) {
+func logFlags(tf *templateFlags) {
+	var js json.RawMessage
+
+	tmp := log.Debug().
+		Str("filename", tf.filename)
+
+	if json.Unmarshal([]byte(tf.templatein), &js) != nil {
+		tmp = tmp.Str("in", tf.templatein)
+	} else {
+		tmp = tmp.RawJSON("in", []byte(tf.templatein))
+	}
+
+	if json.Unmarshal([]byte(tf.templateout), &js) != nil {
+		tmp = tmp.Str("out", tf.templateout)
+	} else {
+		tmp = tmp.RawJSON("out", []byte(tf.templateout))
+	}
+
+	tmp.Msg("template flags")
+}
+
+func createTemplate(cmd *cobra.Command) (jsonline.Template, jsonline.Template, error) {
 	tf, err := getTemplateFlags(cmd)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	columns := []ColumnDefinition{}
-
-	for _, columnDef := range tf.columns {
-		colDef := ColumnDefinition{
-			Name:    "",
-			Format:  "",
-			Type:    "",
-			Columns: nil,
-		}
-
-		err = yaml.Unmarshal([]byte(columnDef), &colDef)
-		if err != nil {
-			return nil, fmt.Errorf("%w", err)
-		}
-
-		columns = append(columns, colDef)
-	}
-
-	t, err := ParseRowDefinition(tf.filename)
+	ti, to, err := ParseRowDefinition(tf.filename)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	if len(columns) > 0 {
-		t, err = parse(jsonline.NewTemplate(), columns)
+	if len(tf.templateout) > 0 && tf.templateout != "{}" {
+		to, err = createTemplateFromString(tf.templateout)
 		if err != nil {
-			return nil, err
-		}
-	} else if len(tf.template) > 0 && tf.template != "{}" {
-		t, err = createTemplateFromString(tf.template)
-		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
-	return t, nil
+	if len(tf.templatein) > 0 && tf.templatein != "{}" {
+		ti, err = createTemplateFromString(tf.templatein)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return ti, to, nil
 }

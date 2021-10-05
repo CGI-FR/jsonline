@@ -21,6 +21,8 @@ Types of changes
 - **`Added`** new package `cast` to expose all type cast-related functions.
 - **`Added`** improved logging, `trace` level gives full information about rows.
 - **`Added`** possibility to configure the underlying raw type for each column in the command line with the `type` property in row YAML definition.
+- **`Added`** flag `-o` on the command line to specify the output format of lines to stdout.
+- **`Added`** flag `-i` on the command line to specify the input format of lines from stdin.
 - **`Changed`** `template.Create()` renamed in `template.CreateRow()` for readability.
 - **`Changed`** default raw type and export value for `Number` format is `json.Number`.
 - **`Changed`** module name to `github.com/cgi-fr/jsonline`.
@@ -29,6 +31,8 @@ Types of changes
 - **`Changed`** exporting or importing to `Timestamp` format will always produce an `int64` (if not specified otherwise).
 - **`Changed`** renamed `type` property to `format` in row YAML definition.
 - **`Removed`** `Time` format because it is a special case of the `DateTime` format with different `time.Parse` format string, the same result can be achieved by calling `cast.TimeStringFormat = "15:04:05Z07:00"`.
+- **`Removed`** `-c` flag from the command line (use `-o` instead).
+- **`Removed`** `-t` flag from the command line (use `-o` instead).
 - **`Fixed`** `Format` type now correctly exported by jsonline package.
 - **`Fixed`** `row.Raw()` now return the correct value (a `map[string]interface{}` of raw values).
 - **`Fixed`** conversions error no longer ignored by unmarshaling.

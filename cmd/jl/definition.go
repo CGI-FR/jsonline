@@ -43,7 +43,8 @@ const (
 )
 
 type RowDefinition struct {
-	Columns []ColumnDefinition `yaml:"columns"`
+	Input  []ColumnDefinition `yaml:"input"`
+	Output []ColumnDefinition `yaml:"output"`
 }
 
 type ColumnDefinition struct {
@@ -55,7 +56,8 @@ type ColumnDefinition struct {
 
 func ReadRowDefinition(filename string) (*RowDefinition, error) {
 	def := &RowDefinition{
-		Columns: []ColumnDefinition{},
+		Input:  []ColumnDefinition{},
+		Output: []ColumnDefinition{},
 	}
 
 	if _, err := os.Stat(filename); err == nil {
@@ -75,15 +77,23 @@ func ReadRowDefinition(filename string) (*RowDefinition, error) {
 	return def, nil
 }
 
-func ParseRowDefinition(filename string) (jsonline.Template, error) {
+func ParseRowDefinition(filename string) (jsonline.Template, jsonline.Template, error) {
 	def, err := ReadRowDefinition(filename)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	template := jsonline.NewTemplate()
+	ti, err := parse(jsonline.NewTemplate(), def.Input)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	return parse(template, def.Columns)
+	to, err := parse(jsonline.NewTemplate(), def.Output)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return ti, to, nil
 }
 
 //nolint:cyclop

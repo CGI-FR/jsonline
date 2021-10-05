@@ -19,22 +19,22 @@ Usage:
   jl [flags]
 
 Examples:
-  jl -c '{name: first, format: string}' -c '{name: second, format: string}' <dirty.jsonl
-  jl -t '{"first":"string","second":"string"}' <dirty.jsonl
+  jl -o '{"first":"string","second":"string"}' <dirty.jsonl
 
 Flags:
-  -c, --column stringArray   inline column definition in minified YAML (-c {name: title, format: string})
-                             use this flag multiple times, one for each column
-                             possible formats : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden
-  -t, --template string      row template definition in JSON (-t {"title":"string"})
-                             possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden
-  -f, --filename string      name of row template filename (default "./row.yml")
-  -v, --verbosity string     set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5) (default "error")
-      --debug                add debug information to logs (very slow)
-      --log-json             output logs in JSON format
-      --color string         use colors in log outputs : yes, no or auto (default "auto")
-  -h, --help                 help for jl
-      --version              version for jl
+  -i, --in string          row template definition in JSON for input lines (-t {"name":"format"} or -t {"name":"format:type"})
+                           possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden
+                           possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number (default "{}")
+  -o, --out string         row template definition in JSON for output lines (-t {"name":"format"} or -t {"name":"format:type"})
+                           possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden
+                           possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number (default "{}")
+  -f, --filename string    name of row template filename (default "./row.yml")
+  -v, --verbosity string   set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5) (default "error")
+      --debug              add debug information to logs (very slow)
+      --log-json           output logs in JSON format
+      --color string       use colors in log outputs : yes, no or auto (default "auto")
+  -h, --help               help for jl
+      --version            version for jl
 ```
 
 ### Example use case
@@ -50,7 +50,7 @@ Look at this file.
 Let's define a template, in a configuration file named `row.yml`.
 
 ```yaml
-columns:
+output:
 - name: "title"
   format: "string"
 - name: "year"
@@ -70,14 +70,7 @@ $ jl <movies.jsonl
 {"title":"Titanic","year":1999,"director":"James Cameron","running-time":195}
 ```
 
-Columns definition can also be inlined in the command.
-
-```bash
-# give the same result as previous command
-jl -c '{name: title, format: string}' -c '{name: year, format: numeric}' -c '{name: director, format: string}' -c '{name: running-time, format: numeric}' <movies.jsonl
-```
-
-Or you can use the more compact template version.
+Columns definition can also be defined by argument in command line.
 
 ```bash
 # give the same result as previous command
@@ -89,23 +82,18 @@ jl -t '{"title":"string","year":"numeric","director":"string","running-time":"nu
 A row definition can contain sub rows.
 
 ```yaml
-columns:
+output:
 - name: "title"
   format: "string"
 - name: "year"
   format: "numeric"
 - name: "director"
   format: "row"
-  columns:
+  output:
     - name: "first_name"
       format: "string"
     - name: "last_name"
       format: "string"
-```
-
-```bash
-# inline columns version
-jl -c '{name: title, format: string}' -c '{name: year, format: numeric}' -c '{name: director, format: row, columns: [{name: first_name, format: string}, {name: last_name, format: string}]}' <movies.jsonl
 ```
 
 ```bash
@@ -141,14 +129,9 @@ $ jl -t '{"int64":"binary:int64"}' < file.jsonl
 3:54PM ERR failed to process JSON line error="can't import type []uint8 to int64 format: unable to cast value to int64: []uint8([104 101 108 108 111])" line-number=2
 ```
 
-```bash
-# same command but with column definition
-jl -c '{name: int64, format: binary, type: int64}' <file.jsonl
-```
-
 ```yaml
 # same effect but with YAML configuration
-columns:
+output:
   - name: "int64"
     format: "binary"
     type: "int64"
