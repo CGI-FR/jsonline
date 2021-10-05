@@ -47,3 +47,28 @@ func TestLinoUseCase(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, data, result.Raw())
 }
+
+func BenchmarkLinoUseCase(b *testing.B) {
+	data := map[string]interface{}{
+		"title":        []byte("The Matrix"),
+		"release_date": []byte("1999"),
+	}
+
+	for n := 0; n < b.N; n++ {
+		// lino pull
+		template := jsonline.NewTemplate().
+			WithString("title").
+			WithNumeric("release_date")
+
+		row, _ := template.CreateRow(data)
+		b, _ := row.MarshalJSON() // output data to the stdout
+
+		// lino push
+		template = jsonline.NewTemplate().
+			WithMappedAuto("title", []byte{}).
+			WithMappedAuto("release_date", []byte{})
+
+		result := template.CreateRowEmpty()
+		result.UnmarshalJSON(b) //nolint:errcheck
+	}
+}

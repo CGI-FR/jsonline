@@ -20,13 +20,17 @@ Types of changes
 - **`Added`** `value.GetRawType()` return the raw type that will be used on import.
 - **`Added`** new package `cast` to expose all type cast-related functions.
 - **`Added`** improved logging, `trace` level gives full information about rows.
+- **`Added`** possibility to configure the underlying raw type for each column in the command line and in row YAML definition (`input`).
+- **`Added`** possibility to configure a different format for input and output JSON Line.
 - **`Changed`** `template.Create()` renamed in `template.CreateRow()` for readability.
 - **`Changed`** default raw type and export value for `Number` format is `json.Number`.
 - **`Changed`** module name to `github.com/cgi-fr/jsonline`.
 - **`Changed`** exporting `int32` or `rune` to `String` format will no longer convert the value to the corresponding unicode character, but rather print the numeric value.
 - **`Changed`** exporting to `Binary` format will no longer convert the value to a `string` before base64 encoding, but will be encoded to in-memory byte representation.
 - **`Changed`** exporting or importing to `Timestamp` format will always produce an `int64` (if not specified otherwise).
+- **`Changed`** renamed `type` property to `output` in row YAML definition.
 - **`Removed`** `Time` format because it is a special case of the `DateTime` format with different `time.Parse` format string, the same result can be achieved by calling `cast.TimeStringFormat = "15:04:05Z07:00"`.
+- **`Removed`** `-c` flag from the command line (use `-t` instead).
 - **`Fixed`** `Format` type now correctly exported by jsonline package.
 - **`Fixed`** `row.Raw()` now return the correct value (a `map[string]interface{}` of raw values).
 - **`Fixed`** conversions error no longer ignored by unmarshaling.

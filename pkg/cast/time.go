@@ -32,6 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
+//nolint:cyclop
 package cast
 
 import (
@@ -43,17 +44,36 @@ func ToTime(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil, time.Time:
 		return val, nil
+
 	case string:
 		t, err := time.Parse(TimeStringFormat, val)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToTime, i, i)
+			i64, err := ToInt64(val)
+			if err != nil {
+				return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToTime, i, i)
+			}
+
+			return ToTime(i64)
 		}
 
 		return t, nil
+
 	case []byte:
-		return ToTime(string(val))
+		t, err := ToTime(string(val))
+		if err != nil {
+			i64, err := ToInt64(val)
+			if err != nil {
+				return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToTime, i, i)
+			}
+
+			return ToTime(i64)
+		}
+
+		return t, nil
+
 	case int64:
 		return time.Unix(val, 0), nil
+
 	default:
 		i64, err := ToInt64(val)
 		if err != nil {

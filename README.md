@@ -4,9 +4,11 @@ This repository contains a command-line tool and a library that can handle JSONL
 
 ## Features
 
-- order of keys is preserved
-- configure format values to valid JSON types : string, numeric, boolean
+- preserve order of keys
+- format values to valid JSON types : string, numeric, boolean
 - handle specific format that are not part of the JSON specification : binary, datetime, time, timestamp
+- read JSON lines with specific underlying var type (e.g. store the binary string read from JSON inside a int64)
+- validate format of input lines
 
 ## Command Line Usage
 
@@ -17,22 +19,19 @@ Usage:
   jl [flags]
 
 Examples:
-  jl -c '{name: first, type: string}' -c '{name: second, type: string}' <dirty.jsonl
   jl -t '{"first":"string","second":"string"}' <dirty.jsonl
 
 Flags:
-  -c, --column stringArray   inline column definition in minified YAML (-c {name: title, type: string})
-                             use this flag multiple times, one for each column
-                             possible types : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden
-  -t, --template string      row template definition in JSON (-t {"title":"string"})
-                             possible types : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden
-  -f, --filename string      name of row template filename (default "./row.yml")
-  -v, --verbosity string     set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5) (default "error")
-      --debug                add debug information to logs (very slow)
-      --log-json             output logs in JSON format
-      --color string         use colors in log outputs : yes, no or auto (default "auto")
-  -h, --help                 help for jl
-      --version              version for jl
+  -t, --template string    row template definition (-t {"name":"format"} or -t {"name":"format(type)"}) or -t {"name":"format(type):format"})
+                           possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden
+                           possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number (default "{}")
+  -f, --filename string    name of row template filename (default "./row.yml")
+  -v, --verbosity string   set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5) (default "error")
+      --debug              add debug information to logs (very slow)
+      --log-json           output logs in JSON format
+      --color string       use colors in log outputs : yes, no or auto (default "auto")
+  -h, --help               help for jl
+      --version            version for jl
 ```
 
 ### Example use case
@@ -40,46 +39,52 @@ Flags:
 Look at this file.
 
 ```json
-{"title":"Jurassic Park", "year":1993}
-{"year":1999, "title":"The Matrix", "running-time":136}
-{"title":"Titanic", "running-time":"195", "director":"James Cameron"}
+{"title":"Jurassic Park", "year":1993, "release-date": 739828800}
+{"year":1999, "release-date": "922910400", "title":"The Matrix", "running-time":136}
+{"title":"Titanic", "running-time":"195", "release-date": "1997-12-19T08:00:00-04:00", "director":"James Cameron"}
 ```
 
-Let's define a template, in a configuration file named `row.yml`.
+Let's define a template  in a configuration file named `row.yml`, it will help organize columns.
 
 ```yaml
 columns:
 - name: "title"
-  type: "string"
-- name: "year"
-  type: "numeric"
 - name: "director"
-  type: "string"
+- name: "year"
+  output: "numeric"
 - name: "running-time"
-  type: "numeric"
+  output: "numeric"
+- name: "release-date"
+  output: "datetime"
 ```
 
 Use the `jl` command line to enforce line format.
 
 ```json
 $ jl <movies.jsonl
-{"title":"Jurassic Park","year":1993,"director":null,"running-time":null}
-{"title":"The Matrix","year":1999,"director":null,"running-time":136}
-{"title":"Titanic","year":1999,"director":"James Cameron","running-time":195}
+{"title":"Jurassic Park","director":null,"year":1993,"running-time":null,"release-date":"1993-06-11T22:00:00+02:00"}
+{"title":"The Matrix","director":null,"year":1999,"running-time":136,"release-date":"1999-03-31T22:00:00+02:00"}
+{"title":"Titanic","director":"James Cameron","year":null,"running-time":195,"release-date":"1997-12-19T08:00:00-04:00"}
 ```
 
-Columns definition can also be inlined in the command.
+Finally, let's improve output display a bit with mlr.
+
+```console
+$ jl <movies.jsonl | mlr --j2p --barred cat
++---------------+---------------+------+--------------+---------------------------+
+| title         | director      | year | running-time | release-date              |
++---------------+---------------+------+--------------+---------------------------+
+| Jurassic Park | -             | 1993 | -            | 1993-06-11T22:00:00+02:00 |
+| The Matrix    | -             | 1999 | 136          | 1999-03-31T22:00:00+02:00 |
+| Titanic       | James Cameron | -    | 195          | 1997-12-19T08:00:00-04:00 |
++---------------+---------------+------+--------------+---------------------------+
+```
+
+Columns definition can also be defined by argument in command line, using the `-t` flag (or `--template`).
 
 ```bash
 # give the same result as previous command
-jl -c '{name: title, type: string}' -c '{name: year, type: numeric}' -c '{name: director, type: string}' -c '{name: running-time, type: numeric}' <movies.jsonl
-```
-
-Or you can use the more compact template version.
-
-```bash
-# give the same result as previous command
-jl -t '{"title":"string","year":"numeric","director":"string","running-time":"numeric"}' <movies.jsonl
+jl -t '{"title":"","director":"","year":"numeric","running-time":"numeric","release-date":"datetime"}' <movies.jsonl
 ```
 
 ### Sub rows use case
@@ -89,26 +94,78 @@ A row definition can contain sub rows.
 ```yaml
 columns:
 - name: "title"
-  type: "string"
-- name: "year"
-  type: "numeric"
 - name: "director"
-  type: "row"
+
+# this is a sub-row definition, it will be added if missing from the input
+- name: "producer"
   columns:
-    - name: "first_name"
-      type: "string"
-    - name: "last_name"
-      type: "string"
+    - name: "first-name"
+    - name: "last-name"
 ```
 
 ```bash
-# inline columns version
-jl -c '{name: title, type: string}' -c '{name: year, type: numeric}' -c '{name: director, type: row, columns: [{name: first_name, type: string}, {name: last_name, type: string}]}' <movies.jsonl
+# template version
+jl -t '{"title":"string","director":"","producer":{"first_name":"","last_name":""}}' <movies.jsonl
+```
+
+### Specify the underlying struct
+
+Check this file, it stores int64 integers in binary format.
+
+```json
+{"value":"AgAAAAAAAAA="}
+{"value":"KgAAAAAAAAA="}
+{"value":"aGVsbG8="}
+```
+
+But one of the lines is invalid (3rd line can't be an integer 64bit because it's only 5 bytes).
+
+```bash
+$ # this command doesn't catch the invalid value
+$ jl -t '{"value":"binary"}' < file.jsonl
+{"value":"AgAAAAAAAAA="}
+{"value":"KgAAAAAAAAA="}
+{"value":"aGVsbG8="}
 ```
 
 ```bash
-# template
-jl -t '{"title":"string","year":"numeric","director":{"first_name":"string","last_name":"string"}}' <movies.jsonl
+$ # this command will catch the invalid value because the value will be cast to int64
+$ jl -t '{"value":"binary(int64)"}' < file.jsonl
+{"value":"AgAAAAAAAAA="}
+{"value":"KgAAAAAAAAA="}
+3:54PM ERR failed to process JSON line error="can't import type []uint8 to int64 format: unable to cast value to int64: []uint8([104 101 108 108 111])" line-number=2
+```
+
+```yaml
+# same effect but with YAML configuration
+columns:
+  - name: "value"
+    output: "binary(int64)"
+```
+
+Valid types are : `int`, `int64`, `int32`, `int16`, `int8`, `uint`, `uint64`, `uint32`, `uint16`, `uint8`, `float64`, `float32`, `bool`, `byte`, `rune`, `string`, `[]byte`, `time.Time`, `json.Number`
+
+### Specify a different format between input and output
+
+```yaml
+columns:
+  # this column will be read as a datetime, and written as a timestamp
+  - name: "release-date"
+    input: "datetime"
+    output: "timestamp"
+```
+
+```json
+{"release-date": 739828800}
+{"release-date": "922910400"}
+{"release-date": "1997-12-19T08:00:00-04:00"}
+```
+
+```console
+$ jl <movies.jsonl
+{"release-date":739828800}
+{"release-date":922910400}
+{"release-date":882532800}
 ```
 
 ## Library Usage

@@ -1,9 +1,28 @@
+# columns listed in order of appearance in output
 columns:
   - name: "title"
-    type: "string"
-  - name: "year"
-    type: "numeric"
+
+  # if the column is missing from the input, it will be added in second position with a null value
   - name: "director"
-    type: "string"
+
+  # this column format will be enforced to numeric in the JSON output
+  - name: "year"
+    output: "numeric"
+
   - name: "running-time"
-    type: "numeric"
+    output: "numeric"
+
+  # this column will be read as a datetime, and output to a timestamp
+  - name: "release-date"
+    input: "datetime"
+    output: "timestamp"
+
+  - name: "cryptic"
+    input: "binary(int32)" # this will validate that the cryptic field, if present, is an int32 encoded as base64 (if not, there will be an error)
+    output: "hidden" # the field will then be masked in the output
+
+  # this is a sub-row definition, it will be added if missing from the input
+  - name: "producer"
+    columns:
+      - name: "first-name"
+      - name: "last-name"
