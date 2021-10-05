@@ -40,23 +40,25 @@ import (
 )
 
 type Template interface {
-	WithString(string) Template
-	WithNumeric(string) Template
-	WithBoolean(string) Template
-	WithBinary(string) Template
-	WithDateTime(string) Template
-	WithTimestamp(string) Template
-	WithAuto(string) Template
-	WithHidden(string) Template
-	WithRow(string, Template) Template
+	WithString(name string) Template
+	WithNumeric(name string) Template
+	WithBoolean(name string) Template
+	WithBinary(name string) Template
+	WithDateTime(name string) Template
+	WithTimestamp(name string) Template
+	WithAuto(name string) Template
+	WithHidden(name string) Template
+	WithRow(name string, row Template) Template
 
-	WithMappedString(string, interface{}) Template
-	WithMappedNumeric(string, interface{}) Template
-	WithMappedBoolean(string, interface{}) Template
-	WithMappedBinary(string, interface{}) Template
-	WithMappedDateTime(string, interface{}) Template
-	WithMappedTimestamp(string, interface{}) Template
-	WithMappedAuto(string, interface{}) Template
+	WithMappedString(name string, rawtype interface{}) Template
+	WithMappedNumeric(name string, rawtype interface{}) Template
+	WithMappedBoolean(name string, rawtype interface{}) Template
+	WithMappedBinary(name string, rawtype interface{}) Template
+	WithMappedDateTime(name string, rawtype interface{}) Template
+	WithMappedTimestamp(name string, rawtype interface{}) Template
+	WithMappedAuto(name string, rawtype interface{}) Template
+
+	With(name string, format Format, rawtype interface{}) Template
 
 	CreateRow(interface{}) (Row, error)
 	CreateRowEmpty() Row
@@ -167,6 +169,12 @@ func (t *template) WithMappedTimestamp(name string, rawtype interface{}) Templat
 
 func (t *template) WithMappedAuto(name string, rawtype interface{}) Template {
 	t.empty.Set(name, NewValue(nil, Auto, rawtype))
+
+	return t
+}
+
+func (t *template) With(name string, format Format, rawtype interface{}) Template {
+	t.empty.Set(name, NewValue(nil, format, rawtype))
 
 	return t
 }

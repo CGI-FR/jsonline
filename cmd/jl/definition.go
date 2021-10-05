@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -39,25 +40,22 @@ const (
 	Timestamp = "timestamp"
 	Auto      = "auto"
 	Hidden    = "hidden"
-	Row       = "row"
 )
 
 type RowDefinition struct {
-	Input  []ColumnDefinition `yaml:"input"`
-	Output []ColumnDefinition `yaml:"output"`
+	Columns []ColumnDefinition `yaml:"columns"`
 }
 
 type ColumnDefinition struct {
 	Name    string             `yaml:"name"`
-	Format  string             `yaml:"format"`
-	Type    string             `yaml:"type"`
+	Input   string             `yaml:"input,omitempty"`
+	Output  string             `yaml:"output,omitempty"`
 	Columns []ColumnDefinition `yaml:"columns,omitempty"`
 }
 
 func ReadRowDefinition(filename string) (*RowDefinition, error) {
 	def := &RowDefinition{
-		Input:  []ColumnDefinition{},
-		Output: []ColumnDefinition{},
+		Columns: []ColumnDefinition{},
 	}
 
 	if _, err := os.Stat(filename); err == nil {
@@ -83,12 +81,7 @@ func ParseRowDefinition(filename string) (jsonline.Template, jsonline.Template, 
 		return nil, nil, err
 	}
 
-	ti, err := parse(jsonline.NewTemplate(), def.Input)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	to, err := parse(jsonline.NewTemplate(), def.Output)
+	ti, to, err := parse(jsonline.NewTemplate(), jsonline.NewTemplate(), def.Columns)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -96,110 +89,97 @@ func ParseRowDefinition(filename string) (jsonline.Template, jsonline.Template, 
 	return ti, to, nil
 }
 
-//nolint:cyclop
-func parse(tmpl jsonline.Template, columns []ColumnDefinition) (jsonline.Template, error) {
-	for _, column := range columns {
-		coltype, ok := typeRegistry[column.Type]
-		if !ok && len(column.Type) > 0 {
-			return nil, fmt.Errorf("%w: %v", ErrInvalidRawType, column.Type)
-		}
+func parseDescriptor(def string) (jsonline.Format, interface{}) {
+	var rawtype interface{}
 
-		switch column.Format {
-		case String:
-			tmpl = tmpl.WithMappedString(column.Name, coltype)
-		case Numeric:
-			tmpl = tmpl.WithMappedNumeric(column.Name, coltype)
-		case Boolean:
-			tmpl = tmpl.WithMappedBoolean(column.Name, coltype)
-		case Binary:
-			tmpl = tmpl.WithMappedBinary(column.Name, coltype)
-		case DateTime:
-			tmpl = tmpl.WithMappedDateTime(column.Name, coltype)
-		case Timestamp:
-			tmpl = tmpl.WithMappedTimestamp(column.Name, coltype)
-		case Auto:
-			tmpl = tmpl.WithMappedAuto(column.Name, coltype)
-		case Hidden:
-			tmpl = tmpl.WithHidden(column.Name)
-		case Row:
-			rowt, err := parse(jsonline.NewTemplate(), column.Columns)
-			if err != nil {
-				return tmpl, err
-			}
+	r := regexp.MustCompile(`^([^\(]+)(?:\(([^\)]+)\))?$`) // "<FORMAT>(<TYPE>)" or "FORMAT"
+	submatches := r.FindStringSubmatch(def)
+	format := jsonline.Auto
 
-			tmpl = tmpl.WithRow(column.Name, rowt)
+	if len(submatches) > 1 {
+		if f, ok := formatRegistry[submatches[1]]; ok {
+			format = f
 		}
 	}
 
-	return tmpl, nil
+	//nolint:gomnd
+	if len(submatches) > 2 {
+		rawtype = typeRegistry[submatches[2]]
+	}
+
+	return format, rawtype
 }
 
-func createTemplateFromString(input string) (jsonline.Template, error) {
+func parse(ti jsonline.Template, to jsonline.Template,
+	columns []ColumnDefinition) (jsonline.Template, jsonline.Template, error) {
+	for _, column := range columns {
+		iformat, irawtype := parseDescriptor(column.Input)
+		oformat, orawtype := parseDescriptor(column.Output)
+
+		ti.With(column.Name, iformat, irawtype)
+		to.With(column.Name, oformat, orawtype)
+
+		if len(column.Columns) > 0 {
+			rowti, rowto, err := parse(jsonline.NewTemplate(), jsonline.NewTemplate(), column.Columns)
+			if err != nil {
+				return ti, to, err
+			}
+
+			ti = ti.WithRow(column.Name, rowti)
+			to = to.WithRow(column.Name, rowto)
+		}
+	}
+
+	return ti, to, nil
+}
+
+func createTemplateFromString(input string) (jsonline.Template, jsonline.Template, error) {
 	row := jsonline.NewRow()
 
 	if err := json.Unmarshal([]byte(input), row); err != nil {
-		return nil, fmt.Errorf("%w", err)
+		return nil, nil, fmt.Errorf("%w", err)
 	}
 
 	return createTemplateFromRow(row)
 }
 
-func createTemplateFromRow(row jsonline.Row) (jsonline.Template, error) {
-	tmpl := jsonline.NewTemplate()
+func createTemplateFromRow(row jsonline.Row) (jsonline.Template, jsonline.Template, error) {
+	ti := jsonline.NewTemplate()
+	to := jsonline.NewTemplate()
 
 	iter := row.Iter()
 
 	for colname, v, ok := iter(); ok; colname, v, ok = iter() {
 		valExported, err := v.Export()
 		if err != nil {
-			return tmpl, fmt.Errorf("%w", err)
+			return ti, to, fmt.Errorf("%w", err)
 		}
 
-		switch coltype := valExported.(type) {
+		switch coldef := valExported.(type) {
 		case string:
-			tmpl = setColumnInTemplate(tmpl, coltype, colname)
+			parts := strings.SplitN(coldef, ":", 2) //nolint:gomnd
+			iformat, irawtype := parseDescriptor(parts[0])
+			ti.With(colname, iformat, irawtype)
 
-		case jsonline.Row:
-			rowt, err := createTemplateFromRow(coltype)
-			if err != nil {
-				return tmpl, err
+			if len(parts) > 1 {
+				oformat, orawtype := parseDescriptor(parts[1])
+				to.With(colname, oformat, orawtype)
+			} else {
+				to.With(colname, iformat, irawtype)
 			}
 
-			tmpl = tmpl.WithRow(colname, rowt)
+		case jsonline.Row:
+			rowti, rowto, err := createTemplateFromRow(coldef)
+			if err != nil {
+				return ti, to, err
+			}
+
+			ti = ti.WithRow(colname, rowti)
+			to = to.WithRow(colname, rowto)
 		}
 	}
 
-	return tmpl, nil
-}
-
-func setColumnInTemplate(tmpl jsonline.Template, coltype string, colname string) jsonline.Template {
-	format := strings.SplitN(coltype, ":", 2) //nolint:gomnd
-
-	var colrawtype interface{}
-	if len(format) > 1 {
-		colrawtype = typeRegistry[format[1]]
-	}
-
-	switch format[0] {
-	case String:
-		tmpl = tmpl.WithMappedString(colname, colrawtype)
-	case Numeric:
-		tmpl = tmpl.WithMappedNumeric(colname, colrawtype)
-	case Boolean:
-		tmpl = tmpl.WithMappedBoolean(colname, colrawtype)
-	case Binary:
-		tmpl = tmpl.WithMappedBinary(colname, colrawtype)
-	case DateTime:
-		tmpl = tmpl.WithMappedDateTime(colname, colrawtype)
-	case Timestamp:
-		tmpl = tmpl.WithMappedTimestamp(colname, colrawtype)
-	case Auto:
-		tmpl = tmpl.WithMappedAuto(colname, colrawtype)
-	case Hidden:
-		tmpl = tmpl.WithHidden(colname)
-	}
-
-	return tmpl
+	return ti, to, nil
 }
 
 //nolint:gochecknoglobals
@@ -223,4 +203,16 @@ var typeRegistry = map[string]interface{}{
 	"[]byte":      []byte{},
 	"time.Time":   time.Time{},
 	"json.Number": json.Number(""),
+}
+
+//nolint:gochecknoglobals
+var formatRegistry = map[string]jsonline.Format{
+	String:    jsonline.String,
+	Numeric:   jsonline.Numeric,
+	Boolean:   jsonline.Boolean,
+	Binary:    jsonline.Binary,
+	DateTime:  jsonline.DateTime,
+	Timestamp: jsonline.Timestamp,
+	Auto:      jsonline.Auto,
+	Hidden:    jsonline.Hidden,
 }

@@ -43,9 +43,8 @@ type globalFlags struct {
 }
 
 type templateFlags struct {
-	templatein  string
-	templateout string
-	filename    string
+	template string
+	filename string
 }
 
 type RootCommand struct {
@@ -61,7 +60,7 @@ func NewRootCommand() (*RootCommand, error) {
 		Run:     run,
 		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)", version, commit, buildDate, builtBy),
 		Example: "" +
-			fmt.Sprintf(`  %s -o '{"first":"string","second":"string"}' <dirty.jsonl`, name),
+			fmt.Sprintf(`  %s -t '{"first":"string","second":"string"}' <dirty.jsonl`, name),
 	}
 
 	cobra.OnInitialize(initConfig)
@@ -74,9 +73,8 @@ func NewRootCommand() (*RootCommand, error) {
 	}
 
 	tf := templateFlags{
-		templatein:  "{}",
-		templateout: "{}",
-		filename:    "./row.yml",
+		template: "{}",
+		filename: "./row.yml",
 	}
 
 	rootCmd.PersistentFlags().StringVarP(&gf.verbosity, "verbosity", "v", gf.verbosity,
@@ -88,14 +86,11 @@ func NewRootCommand() (*RootCommand, error) {
 
 	rootCmd.PersistentFlags().SortFlags = false
 
-	rootCmd.Flags().StringVarP(&tf.templatein, "in", "i", tf.templatein,
-		`row template definition in JSON for input lines (-i {"name":"format"} or -i {"name":"format:type"})`+"\n"+
+	//nolint:lll
+	rootCmd.Flags().StringVarP(&tf.template, "template", "t", tf.template,
+		`row template definition (-t {"name":"format"} or -t {"name":"format(type)"}) or -t {"name":"format(type):format"})`+"\n"+
 			`possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`+"\n"+
-			`possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number`) //nolint:lll
-	rootCmd.Flags().StringVarP(&tf.templateout, "out", "o", tf.templateout,
-		`row template definition in JSON for output lines (-o {"name":"format"} or -o {"name":"format:type"})`+"\n"+
-			`possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`+"\n"+
-			`possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number`) //nolint:lll
+			`possible types : int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8, float64, float32, bool, byte, rune, string, []byte, time.Time, json.Number`)
 	rootCmd.Flags().StringVarP(&tf.filename, "filename", "f", tf.filename, "name of row template filename")
 
 	rootCmd.Flags().SortFlags = false
@@ -247,9 +242,8 @@ func run(cmd *cobra.Command, args []string) {
 
 func getTemplateFlags(cmd *cobra.Command) (*templateFlags, error) {
 	tf := &templateFlags{
-		templatein:  "",
-		templateout: "",
-		filename:    "",
+		template: "",
+		filename: "",
 	}
 
 	var err error
@@ -259,18 +253,9 @@ func getTemplateFlags(cmd *cobra.Command) (*templateFlags, error) {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	tf.templatein, err = cmd.Flags().GetString("in")
+	tf.template, err = cmd.Flags().GetString("template")
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
-	}
-
-	tf.templateout, err = cmd.Flags().GetString("out")
-	if err != nil {
-		return nil, fmt.Errorf("%w", err)
-	}
-
-	if tf.templatein == "{}" {
-		tf.templatein = tf.templateout
 	}
 
 	logFlags(tf)
@@ -284,16 +269,10 @@ func logFlags(tf *templateFlags) {
 	tmp := log.Debug().
 		Str("filename", tf.filename)
 
-	if json.Unmarshal([]byte(tf.templatein), &js) != nil {
-		tmp = tmp.Str("in", tf.templatein)
+	if json.Unmarshal([]byte(tf.template), &js) != nil {
+		tmp = tmp.Str("in", tf.template)
 	} else {
-		tmp = tmp.RawJSON("in", []byte(tf.templatein))
-	}
-
-	if json.Unmarshal([]byte(tf.templateout), &js) != nil {
-		tmp = tmp.Str("out", tf.templateout)
-	} else {
-		tmp = tmp.RawJSON("out", []byte(tf.templateout))
+		tmp = tmp.RawJSON("in", []byte(tf.template))
 	}
 
 	tmp.Msg("template flags")
@@ -310,15 +289,8 @@ func createTemplate(cmd *cobra.Command) (jsonline.Template, jsonline.Template, e
 		return nil, nil, err
 	}
 
-	if len(tf.templateout) > 0 && tf.templateout != "{}" {
-		to, err = createTemplateFromString(tf.templateout)
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-
-	if len(tf.templatein) > 0 && tf.templatein != "{}" {
-		ti, err = createTemplateFromString(tf.templatein)
+	if len(tf.template) > 0 && tf.template != "{}" {
+		ti, to, err = createTemplateFromString(tf.template)
 		if err != nil {
 			return nil, nil, err
 		}
