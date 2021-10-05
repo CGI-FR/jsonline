@@ -5,7 +5,7 @@ testcases:
   - name: do not affect current row with values from previous row
     steps:
       - script: |-
-          echo -e '{}\n{"field":"value"}\n{}' | jl -c '{name: field, type: string}' | tr -d '\n'
+          echo -e '{}\n{"field":"value"}\n{}' | jl -c '{name: field, format: string}' | tr -d '\n'
         assertions:
           - result.systemout ShouldEqual '{"field":null}{"field":"value"}{"field":null}'
           - result.systemerr ShouldBeEmpty

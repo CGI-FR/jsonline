@@ -62,7 +62,7 @@ func NewRootCommand() (*RootCommand, error) {
 		Run:     run,
 		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)", version, commit, buildDate, builtBy),
 		Example: "" +
-			fmt.Sprintf(`  %s -c '{name: first, type: string}' -c '{name: second, type: string}' <dirty.jsonl`, name) + "\n" +
+			fmt.Sprintf(`  %s -c '{name: first, format: string}' -c '{name: second, format: string}' <dirty.jsonl`, name) + "\n" +
 			fmt.Sprintf(`  %s -t '{"first":"string","second":"string"}' <dirty.jsonl`, name),
 	}
 
@@ -91,12 +91,12 @@ func NewRootCommand() (*RootCommand, error) {
 	rootCmd.PersistentFlags().SortFlags = false
 
 	rootCmd.Flags().StringArrayVarP(&tf.columns, "column", "c", tf.columns,
-		`inline column definition in minified YAML (-c {name: title, type: string})`+"\n"+
+		`inline column definition in minified YAML (-c {name: title, format: string})`+"\n"+
 			`use this flag multiple times, one for each column`+"\n"+
-			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden`)
+			`possible formats : string, numeric, boolean, binary, datetime, time, timestamp, row, auto, hidden`)
 	rootCmd.Flags().StringVarP(&tf.template, "template", "t", tf.template,
 		`row template definition in JSON (-t {"title":"string"})`+"\n"+
-			`possible types : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`)
+			`possible formats : string, numeric, boolean, binary, datetime, time, timestamp, auto, hidden`)
 	rootCmd.Flags().StringVarP(&tf.filename, "filename", "f", tf.filename, "name of row template filename")
 
 	rootCmd.Flags().SortFlags = false
@@ -303,7 +303,12 @@ func createTemplate(cmd *cobra.Command) (jsonline.Template, error) {
 	columns := []ColumnDefinition{}
 
 	for _, columnDef := range tf.columns {
-		colDef := ColumnDefinition{Name: "", Type: "", Columns: nil}
+		colDef := ColumnDefinition{
+			Name:    "",
+			Format:  "",
+			Type:    "",
+			Columns: nil,
+		}
 
 		err = yaml.Unmarshal([]byte(columnDef), &colDef)
 		if err != nil {

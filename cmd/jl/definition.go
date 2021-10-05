@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/cgi-fr/jsonline/pkg/jsonline"
 	"github.com/rs/zerolog/log"
@@ -46,6 +48,7 @@ type RowDefinition struct {
 
 type ColumnDefinition struct {
 	Name    string             `yaml:"name"`
+	Format  string             `yaml:"format"`
 	Type    string             `yaml:"type"`
 	Columns []ColumnDefinition `yaml:"columns,omitempty"`
 }
@@ -86,21 +89,26 @@ func ParseRowDefinition(filename string) (jsonline.Template, error) {
 //nolint:cyclop
 func parse(tmpl jsonline.Template, columns []ColumnDefinition) (jsonline.Template, error) {
 	for _, column := range columns {
-		switch column.Type {
+		coltype, ok := typeRegistry[column.Type]
+		if !ok && len(column.Type) > 0 {
+			return nil, fmt.Errorf("%w: %v", ErrInvalidRawType, column.Type)
+		}
+
+		switch column.Format {
 		case String:
-			tmpl = tmpl.WithString(column.Name)
+			tmpl = tmpl.WithMappedString(column.Name, coltype)
 		case Numeric:
-			tmpl = tmpl.WithNumeric(column.Name)
+			tmpl = tmpl.WithMappedNumeric(column.Name, coltype)
 		case Boolean:
-			tmpl = tmpl.WithBoolean(column.Name)
+			tmpl = tmpl.WithMappedBoolean(column.Name, coltype)
 		case Binary:
-			tmpl = tmpl.WithBinary(column.Name)
+			tmpl = tmpl.WithMappedBinary(column.Name, coltype)
 		case DateTime:
-			tmpl = tmpl.WithDateTime(column.Name)
+			tmpl = tmpl.WithMappedDateTime(column.Name, coltype)
 		case Timestamp:
-			tmpl = tmpl.WithTimestamp(column.Name)
+			tmpl = tmpl.WithMappedTimestamp(column.Name, coltype)
 		case Auto:
-			tmpl = tmpl.WithAuto(column.Name)
+			tmpl = tmpl.WithMappedAuto(column.Name, coltype)
 		case Hidden:
 			tmpl = tmpl.WithHidden(column.Name)
 		case Row:
@@ -155,24 +163,54 @@ func createTemplateFromRow(row jsonline.Row) (jsonline.Template, error) {
 }
 
 func setColumnInTemplate(tmpl jsonline.Template, coltype string, colname string) jsonline.Template {
-	switch coltype {
+	format := strings.SplitN(coltype, ":", 2) //nolint:gomnd
+
+	var colrawtype interface{}
+	if len(format) > 1 {
+		colrawtype = typeRegistry[format[1]]
+	}
+
+	switch format[0] {
 	case String:
-		tmpl = tmpl.WithString(colname)
+		tmpl = tmpl.WithMappedString(colname, colrawtype)
 	case Numeric:
-		tmpl = tmpl.WithNumeric(colname)
+		tmpl = tmpl.WithMappedNumeric(colname, colrawtype)
 	case Boolean:
-		tmpl = tmpl.WithBoolean(colname)
+		tmpl = tmpl.WithMappedBoolean(colname, colrawtype)
 	case Binary:
-		tmpl = tmpl.WithBinary(colname)
+		tmpl = tmpl.WithMappedBinary(colname, colrawtype)
 	case DateTime:
-		tmpl = tmpl.WithDateTime(colname)
+		tmpl = tmpl.WithMappedDateTime(colname, colrawtype)
 	case Timestamp:
-		tmpl = tmpl.WithTimestamp(colname)
+		tmpl = tmpl.WithMappedTimestamp(colname, colrawtype)
 	case Auto:
-		tmpl = tmpl.WithAuto(colname)
+		tmpl = tmpl.WithMappedAuto(colname, colrawtype)
 	case Hidden:
 		tmpl = tmpl.WithHidden(colname)
 	}
 
 	return tmpl
+}
+
+//nolint:gochecknoglobals
+var typeRegistry = map[string]interface{}{
+	"int":         int(0),
+	"int64":       int64(0),
+	"int32":       int32(0),
+	"int16":       int16(0),
+	"int8":        int8(0),
+	"uint":        uint(0),
+	"uint64":      uint64(0),
+	"uint32":      uint32(0),
+	"uint16":      uint16(0),
+	"uint8":       uint8(0),
+	"float64":     float64(0),
+	"float32":     float32(0),
+	"bool":        bool(true),
+	"byte":        byte(0),
+	"rune":        rune(0),
+	"string":      string(""),
+	"[]byte":      []byte{},
+	"time.Time":   time.Time{},
+	"json.Number": json.Number(""),
 }

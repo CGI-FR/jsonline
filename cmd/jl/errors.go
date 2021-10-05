@@ -19,4 +19,7 @@ package main
 
 import "errors"
 
-var ErrForbiddenTemplateAndColumnFlags = errors.New("using both flags template and columns is forbidden")
+var (
+	ErrForbiddenTemplateAndColumnFlags = errors.New("using both flags template and columns is forbidden")
+	ErrInvalidRawType                  = errors.New("invalid raw type")
+)
