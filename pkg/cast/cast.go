@@ -32,7 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-//nolint:cyclop,funlen
+//nolint:cyclop
 package cast
 
 import (
@@ -78,12 +78,7 @@ func To(targetType interface{}, val interface{}) (interface{}, error) {
 	case time.Time:
 		return ToTime(val)
 	case json.Number:
-		n, err := ToString(val)
-		if err != nil {
-			return nil, err
-		}
-
-		return json.Number(n.(string)), err
+		return ToNumber(val)
 	default:
 		return nil, fmt.Errorf("%w: %#v to %T", ErrUnableToCast, val, targetType)
 	}

@@ -10,6 +10,7 @@ expose:
     "test",
     "release",
     "test-int",
+    "bench",
     "publish",
     "docker",
     "docker-tag",
@@ -239,6 +240,14 @@ targets:
     depends: ["info", "refresh", "lint", "test", "release"]
     steps:
       - $: venom run test/suites/*
+
+  bench:
+    doc: "Run bench tests and compare with ref bench"
+    depends: ["info", "refresh"]
+    steps:
+      - $: go test -bench=. -count=5 github.com/cgi-fr/jsonline/pkg/cast
+        1>: ={BUILD_DIR}/bench-pkg-cast-={commit}.txt
+      - $: benchstat test/benchmarks/pkg-cast.txt ={BUILD_DIR}/bench-pkg-cast-={commit}.txt
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' publish" to publish specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' publish

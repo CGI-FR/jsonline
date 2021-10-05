@@ -32,112 +32,68 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-//nolint:cyclop,funlen,gomnd
+//nolint:cyclop,funlen
 package cast
 
 import (
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"math"
+	"strconv"
 	"time"
-	"unsafe"
 )
 
-func ToBinary(i interface{}) (interface{}, error) {
+func ToBool(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
-	case nil, []byte:
+	case nil, bool:
 		return val, nil
 	case float64:
-		bits := math.Float64bits(val)
-		bytes := make([]byte, 8)
-		binary.LittleEndian.PutUint64(bytes, bits)
-
-		return bytes, nil
+		return val != 0.0, nil
 	case float32:
-		bits := math.Float32bits(val)
-		bytes := make([]byte, 4)
-		binary.LittleEndian.PutUint32(bytes, bits)
-
-		return bytes, nil
+		return val != 0.0, nil
 	case int:
-		size := unsafe.Sizeof(val)
-		bytes := make([]byte, size)
-
-		switch size {
-		case 64:
-			binary.LittleEndian.PutUint64(bytes, uint64(val))
-		default: // case 32:
-			binary.LittleEndian.PutUint32(bytes, uint32(val))
-		}
-
-		return bytes, nil
+		return val != 0, nil
 	case int64:
-		bytes := make([]byte, 8)
-		binary.LittleEndian.PutUint64(bytes, uint64(val))
-
-		return bytes, nil
+		return val != 0, nil
 	case int32:
-		bytes := make([]byte, 4)
-		binary.LittleEndian.PutUint32(bytes, uint32(val))
-
-		return bytes, nil
+		return val != 0, nil
 	case int16:
-		bytes := make([]byte, 2)
-		binary.LittleEndian.PutUint16(bytes, uint16(val))
-
-		return bytes, nil
+		return val != 0, nil
 	case int8:
-		bytes := make([]byte, 1)
-		bytes[0] = byte(val)
-
-		return bytes, nil
+		return val != 0, nil
 	case uint:
-		size := unsafe.Sizeof(val)
-		bytes := make([]byte, size)
-
-		switch size {
-		case 64:
-			binary.LittleEndian.PutUint64(bytes, uint64(val))
-		default: // case 32:
-			binary.LittleEndian.PutUint32(bytes, uint32(val))
-		}
-
-		return bytes, nil
+		return val != 0, nil
 	case uint64:
-		bytes := make([]byte, 8)
-		binary.LittleEndian.PutUint64(bytes, val)
-
-		return bytes, nil
+		return val != 0, nil
 	case uint32:
-		bytes := make([]byte, 4)
-		binary.LittleEndian.PutUint32(bytes, val)
-
-		return bytes, nil
+		return val != 0, nil
 	case uint16:
-		bytes := make([]byte, 2)
-		binary.LittleEndian.PutUint16(bytes, val)
-
-		return bytes, nil
+		return val != 0, nil
 	case uint8:
-		bytes := make([]byte, 1)
-		bytes[0] = val
-
-		return bytes, nil
-	case bool:
-		b := byte(0)
-		if val {
-			b = 1
+		return val != 0, nil
+	case string:
+		b, err := strconv.ParseBool(val)
+		if err == nil {
+			return b, nil
 		}
 
-		return []byte{b}, nil
-	case string:
-		return []byte(val), nil
+		f, err := ToFloat64(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
+		}
+
+		return f != 0.0, nil
 	case json.Number:
-		return ToBinary(string(val))
+		f, err := ToFloat64(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
+		}
+
+		return f != 0.0, nil
+	case []byte:
+		return boolFromBytes(val)
 	case time.Time:
-		return ToBinary(val.Unix())
+		return ToBool(val.Unix())
 	default:
-		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBinary, i, i)
+		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
 	}
 }

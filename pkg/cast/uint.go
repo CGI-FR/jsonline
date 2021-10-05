@@ -32,14 +32,13 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-//nolint:cyclop,funlen,gomnd
+//nolint:cyclop,gocyclo,gocognit,funlen,gomnd
 package cast
 
 import (
-	"bytes"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 )
 
@@ -48,14 +47,34 @@ func ToUint(i interface{}) (interface{}, error) {
 	case nil:
 		return nil, nil
 	case int:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint, i, i)
+		}
+
 		return uint(val), nil
 	case int64:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint, i, i)
+		}
+
 		return uint(val), nil
 	case int32:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint, i, i)
+		}
+
 		return uint(val), nil
 	case int16:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint, i, i)
+		}
+
 		return uint(val), nil
 	case int8:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint, i, i)
+		}
+
 		return uint(val), nil
 	case uint:
 		return val, nil
@@ -68,8 +87,16 @@ func ToUint(i interface{}) (interface{}, error) {
 	case uint8:
 		return uint(val), nil
 	case float64:
+		if val < 0.0 || val > math.MaxUint64 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint, i, i)
+		}
+
 		return uint(val), nil
 	case float32:
+		if val < 0.0 || val > math.MaxUint64 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint, i, i)
+		}
+
 		return uint(val), nil
 	case bool:
 		if val {
@@ -85,14 +112,7 @@ func ToUint(i interface{}) (interface{}, error) {
 
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint, i, i)
 	case []byte:
-		var v uint
-
-		buf := bytes.NewReader(val)
-		if err := binary.Read(buf, binary.LittleEndian, &v); err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint, i, i)
-		}
-
-		return v, nil
+		return uintFromBytes(val)
 	case json.Number:
 		return ToUint(string(val))
 	default:
@@ -105,14 +125,34 @@ func ToUint64(i interface{}) (interface{}, error) {
 	case nil:
 		return nil, nil
 	case int:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint64, i, i)
+		}
+
 		return uint64(val), nil
 	case int64:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint64, i, i)
+		}
+
 		return uint64(val), nil
 	case int32:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint64, i, i)
+		}
+
 		return uint64(val), nil
 	case int16:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint64, i, i)
+		}
+
 		return uint64(val), nil
 	case int8:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint64, i, i)
+		}
+
 		return uint64(val), nil
 	case uint:
 		return uint64(val), nil
@@ -125,8 +165,16 @@ func ToUint64(i interface{}) (interface{}, error) {
 	case uint8:
 		return uint64(val), nil
 	case float64:
+		if val < 0.0 || val > math.MaxUint64 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint64, i, i)
+		}
+
 		return uint64(val), nil
 	case float32:
+		if val < 0.0 || val > math.MaxUint64 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint64, i, i)
+		}
+
 		return uint64(val), nil
 	case bool:
 		if val {
@@ -142,14 +190,7 @@ func ToUint64(i interface{}) (interface{}, error) {
 
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint64, i, i)
 	case []byte:
-		var v uint64
-
-		buf := bytes.NewReader(val)
-		if err := binary.Read(buf, binary.LittleEndian, &v); err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint64, i, i)
-		}
-
-		return v, nil
+		return uint64FromBytes(val)
 	case json.Number:
 		return ToUint64(string(val))
 	default:
@@ -162,18 +203,46 @@ func ToUint32(i interface{}) (interface{}, error) {
 	case nil:
 		return nil, nil
 	case int:
+		if val < 0 || val > math.MaxUint32 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint32, i, i)
+		}
+
 		return uint32(val), nil
 	case int64:
+		if val < 0 || val > math.MaxUint32 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint32, i, i)
+		}
+
 		return uint32(val), nil
 	case int32:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint32, i, i)
+		}
+
 		return uint32(val), nil
 	case int16:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint32, i, i)
+		}
+
 		return uint32(val), nil
 	case int8:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint32, i, i)
+		}
+
 		return uint32(val), nil
 	case uint:
+		if val > math.MaxUint32 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint32, i, i)
+		}
+
 		return uint32(val), nil
 	case uint64:
+		if val > math.MaxUint32 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint32, i, i)
+		}
+
 		return uint32(val), nil
 	case uint32:
 		return val, nil
@@ -182,8 +251,16 @@ func ToUint32(i interface{}) (interface{}, error) {
 	case uint8:
 		return uint32(val), nil
 	case float64:
+		if val < 0.0 || val > math.MaxUint32 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint32, i, i)
+		}
+
 		return uint32(val), nil
 	case float32:
+		if val < 0.0 || val > math.MaxUint32 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint32, i, i)
+		}
+
 		return uint32(val), nil
 	case bool:
 		if val {
@@ -199,14 +276,7 @@ func ToUint32(i interface{}) (interface{}, error) {
 
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint32, i, i)
 	case []byte:
-		var v uint32
-
-		buf := bytes.NewReader(val)
-		if err := binary.Read(buf, binary.LittleEndian, &v); err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint32, i, i)
-		}
-
-		return v, nil
+		return uint32FromBytes(val)
 	case json.Number:
 		return ToUint32(string(val))
 	default:
@@ -219,28 +289,68 @@ func ToUint16(i interface{}) (interface{}, error) {
 	case nil:
 		return nil, nil
 	case int:
+		if val < 0 || val > math.MaxUint16 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint16, i, i)
+		}
+
 		return uint16(val), nil
 	case int64:
+		if val < 0 || val > math.MaxUint16 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint16, i, i)
+		}
+
 		return uint16(val), nil
 	case int32:
+		if val < 0 || val > math.MaxUint16 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint16, i, i)
+		}
+
 		return uint16(val), nil
 	case int16:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint16, i, i)
+		}
+
 		return uint16(val), nil
 	case int8:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint16, i, i)
+		}
+
 		return uint16(val), nil
 	case uint:
+		if val > math.MaxUint16 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint16, i, i)
+		}
+
 		return uint16(val), nil
 	case uint64:
+		if val > math.MaxUint16 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint16, i, i)
+		}
+
 		return uint16(val), nil
 	case uint32:
+		if val > math.MaxUint16 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint16, i, i)
+		}
+
 		return uint16(val), nil
 	case uint16:
 		return val, nil
 	case uint8:
 		return uint16(val), nil
 	case float64:
+		if val < 0.0 || val > math.MaxUint16 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint16, i, i)
+		}
+
 		return uint16(val), nil
 	case float32:
+		if val < 0.0 || val > math.MaxUint16 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint16, i, i)
+		}
+
 		return uint16(val), nil
 	case bool:
 		if val {
@@ -256,14 +366,7 @@ func ToUint16(i interface{}) (interface{}, error) {
 
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint16, i, i)
 	case []byte:
-		var v uint16
-
-		buf := bytes.NewReader(val)
-		if err := binary.Read(buf, binary.LittleEndian, &v); err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint16, i, i)
-		}
-
-		return v, nil
+		return uint16FromBytes(val)
 	case json.Number:
 		return ToUint16(string(val))
 	default:
@@ -276,28 +379,72 @@ func ToUint8(i interface{}) (interface{}, error) {
 	case nil:
 		return nil, nil
 	case int:
+		if val < 0 || val > math.MaxUint8 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case int64:
+		if val < 0 || val > math.MaxUint8 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case int32:
+		if val < 0 || val > math.MaxUint8 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case int16:
+		if val < 0 || val > math.MaxUint8 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case int8:
+		if val < 0 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case uint:
+		if val > math.MaxUint8 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case uint64:
+		if val > math.MaxUint8 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case uint32:
+		if val > math.MaxUint8 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case uint16:
+		if val > math.MaxUint8 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case uint8:
 		return val, nil
 	case float64:
+		if val < 0.0 || val > math.MaxUint8 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case float32:
+		if val < 0.0 || val > math.MaxUint8 {
+			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint8, i, i)
+		}
+
 		return uint8(val), nil
 	case bool:
 		if val {
@@ -313,14 +460,7 @@ func ToUint8(i interface{}) (interface{}, error) {
 
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint8, i, i)
 	case []byte:
-		var v uint8
-
-		buf := bytes.NewReader(val)
-		if err := binary.Read(buf, binary.LittleEndian, &v); err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToUint8, i, i)
-		}
-
-		return v, nil
+		return uint8FromBytes(val)
 	case json.Number:
 		return ToUint8(string(val))
 	default:

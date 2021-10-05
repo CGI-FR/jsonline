@@ -36,8 +36,6 @@
 package cast
 
 import (
-	"bytes"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -85,14 +83,7 @@ func ToFloat64(i interface{}) (interface{}, error) {
 
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToFloat64, i, i)
 	case []byte:
-		var f float64
-
-		buf := bytes.NewReader(val)
-		if err := binary.Read(buf, binary.LittleEndian, &f); err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToFloat64, i, i)
-		}
-
-		return f, nil
+		return float64FromBytes(val)
 	case json.Number:
 		return ToFloat64(string(val))
 	default:
@@ -142,14 +133,7 @@ func ToFloat32(i interface{}) (interface{}, error) {
 
 		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToFloat32, i, i)
 	case []byte:
-		var f float32
-
-		buf := bytes.NewReader(val)
-		if err := binary.Read(buf, binary.LittleEndian, &f); err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToFloat32, i, i)
-		}
-
-		return f, nil
+		return float32FromBytes(val)
 	case json.Number:
 		return ToFloat32(string(val))
 	default:

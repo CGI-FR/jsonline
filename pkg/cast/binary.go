@@ -32,68 +32,52 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-//nolint:cyclop,funlen
+//nolint:cyclop
 package cast
 
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 )
 
-func ToBool(i interface{}) (interface{}, error) {
+func ToBinary(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
-	case nil, bool:
+	case nil, []byte:
 		return val, nil
 	case float64:
-		return val != 0.0, nil
+		return float64ToBytes(val), nil
 	case float32:
-		return val != 0.0, nil
+		return float32ToBytes(val), nil
 	case int:
-		return val != 0, nil
+		return intToBytes(val), nil
 	case int64:
-		return val != 0, nil
+		return int64ToBytes(val), nil
 	case int32:
-		return val != 0, nil
+		return int32ToBytes(val), nil
 	case int16:
-		return val != 0, nil
+		return int16ToBytes(val), nil
 	case int8:
-		return val != 0, nil
+		return int8ToBytes(val), nil
 	case uint:
-		return val != 0, nil
+		return uintToBytes(val), nil
 	case uint64:
-		return val != 0, nil
+		return uint64ToBytes(val), nil
 	case uint32:
-		return val != 0, nil
+		return uint32ToBytes(val), nil
 	case uint16:
-		return val != 0, nil
+		return uint16ToBytes(val), nil
 	case uint8:
-		return val != 0, nil
+		return uint8ToBytes(val), nil
+	case bool:
+		return boolToBytes(val), nil
 	case string:
-		b, err := strconv.ParseBool(val)
-		if err == nil {
-			return b, nil
-		}
-
-		f, err := ToFloat64(val)
-		if err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
-		}
-
-		return f != 0.0, nil
+		return []byte(val), nil
 	case json.Number:
-		f, err := ToFloat64(val)
-		if err != nil {
-			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
-		}
-
-		return f != 0.0, nil
-	case []byte:
-		return ToBool(string(val))
+		return []byte(val), nil
 	case time.Time:
-		return ToBool(val.Unix())
+		return ToBinary(val.Unix())
 	default:
-		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBool, i, i)
+		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBinary, i, i)
 	}
 }

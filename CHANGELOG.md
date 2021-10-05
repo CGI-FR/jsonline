@@ -30,6 +30,7 @@ Types of changes
 - **`Fixed`** `Format` type now correctly exported by jsonline package.
 - **`Fixed`** `row.Raw()` now return the correct value (a `map[string]interface{}` of raw values).
 - **`Fixed`** conversions error no longer ignored by unmarshaling.
+- **`Fixed`** casting between int types generate errors when value overflow target type.
 - **`Fixed`** jl command line did not handle `Binary` column format properly.
 - **`Fixed`** jl command line did not handle invalid `template` flag properly.
 
