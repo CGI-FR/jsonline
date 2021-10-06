@@ -53,12 +53,16 @@ type RootCommand struct {
 
 func NewRootCommand() (*RootCommand, error) {
 	rootCmd := cobra.Command{ //nolint:exhaustivestruct
-		Use:     fmt.Sprintf("%v", name),
-		Short:   "JSONLine templating",
-		Long:    `Order keys and enforce format of JSON lines.`,
-		Args:    cobra.NoArgs,
-		Run:     run,
-		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)", version, commit, buildDate, builtBy),
+		Use:   fmt.Sprintf("%v", name),
+		Short: "JSONLine templating",
+		Long:  `Order keys and enforce format of JSON lines.`,
+		Args:  cobra.NoArgs,
+		Run:   run,
+		Version: fmt.Sprintf(`%v (commit=%v date=%v by=%v)
+Copyright (C) 2021 CGI France
+License GPLv3: GNU GPL version 3 <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDate, builtBy),
 		Example: "" +
 			fmt.Sprintf(`  %s -t '{"first":"string","second":"string"}' <dirty.jsonl`, name),
 	}
