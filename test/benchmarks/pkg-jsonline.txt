@@ -1,0 +1,11 @@
+goos: linux
+goarch: amd64
+pkg: github.com/cgi-fr/jsonline/pkg/jsonline
+cpu: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+BenchmarkLinoUseCase-8   	  154482	      7903 ns/op
+BenchmarkLinoUseCase-8   	  151372	      8090 ns/op
+BenchmarkLinoUseCase-8   	  153706	      8012 ns/op
+BenchmarkLinoUseCase-8   	  149954	      7928 ns/op
+BenchmarkLinoUseCase-8   	  150741	      8065 ns/op
+PASS
+ok  	github.com/cgi-fr/jsonline/pkg/jsonline	6.535s
