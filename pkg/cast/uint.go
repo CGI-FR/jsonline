@@ -203,7 +203,7 @@ func ToUint32(i interface{}) (interface{}, error) {
 	case nil:
 		return nil, nil
 	case int:
-		if val < 0 || val > math.MaxUint32 {
+		if val < 0 || uint64(val) > math.MaxUint32 {
 			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToUint32, i, i)
 		}
 

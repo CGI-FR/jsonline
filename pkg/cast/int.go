@@ -124,7 +124,7 @@ func ToInt64(i interface{}) (interface{}, error) {
 	case int8:
 		return int64(val), nil
 	case uint:
-		if val > math.MaxInt64 {
+		if uint64(val) > math.MaxInt64 {
 			return nil, fmt.Errorf("%w: %T(%v)", ErrUnableToCastToInt64, i, i)
 		}
 
