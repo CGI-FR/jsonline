@@ -19,8 +19,8 @@ Types of changes
 - **`Added`** type `RawType` alias of `interface{}` and use of it everywhere a rawtype is asked.
 - **`Added`** function `Has(key string) bool` on `Row` interface.
 - **`Added`** function `Len() int` on `Row` interface.
-- **`Added`** function `IterValues() func() (string, Value, bool)` on `Row` interface.
-- **`Changed`** function `row.Iter()` renamed to `row.IterValues()`.
+- **`Changed`** function `row.Iter() func() (string, Value, bool)` replaced by `row.Iter() func() (string, interface{}, bool)`.
+- **`Changed`** function `row.Iter() func() (string, Value, bool)` renamed to `row.IterValues() func() (string, Value, bool)`.
 - **`Changed`** function `row.Set(string, Value)` renamed to `row.SetValue(string, Value)`.
 - **`Changed`** function `row.SetAtIndex(int, Value)` renamed to `row.SetValueAtIndex(string, Value)`.
 - **`Changed`** function `row.ImportAtKey(string, interface{})` renamed to `row.Set(string, interface{})`.
