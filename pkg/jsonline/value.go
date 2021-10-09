@@ -256,7 +256,14 @@ func (v *value) String() string {
 		return fmt.Sprintf("ERROR: %v", err)
 	}
 
-	return string(b)
+	var result interface{}
+
+	err = json.Unmarshal(b, &result)
+	if err != nil {
+		return fmt.Sprintf("ERROR: %v", err)
+	}
+
+	return fmt.Sprintf("%v", result)
 }
 
 func (v *value) DebugString() string {
