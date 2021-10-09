@@ -251,16 +251,9 @@ func (v *value) UnmarshalJSON(data []byte) error {
 }
 
 func (v *value) String() string {
-	b, err := v.MarshalJSON()
+	result, err := v.Export()
 	if err != nil {
-		return fmt.Sprintf("ERROR: %v", err)
-	}
-
-	var result interface{}
-
-	err = json.Unmarshal(b, &result)
-	if err != nil {
-		return fmt.Sprintf("ERROR: %v", err)
+		return fmt.Sprintf("ERROR : can't format value: %v", err)
 	}
 
 	return fmt.Sprintf("%v", result)
