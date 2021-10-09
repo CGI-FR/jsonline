@@ -14,7 +14,23 @@ Types of changes
 - **`Fixed`** for any bug fixes.
 - **`Security`** in case of vulnerabilities.
 
-## [0.2.0] Unreleased
+## [0.3.0] Unreleased
+
+- **`Added`** type `RawType` alias of `interface{}` and use of it everywhere a rawtype is asked.
+- **`Added`** function `Has(key string) bool` on `Row` interface.
+- **`Added`** function `Len() int` on `Row` interface.
+- **`Added`** function `IterValues() func() (string, Value, bool)` on `Row` interface.
+- **`Changed`** function `row.Iter()` renamed to `row.IterValues()`.
+- **`Changed`** function `row.Set(string, Value)` renamed to `row.SetValue(string, Value)`.
+- **`Changed`** function `row.SetAtIndex(int, Value)` renamed to `row.SetValueAtIndex(string, Value)`.
+- **`Changed`** function `row.ImportAtKey(string, interface{})` renamed to `row.Set(string, interface{})`.
+- **`Changed`** function `row.ImportAtIndex(int, interface{})` renamed to `row.SetAtIndex(string, interface{})`.
+- **`Changed`** function `row.Get(string) Value` renamed to `row.GetValue(string) (Value, bool)`.
+- **`Changed`** function `row.GetAtIndex(int) Value` renamed to `row.GetValueAtIndex(string) (Value, bool)`.
+- **`Changed`** function `row.Get(string) Value` replaced by `row.Get(string) (interface{}, bool)`.
+- **`Changed`** function `row.GetAtIndex(int) Value` replaced by `row.GetAtIndex(int) (interface{}, bool)`.
+
+## [0.2.0] 2021-10-06
 
 - **`Added`** cast values to specific raw type on row import with `template.WithMapped*` or `value.NewValue(v interface{}, f Format, rawtype interface{})`.
 - **`Added`** `value.GetRawType()` return the raw type that will be used on import.

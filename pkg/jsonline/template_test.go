@@ -126,16 +126,16 @@ func TestTemplateCreateFromRow(t *testing.T) {
 	}
 
 	rsrc := jsonline.NewRow().
-		Set("datetime", jsonline.NewValueDateTime(1566844858)).
-		Set("numeric", jsonline.NewValueNumeric(0)).
-		Set("boolean", jsonline.NewValueBoolean(true)).
-		Set("extra", jsonline.NewValueAuto("extra")).
-		Set("timestamp", jsonline.NewValueTimestamp(1566844858)).
-		Set("binary", jsonline.NewValueBinary("value")).
-		Set("hidden", jsonline.NewValueHidden("hidden")).
-		Set("auto", jsonline.NewValueAuto("hello")).
-		Set("row", jsonline.NewValueAuto(sub)).
-		Set("string", jsonline.NewValueString("value"))
+		SetValue("datetime", jsonline.NewValueDateTime(1566844858)).
+		SetValue("numeric", jsonline.NewValueNumeric(0)).
+		SetValue("boolean", jsonline.NewValueBoolean(true)).
+		SetValue("extra", jsonline.NewValueAuto("extra")).
+		SetValue("timestamp", jsonline.NewValueTimestamp(1566844858)).
+		SetValue("binary", jsonline.NewValueBinary("value")).
+		SetValue("hidden", jsonline.NewValueHidden("hidden")).
+		SetValue("auto", jsonline.NewValueAuto("hello")).
+		SetValue("row", jsonline.NewValueAuto(sub)).
+		SetValue("string", jsonline.NewValueString("value"))
 
 	row, err := template.CreateRow(rsrc)
 	assert.NoError(t, err)

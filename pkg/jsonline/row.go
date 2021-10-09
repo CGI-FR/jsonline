@@ -43,20 +43,22 @@ import (
 	"strings"
 )
 
-// Row of data.
 type Row interface {
-	Set(key string, val Value) Row
-	SetAtIndex(index int, val Value) Row
-
-	ImportAtKey(key string, val interface{}) error
-	ImportAtIndex(index int, val interface{}) error
-
-	Get(key string) Value
-	GetAtIndex(index int) Value
-
-	Iter() func() (string, Value, bool)
-
 	Value
+
+	Has(key string) bool
+	Get(key string) (interface{}, bool)
+	GetAtIndex(index int) (interface{}, bool)
+	Set(key string, val interface{}) error
+	SetAtIndex(index int, val interface{}) error
+	Len() int
+	Iter() func() (string, interface{}, bool)
+
+	GetValue(key string) (Value, bool)
+	GetValueAtIndex(index int) (Value, bool)
+	SetValue(key string, val Value) Row
+	SetValueAtIndex(index int, val Value) Row
+	IterValues() func() (string, Value, bool)
 }
 
 type m map[string]Value
@@ -79,10 +81,10 @@ func NewRow() Row {
 func CloneRow(r Row) Row {
 	result := NewRow()
 
-	iter := r.Iter()
+	iter := r.IterValues()
 
 	for k, v, ok := iter(); ok; k, v, ok = iter() {
-		result.Set(k, CloneValue(v))
+		result.SetValue(k, CloneValue(v))
 	}
 
 	return result
@@ -92,7 +94,7 @@ func (r *row) GetFormat() Format {
 	return Auto
 }
 
-func (r *row) GetRawType() interface{} {
+func (r *row) GetRawType() RawType {
 	return nil
 }
 
@@ -102,7 +104,7 @@ func (r *row) Raw() interface{} {
 	iter := r.Iter()
 
 	for k, v, ok := iter(); ok; k, v, ok = iter() {
-		result[k] = v.Raw()
+		result[k] = v
 	}
 
 	return result
@@ -111,7 +113,7 @@ func (r *row) Raw() interface{} {
 func (r *row) Export() (interface{}, error) {
 	result := map[string]interface{}{}
 
-	iter := r.Iter()
+	iter := r.IterValues()
 
 	for k, v, ok := iter(); ok; k, v, ok = iter() {
 		valExported, err := v.Export()
@@ -129,13 +131,13 @@ func (r *row) Import(v interface{}) error {
 	switch values := v.(type) {
 	case []interface{}:
 		for i, val := range values {
-			if err := r.ImportAtIndex(i, val); err != nil {
+			if err := r.SetAtIndex(i, val); err != nil {
 				return err
 			}
 		}
 	case map[string]interface{}:
 		for key, val := range values {
-			if err := r.ImportAtKey(key, val); err != nil {
+			if err := r.Set(key, val); err != nil {
 				return err
 			}
 		}
@@ -146,7 +148,37 @@ func (r *row) Import(v interface{}) error {
 	return nil
 }
 
-func (r *row) ImportAtKey(key string, val interface{}) error {
+func (r *row) Has(key string) bool {
+	_, ok := r.m[key]
+
+	return ok
+}
+
+func (r *row) Get(key string) (interface{}, bool) {
+	val, ok := r.m[key]
+	if ok {
+		return val.Raw(), ok
+	}
+
+	return nil, ok
+}
+
+func (r *row) GetAtIndex(index int) (interface{}, bool) {
+	var key string
+
+	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
+		if index == 0 {
+			key, _ = cur.Value.(string)
+
+			break
+		}
+		index--
+	}
+
+	return r.Get(key)
+}
+
+func (r *row) Set(key string, val interface{}) error {
 	if _, ok := r.m[key]; !ok {
 		r.keys[key] = r.l.PushBack(key)
 	}
@@ -164,32 +196,7 @@ func (r *row) ImportAtKey(key string, val interface{}) error {
 	return nil
 }
 
-func (r *row) ImportAtIndex(index int, val interface{}) error {
-	var key string
-
-	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
-		if index == 0 {
-			key, _ = cur.Value.(string)
-
-			break
-		}
-		index--
-	}
-
-	return r.ImportAtKey(key, val)
-}
-
-func (r *row) Set(key string, val Value) Row {
-	if _, ok := r.m[key]; !ok {
-		r.keys[key] = r.l.PushBack(key)
-	}
-
-	r.m[key] = val
-
-	return r
-}
-
-func (r *row) SetAtIndex(index int, val Value) Row {
+func (r *row) SetAtIndex(index int, val interface{}) error {
 	var key string
 
 	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
@@ -204,11 +211,33 @@ func (r *row) SetAtIndex(index int, val Value) Row {
 	return r.Set(key, val)
 }
 
-func (r *row) Get(key string) Value {
-	return r.m[key]
+func (r *row) Len() int {
+	return r.l.Len()
 }
 
-func (r *row) GetAtIndex(index int) Value {
+func (r *row) Iter() func() (string, interface{}, bool) {
+	iter := r.IterValues()
+
+	return func() (string, interface{}, bool) {
+		key, val, ok := iter()
+		if ok {
+			return key, val.Raw(), ok
+		}
+
+		return key, val, ok
+	}
+}
+
+func (r *row) GetValue(key string) (Value, bool) {
+	val, ok := r.m[key]
+	if ok {
+		return val, ok
+	}
+
+	return nil, ok
+}
+
+func (r *row) GetValueAtIndex(index int) (Value, bool) {
 	var key string
 
 	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
@@ -220,10 +249,35 @@ func (r *row) GetAtIndex(index int) Value {
 		index--
 	}
 
-	return r.Get(key)
+	return r.GetValue(key)
 }
 
-func (r *row) Iter() func() (string, Value, bool) {
+func (r *row) SetValue(key string, val Value) Row {
+	if _, ok := r.m[key]; !ok {
+		r.keys[key] = r.l.PushBack(key)
+	}
+
+	r.m[key] = val
+
+	return r
+}
+
+func (r *row) SetValueAtIndex(index int, val Value) Row {
+	var key string
+
+	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
+		if index == 0 {
+			key, _ = cur.Value.(string)
+
+			break
+		}
+		index--
+	}
+
+	return r.SetValue(key, val)
+}
+
+func (r *row) IterValues() func() (string, Value, bool) {
 	e := r.l.Front()
 
 	return func() (string, Value, bool) {
@@ -234,7 +288,7 @@ func (r *row) Iter() func() (string, Value, bool) {
 			return key, r.m[key], true
 		}
 
-		return "", NewValueAuto(nil), false
+		return "", nil, false
 	}
 }
 
@@ -278,7 +332,7 @@ func (r *row) String() string {
 
 func (r *row) DebugString() string {
 	sb := strings.Builder{}
-	iter := r.Iter()
+	iter := r.IterValues()
 
 	sep := ""
 	for k, v, ok := iter(); ok; k, v, ok = iter() {

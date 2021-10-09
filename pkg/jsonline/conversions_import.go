@@ -41,7 +41,7 @@ import (
 	"github.com/cgi-fr/jsonline/pkg/cast"
 )
 
-func importFromString(val interface{}, targetType interface{}) (interface{}, error) {
+func importFromString(val interface{}, targetType RawType) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
 		str, err := cast.ToString(val)
@@ -61,7 +61,7 @@ func importFromString(val interface{}, targetType interface{}) (interface{}, err
 	}
 }
 
-func importFromNumeric(val interface{}, targetType interface{}) (interface{}, error) {
+func importFromNumeric(val interface{}, targetType RawType) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
 		nb, err := cast.ToNumber(val)
@@ -81,7 +81,7 @@ func importFromNumeric(val interface{}, targetType interface{}) (interface{}, er
 	}
 }
 
-func importFromBoolean(val interface{}, targetType interface{}) (interface{}, error) {
+func importFromBoolean(val interface{}, targetType RawType) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
 		b, err := cast.ToBool(val)
@@ -101,7 +101,7 @@ func importFromBoolean(val interface{}, targetType interface{}) (interface{}, er
 	}
 }
 
-func importFromBinary(val interface{}, targetType interface{}) (interface{}, error) {
+func importFromBinary(val interface{}, targetType RawType) (interface{}, error) {
 	str, err := cast.ToString(val)
 	if err != nil {
 		return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
@@ -126,7 +126,7 @@ func importFromBinary(val interface{}, targetType interface{}) (interface{}, err
 	}
 }
 
-func importFromDateTime(val interface{}, targetType interface{}) (interface{}, error) {
+func importFromDateTime(val interface{}, targetType RawType) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
 		t, err := cast.ToTime(val)
@@ -146,7 +146,7 @@ func importFromDateTime(val interface{}, targetType interface{}) (interface{}, e
 	}
 }
 
-func importFromTimestamp(val interface{}, targetType interface{}) (interface{}, error) {
+func importFromTimestamp(val interface{}, targetType RawType) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:
 		i64, err := cast.ToInt64(val)
