@@ -29,6 +29,7 @@ Types of changes
 - **`Changed`** function `row.GetAtIndex(int) Value` renamed to `row.GetValueAtIndex(string) (Value, bool)`.
 - **`Changed`** function `row.Get(string) Value` replaced by `row.Get(string) (interface{}, bool)`.
 - **`Changed`** function `row.GetAtIndex(int) Value` replaced by `row.GetAtIndex(int) (interface{}, bool)`.
+- **`Changed`** importing a value (`row.Set("key", NewValue())`) will replace the existing value by the new one.
 
 ## [0.2.0] 2021-10-06
 

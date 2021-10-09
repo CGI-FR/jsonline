@@ -189,6 +189,8 @@ func (r *row) Set(key string, val interface{}) error {
 		}
 
 		r.m[key] = value
+	} else if value, ok := val.(Value); ok {
+		r.m[key] = value
 	} else {
 		r.m[key] = NewValueAuto(val)
 	}

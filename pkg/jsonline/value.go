@@ -200,9 +200,18 @@ func (v *value) Export() (interface{}, error) {
 	return nil, fmt.Errorf("%w: %#v", ErrUnsupportedFormat, v.f)
 }
 
+//nolint:cyclop
 func (v *value) Import(val interface{}) error {
 	if val == nil {
 		v.raw = nil
+
+		return nil
+	}
+
+	if value, ok := val.(Value); ok {
+		v.f = value.GetFormat()
+		v.raw = value.Raw()
+		v.typ = value.GetRawType()
 
 		return nil
 	}
