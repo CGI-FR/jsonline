@@ -147,7 +147,9 @@ func TestValueMarshalString(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueString(td.value)
-			assert.Equal(t, td.expected, value.String())
+			actual, err := value.MarshalJSON()
+			assert.Nil(t, err)
+			assert.Equal(t, td.expected, string(actual))
 		})
 	}
 }
@@ -206,6 +208,54 @@ func TestValueMarshalNumeric(t *testing.T) {
 		expected interface{}
 	}{
 		{nil, `null`},
+		// signed integers
+		{int(-2), `-2`}, // either 32 or 64 bits
+		{int8(-1), `-1`},
+		{int16(0), `0`},
+		{int32(1), `1`}, // int32 is an alias of rune
+		{int64(2), `2`},
+		// unsigned integers
+		{uint(0), `0`}, // either 32 or 64 bits
+		{uint8(1), `1`},
+		{uint16(2), `2`},
+		{uint32(3), `3`},
+		{uint64(4), `4`},
+		// floats
+		{float32(1.2), `1.2`},
+		{float64(-1.2), `-1.2`},
+		// complex numbers
+		// {complex64(1.2i + 5), "(5+1.2i)"}, => NOT SUPPORTED
+		// {complex128(-1.0i + 8), "(8-1i)"}, => NOT SUPPORTED
+		// booleans
+		{true, `1`},
+		{false, `0`},
+		// strings
+		{"1.5", `1.5`},
+		{'r', `114`},
+		// binary
+		{byte(36), `36`}, // byte is an alias for uint8
+		{[]byte("1.5"), `1.5`},
+		// composite => NOT SUPPORTED
+		// references (slices, maps) => NOT SUPPORTED
+		// interfaces => NOT SUPPORTED
+	}
+
+	for _, td := range testdatas {
+		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
+			value := jsonline.NewValueNumeric(td.value)
+			actual, err := value.MarshalJSON()
+			assert.Nil(t, err)
+			assert.Equal(t, td.expected, string(actual))
+		})
+	}
+}
+
+func TestValueStringNumeric(t *testing.T) {
+	testdatas := []struct {
+		value    interface{}
+		expected interface{}
+	}{
+		{nil, `<nil>`},
 		// signed integers
 		{int(-2), `-2`}, // either 32 or 64 bits
 		{int8(-1), `-1`},
@@ -361,7 +411,9 @@ func TestValueMarshalBoolean(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueBoolean(td.value)
-			assert.Equal(t, td.expected, value.String())
+			actual, err := value.MarshalJSON()
+			assert.Nil(t, err)
+			assert.Equal(t, td.expected, string(actual))
 		})
 	}
 }
@@ -488,7 +540,9 @@ func TestValueMarshalBinary(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueBinary(td.value)
-			assert.Equal(t, td.expected, value.String())
+			actual, err := value.MarshalJSON()
+			assert.Nil(t, err)
+			assert.Equal(t, td.expected, string(actual))
 		})
 	}
 }
