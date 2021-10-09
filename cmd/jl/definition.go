@@ -89,8 +89,8 @@ func ParseRowDefinition(filename string) (jsonline.Template, jsonline.Template, 
 	return ti, to, nil
 }
 
-func parseDescriptor(def string) (jsonline.Format, interface{}) {
-	var rawtype interface{}
+func parseDescriptor(def string) (jsonline.Format, jsonline.RawType) {
+	var rawtype jsonline.RawType
 
 	r := regexp.MustCompile(`^([^\(]+)(?:\(([^\)]+)\))?$`) // "<FORMAT>(<TYPE>)" or "FORMAT"
 	submatches := r.FindStringSubmatch(def)
@@ -147,7 +147,7 @@ func createTemplateFromRow(row jsonline.Row) (jsonline.Template, jsonline.Templa
 	ti := jsonline.NewTemplate()
 	to := jsonline.NewTemplate()
 
-	iter := row.Iter()
+	iter := row.IterValues()
 
 	for colname, v, ok := iter(); ok; colname, v, ok = iter() {
 		valExported, err := v.Export()
@@ -183,7 +183,7 @@ func createTemplateFromRow(row jsonline.Row) (jsonline.Template, jsonline.Templa
 }
 
 //nolint:gochecknoglobals
-var typeRegistry = map[string]interface{}{
+var typeRegistry = map[string]jsonline.RawType{
 	"int":         int(0),
 	"int64":       int64(0),
 	"int32":       int32(0),

@@ -50,15 +50,15 @@ type Template interface {
 	WithHidden(name string) Template
 	WithRow(name string, row Template) Template
 
-	WithMappedString(name string, rawtype interface{}) Template
-	WithMappedNumeric(name string, rawtype interface{}) Template
-	WithMappedBoolean(name string, rawtype interface{}) Template
-	WithMappedBinary(name string, rawtype interface{}) Template
-	WithMappedDateTime(name string, rawtype interface{}) Template
-	WithMappedTimestamp(name string, rawtype interface{}) Template
-	WithMappedAuto(name string, rawtype interface{}) Template
+	WithMappedString(name string, rawtype RawType) Template
+	WithMappedNumeric(name string, rawtype RawType) Template
+	WithMappedBoolean(name string, rawtype RawType) Template
+	WithMappedBinary(name string, rawtype RawType) Template
+	WithMappedDateTime(name string, rawtype RawType) Template
+	WithMappedTimestamp(name string, rawtype RawType) Template
+	WithMappedAuto(name string, rawtype RawType) Template
 
-	With(name string, format Format, rawtype interface{}) Template
+	With(name string, format Format, rawtype RawType) Template
 
 	CreateRow(interface{}) (Row, error)
 	CreateRowEmpty() Row
@@ -78,103 +78,103 @@ func NewTemplate() Template {
 }
 
 func (t *template) WithString(name string) Template {
-	t.empty.Set(name, NewValueString(nil))
+	t.empty.SetValue(name, NewValueString(nil))
 
 	return t
 }
 
 func (t *template) WithNumeric(name string) Template {
-	t.empty.Set(name, NewValueNumeric(nil))
+	t.empty.SetValue(name, NewValueNumeric(nil))
 
 	return t
 }
 
 func (t *template) WithBoolean(name string) Template {
-	t.empty.Set(name, NewValueBoolean(nil))
+	t.empty.SetValue(name, NewValueBoolean(nil))
 
 	return t
 }
 
 func (t *template) WithBinary(name string) Template {
-	t.empty.Set(name, NewValueBinary(nil))
+	t.empty.SetValue(name, NewValueBinary(nil))
 
 	return t
 }
 
 func (t *template) WithDateTime(name string) Template {
-	t.empty.Set(name, NewValueDateTime(nil))
+	t.empty.SetValue(name, NewValueDateTime(nil))
 
 	return t
 }
 
 func (t *template) WithTimestamp(name string) Template {
-	t.empty.Set(name, NewValueTimestamp(nil))
+	t.empty.SetValue(name, NewValueTimestamp(nil))
 
 	return t
 }
 
 func (t *template) WithAuto(name string) Template {
-	t.empty.Set(name, NewValueAuto(nil))
+	t.empty.SetValue(name, NewValueAuto(nil))
 
 	return t
 }
 
 func (t *template) WithHidden(name string) Template {
-	t.empty.Set(name, NewValueHidden(nil))
+	t.empty.SetValue(name, NewValueHidden(nil))
 
 	return t
 }
 
 func (t *template) WithRow(name string, rowt Template) Template {
-	t.empty.Set(name, rowt.CreateRowEmpty())
+	t.empty.SetValue(name, rowt.CreateRowEmpty())
 
 	return t
 }
 
-func (t *template) WithMappedString(name string, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(nil, String, rawtype))
+func (t *template) WithMappedString(name string, rawtype RawType) Template {
+	t.empty.SetValue(name, NewValue(nil, String, rawtype))
 
 	return t
 }
 
-func (t *template) WithMappedNumeric(name string, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(nil, Numeric, rawtype))
+func (t *template) WithMappedNumeric(name string, rawtype RawType) Template {
+	t.empty.SetValue(name, NewValue(nil, Numeric, rawtype))
 
 	return t
 }
 
-func (t *template) WithMappedBoolean(name string, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(nil, Boolean, rawtype))
+func (t *template) WithMappedBoolean(name string, rawtype RawType) Template {
+	t.empty.SetValue(name, NewValue(nil, Boolean, rawtype))
 
 	return t
 }
 
-func (t *template) WithMappedBinary(name string, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(nil, Binary, rawtype))
+func (t *template) WithMappedBinary(name string, rawtype RawType) Template {
+	t.empty.SetValue(name, NewValue(nil, Binary, rawtype))
 
 	return t
 }
 
-func (t *template) WithMappedDateTime(name string, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(nil, DateTime, rawtype))
+func (t *template) WithMappedDateTime(name string, rawtype RawType) Template {
+	t.empty.SetValue(name, NewValue(nil, DateTime, rawtype))
 
 	return t
 }
 
-func (t *template) WithMappedTimestamp(name string, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(nil, Timestamp, rawtype))
+func (t *template) WithMappedTimestamp(name string, rawtype RawType) Template {
+	t.empty.SetValue(name, NewValue(nil, Timestamp, rawtype))
 
 	return t
 }
 
-func (t *template) WithMappedAuto(name string, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(nil, Auto, rawtype))
+func (t *template) WithMappedAuto(name string, rawtype RawType) Template {
+	t.empty.SetValue(name, NewValue(nil, Auto, rawtype))
 
 	return t
 }
 
-func (t *template) With(name string, format Format, rawtype interface{}) Template {
-	t.empty.Set(name, NewValue(nil, format, rawtype))
+func (t *template) With(name string, format Format, rawtype RawType) Template {
+	t.empty.SetValue(name, NewValue(nil, format, rawtype))
 
 	return t
 }
@@ -186,38 +186,38 @@ func (t *template) CreateRow(v interface{}) (Row, error) {
 	switch values := v.(type) {
 	case []interface{}:
 		for i, val := range values {
-			target := result.GetAtIndex(i)
-			if target != nil {
+			target, ok := result.GetValueAtIndex(i)
+			if ok && target != nil {
 				target = NewValue(val, target.GetFormat(), target.GetRawType())
 			} else {
 				target = NewValueAuto(val)
 			}
 
-			result.SetAtIndex(i, target)
+			result.SetValueAtIndex(i, target)
 		}
 	case map[string]interface{}:
 		for key, val := range values {
-			target := result.Get(key)
-			if target != nil {
+			target, ok := result.GetValue(key)
+			if ok && target != nil {
 				target = NewValue(val, target.GetFormat(), target.GetRawType())
 			} else {
 				target = NewValueAuto(val)
 			}
 
-			result.Set(key, target)
+			result.SetValue(key, target)
 		}
 	case Row:
-		iter := values.Iter()
+		iter := values.IterValues()
 
 		for key, val, ok := iter(); ok; key, val, ok = iter() {
-			target := result.Get(key)
-			if target != nil {
+			target, ok := result.GetValue(key)
+			if ok && target != nil {
 				target = NewValue(val.Raw(), target.GetFormat(), target.GetRawType())
 			} else {
 				target = NewValueAuto(val.Raw())
 			}
 
-			result.Set(key, target)
+			result.SetValue(key, target)
 		}
 
 	case []byte:

@@ -41,7 +41,10 @@ import (
 	"github.com/cgi-fr/jsonline/pkg/cast"
 )
 
-type Format int8
+type (
+	Format  int8
+	RawType interface{}
+)
 
 const (
 	String    Format = iota // String representation, e.g. : "hello", "2.4", "true".
@@ -56,9 +59,10 @@ const (
 
 type Value interface {
 	GetFormat() Format
-	GetRawType() interface{}
+	GetRawType() RawType
 
 	Raw() interface{}
+
 	Export() (interface{}, error)
 	Import(interface{}) error
 
@@ -72,10 +76,10 @@ type Value interface {
 type value struct {
 	raw interface{}
 	f   Format
-	typ interface{}
+	typ RawType
 }
 
-func NewValue(v interface{}, f Format, rawtype interface{}) Value {
+func NewValue(v interface{}, f Format, rawtype RawType) Value {
 	return &value{
 		raw: v,
 		f:   f,
@@ -83,7 +87,7 @@ func NewValue(v interface{}, f Format, rawtype interface{}) Value {
 	}
 }
 
-func NewValueNil(f Format, rawtype interface{}) Value {
+func NewValueNil(f Format, rawtype RawType) Value {
 	return &value{
 		raw: nil,
 		f:   f,
@@ -163,7 +167,7 @@ func (v *value) GetFormat() Format {
 	return v.f
 }
 
-func (v *value) GetRawType() interface{} {
+func (v *value) GetRawType() RawType {
 	return v.typ
 }
 
@@ -242,7 +246,14 @@ func (v *value) MarshalJSON() ([]byte, error) {
 }
 
 func (v *value) UnmarshalJSON(data []byte) error {
-	err := json.Unmarshal(data, &v.raw)
+	var raw interface{}
+
+	err := json.Unmarshal(data, &raw)
+	if err != nil {
+		return fmt.Errorf("can't unmarshal JSON data: %w", err)
+	}
+
+	err = v.Import(raw)
 	if err != nil {
 		return fmt.Errorf("can't unmarshal JSON data: %w", err)
 	}
