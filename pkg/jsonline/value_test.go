@@ -104,50 +104,52 @@ func TestValueMarshalString(t *testing.T) {
 		value    interface{}
 		expected interface{}
 	}{
-		{nil, `<nil>`},
+		{nil, `null`},
 		// signed integers
-		{int(-2), `-2`},
-		{int8(-1), `-1`},
-		{int16(0), `0`},
-		{int32(1), `1`}, // int32 is an alias of rune
-		{int64(2), `2`},
+		{int(-2), `"-2"`},
+		{int8(-1), `"-1"`},
+		{int16(0), `"0"`},
+		{int32(1), `"1"`}, // int32 is an alias of rune
+		{int64(2), `"2"`},
 		// unsigned integers
-		{uint(0), `0`},
-		{uint8(1), `1`},
-		{uint16(2), `2`},
-		{uint32(3), `3`},
-		{uint64(4), `4`},
+		{uint(0), `"0"`},
+		{uint8(1), `"1"`},
+		{uint16(2), `"2"`},
+		{uint32(3), `"3"`},
+		{uint64(4), `"4"`},
 		// floats
-		{float32(1.2), `1.2`},
-		{float64(-1.2), `-1.2`},
+		{float32(1.2), `"1.2"`},
+		{float64(-1.2), `"-1.2"`},
 		// complex numbers => NOT SUPPORTED YET
-		// {complex64(1.2i + 5), `(5+1.2i)`},
-		// {complex128(-1.0i + 8), `(8-1i)`},
+		// {complex64(1.2i + 5), `"(5+1.2i)"`},
+		// {complex128(-1.0i + 8), `"(8-1i)"`},
 		// booleans
-		{true, `true`},
-		{false, `false`},
+		{true, `"true"`},
+		{false, `"false"`},
 		// strings
-		{"string", `string`},
-		{'r', `114`}, // rune is an alias of int32
+		{"string", `"string"`},
+		{'r', `"114"`}, // rune is an alias of int32
 		// binary
-		{byte(36), `36`}, // byte is an alias for uint8
-		{[]byte("hello"), `hello`},
+		{byte(36), `"36"`}, // byte is an alias for uint8
+		{[]byte("hello"), `"hello"`},
 		// composite => NOT SUPPORTED YET
-		// {stringArray, `[a b]`},
+		// {stringArray, `"[a b]"`},
 		// {struct {
 		// 	a string
 		// 	b string
-		// }{"a", "b"}, `{a b}`},
+		// }{"a", "b"}, `"{a b}"`},
 		// references (slices, maps) => NOT SUPPORTED YET
-		// {[]string{"a", "b"}, `[a b]`},
-		// {map[string]string{"k1": "a", "k2": "b"}, `map[k1:a k2:b]`},
+		// {[]string{"a", "b"}, `"[a b]"`},
+		// {map[string]string{"k1": "a", "k2": "b"}, `"map[k1:a k2:b]"`},
 		// interfaces
 	}
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueString(td.value)
-			assert.Equal(t, td.expected, value.String())
+			actual, err := value.MarshalJSON()
+			assert.Nil(t, err)
+			assert.Equal(t, td.expected, string(actual))
 		})
 	}
 }
@@ -201,6 +203,54 @@ func TestValueFormatNumeric(t *testing.T) {
 }
 
 func TestValueMarshalNumeric(t *testing.T) {
+	testdatas := []struct {
+		value    interface{}
+		expected interface{}
+	}{
+		{nil, `null`},
+		// signed integers
+		{int(-2), `-2`}, // either 32 or 64 bits
+		{int8(-1), `-1`},
+		{int16(0), `0`},
+		{int32(1), `1`}, // int32 is an alias of rune
+		{int64(2), `2`},
+		// unsigned integers
+		{uint(0), `0`}, // either 32 or 64 bits
+		{uint8(1), `1`},
+		{uint16(2), `2`},
+		{uint32(3), `3`},
+		{uint64(4), `4`},
+		// floats
+		{float32(1.2), `1.2`},
+		{float64(-1.2), `-1.2`},
+		// complex numbers
+		// {complex64(1.2i + 5), "(5+1.2i)"}, => NOT SUPPORTED
+		// {complex128(-1.0i + 8), "(8-1i)"}, => NOT SUPPORTED
+		// booleans
+		{true, `1`},
+		{false, `0`},
+		// strings
+		{"1.5", `1.5`},
+		{'r', `114`},
+		// binary
+		{byte(36), `36`}, // byte is an alias for uint8
+		{[]byte("1.5"), `1.5`},
+		// composite => NOT SUPPORTED
+		// references (slices, maps) => NOT SUPPORTED
+		// interfaces => NOT SUPPORTED
+	}
+
+	for _, td := range testdatas {
+		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
+			value := jsonline.NewValueNumeric(td.value)
+			actual, err := value.MarshalJSON()
+			assert.Nil(t, err)
+			assert.Equal(t, td.expected, string(actual))
+		})
+	}
+}
+
+func TestValueStringNumeric(t *testing.T) {
 	testdatas := []struct {
 		value    interface{}
 		expected interface{}
@@ -312,7 +362,7 @@ func TestValueMarshalBoolean(t *testing.T) {
 		value    interface{}
 		expected interface{}
 	}{
-		{nil, "<nil>"},
+		{nil, "null"},
 		// signed integers
 		{int(-2), `true`},
 		{int8(-1), `true`},
@@ -361,7 +411,9 @@ func TestValueMarshalBoolean(t *testing.T) {
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueBoolean(td.value)
-			assert.Equal(t, td.expected, value.String())
+			actual, err := value.MarshalJSON()
+			assert.Nil(t, err)
+			assert.Equal(t, td.expected, string(actual))
 		})
 	}
 }
@@ -445,50 +497,52 @@ func TestValueMarshalBinary(t *testing.T) {
 		value    interface{}
 		expected interface{}
 	}{
-		{nil, "<nil>"},
+		{nil, "null"},
 		// signed integers
-		{int(-2), `/v////////8=`},
-		{int8(-1), `/w==`},
-		{int16(0), `AAA=`},
-		{int32(1), `AQAAAA==`}, // int32 is an alias of rune
-		{int64(2), `AgAAAAAAAAA=`},
+		{int(-2), `"/v////////8="`},
+		{int8(-1), `"/w=="`},
+		{int16(0), `"AAA="`},
+		{int32(1), `"AQAAAA=="`}, // int32 is an alias of rune
+		{int64(2), `"AgAAAAAAAAA="`},
 		// unsigned integers
-		{uint(0), `AAAAAAAAAAA=`},
-		{uint8(1), `AQ==`},
-		{uint16(2), `AgA=`},
-		{uint32(3), `AwAAAA==`},
-		{uint64(4), `BAAAAAAAAAA=`},
+		{uint(0), `"AAAAAAAAAAA="`},
+		{uint8(1), `"AQ=="`},
+		{uint16(2), `"AgA="`},
+		{uint32(3), `"AwAAAA=="`},
+		{uint64(4), `"BAAAAAAAAAA="`},
 		// floats
-		{float32(1.2), `mpmZPw==`},
-		{float64(-1.2), `MzMzMzMz878=`},
+		{float32(1.2), `"mpmZPw=="`},
+		{float64(-1.2), `"MzMzMzMz878="`},
 		// complex numbers => NOT SUPPORTED YET
-		// {complex64(1.2i + 5), `KDUrMS4yaSk=`},
-		// {complex128(-1.0i + 8), `KDgtMWkp`},
+		// {complex64(1.2i + 5), `"KDUrMS4yaSk="`},
+		// {complex128(-1.0i + 8), `"KDgtMWkp"`},
 		// booleans
-		{true, `AQ==`},
-		{false, `AA==`},
+		{true, `"AQ=="`},
+		{false, `"AA=="`},
 		// strings
-		{"string", `c3RyaW5n`},
-		{'r', `cgAAAA==`},
+		{"string", `"c3RyaW5n"`},
+		{'r', `"cgAAAA=="`},
 		// binary
-		{byte(36), `JA==`}, // byte is an alias for uint8
-		{[]byte("hello"), `aGVsbG8=`},
+		{byte(36), `"JA=="`}, // byte is an alias for uint8
+		{[]byte("hello"), `"aGVsbG8="`},
 		// composite => NOT SUPPORTED YET
-		// {stringArray, `W2EgYl0=`},
+		// {stringArray, `"W2EgYl0="`},
 		// {struct {
 		// 	a string
 		// 	b string
-		// }{"a", "b"}, `e2EgYn0=`},
+		// }{"a", "b"}, `"e2EgYn0="`},
 		// references (slices, maps) => NOT SUPPORTED YET
-		// {[]string{"a", "b"}, `W2EgYl0=`},
-		// {map[string]string{"k1": "a", "k2": "b"}, `bWFwW2sxOmEgazI6Yl0=`},
+		// {[]string{"a", "b"}, `"W2EgYl0="`},
+		// {map[string]string{"k1": "a", "k2": "b"}, `"bWFwW2sxOmEgazI6Yl0="`},
 		// interfaces => NOT SUPPORTED
 	}
 
 	for _, td := range testdatas {
 		t.Run(fmt.Sprintf("%#v", td.value), func(t *testing.T) {
 			value := jsonline.NewValueBinary(td.value)
-			assert.Equal(t, td.expected, value.String())
+			actual, err := value.MarshalJSON()
+			assert.Nil(t, err)
+			assert.Equal(t, td.expected, string(actual))
 		})
 	}
 }
