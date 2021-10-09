@@ -28,7 +28,7 @@ func main() {
 	template := jsonline.NewTemplate().WithString("name").WithNumeric("age").WithDateTime("birthdate")
 
 	person1, err := template.CreateRow([]interface{}{"Dorothy", 30, time.Date(1991, time.September, 24, 21, 21, 0, 0, time.UTC)})
-	if err != nil {
+	if err == nil {
 		fmt.Println(person1) // {"name":"Dorothy","age":30,"birthdate":"1991-09-24T21:21:00Z"}
 	} else {
 		fmt.Println("ERROR:", err)
@@ -45,11 +45,13 @@ func main() {
 	b, err := person1.MarshalJSON()
 	fmt.Println(string(b)) // same result as fmt.Println(person1)
 
-	person2 := jsonline.NewRow().UnmarshalJSON(b)
+	person2 := jsonline.NewRow()
+
+	person2.UnmarshalJSON(b)
 	fmt.Println(person2) // same result as fmt.Println(person1)
 
 	person3, err := template.CreateRow(map[string]interface{}{"name": "Alice", "extra": true, "age": 17, "birthdate": time.Date(2004, time.June, 15, 21, 8, 47, 0, time.UTC)})
-	if err != nil {
+	if err == nil {
 		fmt.Println(person3) // {"name":"Alice","age":17,"birthdate":"2004-06-15T21:08:47Z","extra":true}
 	} else {
 		fmt.Println("ERROR:", err)
