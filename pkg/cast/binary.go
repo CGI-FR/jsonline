@@ -32,12 +32,13 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-//nolint:cyclop
+//nolint:cyclop,funlen
 package cast
 
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"time"
 )
 
@@ -78,6 +79,21 @@ func ToBinary(i interface{}) (interface{}, error) {
 	case time.Time:
 		return ToBinary(val.Unix())
 	default:
-		return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBinary, i, i)
+		v := reflect.ValueOf(val)
+		switch v.Kind() { //nolint:exhaustive
+		case reflect.Array:
+			if v.Type().Elem().Kind() == reflect.Uint8 {
+				b := make([]uint8, v.Len())
+				if n := reflect.Copy(reflect.ValueOf(b), v); n != v.Len() {
+					return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBinary, i, i)
+				}
+
+				return b, nil
+			}
+
+			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBinary, i, i)
+		default:
+			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToBinary, i, i)
+		}
 	}
 }

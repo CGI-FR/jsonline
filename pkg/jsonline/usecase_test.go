@@ -8,6 +8,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestUseCase(t *testing.T) {
+	tmpl := jsonline.NewTemplate().
+		WithBinary("from string").
+		WithBinary("from byte array").
+		WithBinary("from byte slice").
+		WithBinary("from int")
+
+	r, err := tmpl.CreateRow(map[string]interface{}{
+		"from string":     "hello",
+		"from byte array": [2]byte{1, 2},
+		"from byte slice": []byte{1, 2},
+		"from int":        1,
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, `{"from string":"aGVsbG8=","from byte array":"AQI=","from byte slice":"AQI=","from int":"AQAAAAAAAAA="}`, r.String()) //nolint:lll
+}
+
 func TestLinoUseCase(t *testing.T) {
 	data := map[string]interface{}{
 		"title":        []byte("The Matrix"),
