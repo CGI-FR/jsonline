@@ -80,8 +80,13 @@ type value struct {
 }
 
 func NewValue(v interface{}, f Format, rawtype RawType) Value {
+	r, err := cast.To(rawtype, v)
+	if err != nil {
+		r = v
+	}
+
 	return &value{
-		raw: v,
+		raw: r,
 		f:   f,
 		typ: rawtype,
 	}
