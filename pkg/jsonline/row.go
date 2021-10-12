@@ -41,6 +41,8 @@ import (
 	"fmt"
 	"io"
 	"strings"
+
+	"github.com/cgi-fr/jsonline/pkg/cast"
 )
 
 type Row interface {
@@ -221,7 +223,13 @@ func (r *row) Set(key string, val interface{}) {
 		r.keys[key] = r.l.PushBack(key)
 	}
 
-	if value, ok := val.(Value); ok {
+	if value, exist := r.m[key]; exist {
+		if raw, err := cast.To(value.GetRawType(), val); err != nil {
+			r.m[key] = NewValue(raw, value.GetFormat(), value.GetRawType())
+		} else {
+			r.m[key] = NewValue(val, value.GetFormat(), value.GetRawType())
+		}
+	} else if value, ok := val.(Value); ok {
 		r.m[key] = value
 	} else {
 		r.m[key] = NewValueAuto(val)

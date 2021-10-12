@@ -14,6 +14,11 @@ Types of changes
 - **`Fixed`** for any bug fixes.
 - **`Security`** in case of vulnerabilities.
 
+## [0.4.0] 2021-10-13
+
+- **`Added`** `row.ImportAtKey` and `row.ImportAtIndex` methods (back from v0.2.0).
+- **`Changed`** `row.Set` and `row.SetAtIndex` won't import the value anymore (causing a bug with binary format values), but just try to cast it.
+
 ## [0.3.0] 2021-10-12
 
 - **`Added`** type `RawType` alias of `interface{}` and use of it everywhere a rawtype is asked.
