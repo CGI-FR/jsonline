@@ -14,7 +14,7 @@ Types of changes
 - **`Fixed`** for any bug fixes.
 - **`Security`** in case of vulnerabilities.
 
-## [0.3.0] Unreleased
+## [0.3.0] 2021-10-12
 
 - **`Added`** type `RawType` alias of `interface{}` and use of it everywhere a rawtype is asked.
 - **`Added`** function `Has(key string) bool` on `Row` interface.
