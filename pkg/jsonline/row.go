@@ -40,7 +40,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"reflect"
 	"strings"
+	"unicode"
 
 	"github.com/cgi-fr/jsonline/pkg/cast"
 )
@@ -66,6 +68,8 @@ type Row interface {
 	SetValue(key string, val Value) Row
 	SetValueAtIndex(index int, val Value) Row
 	IterValues() func() (string, Value, bool)
+
+	MapTo(interface{})
 }
 
 type m map[string]Value
@@ -355,6 +359,42 @@ func (r *row) IterValues() func() (string, Value, bool) {
 
 		return "", nil, false
 	}
+}
+
+func (r *row) MapTo(v interface{}) {
+	t := reflect.TypeOf(v).Elem()
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+
+		value, exist := r.Get(LcFirst(field.Name))
+		if exist {
+			switch val := value.(type) {
+			case int, int64, int32, int16, int8:
+				i, _ := cast.ToInt64(val)
+				reflect.ValueOf(v).Elem().FieldByName(field.Name).SetInt(i.(int64))
+			case uint, uint64, uint32, uint16, uint8:
+				i, _ := cast.ToUint64(val)
+				reflect.ValueOf(v).Elem().FieldByName(field.Name).SetUint(i.(uint64))
+			case float32, float64:
+				i, _ := cast.ToFloat64(val)
+				reflect.ValueOf(v).Elem().FieldByName(field.Name).SetFloat(i.(float64))
+			case string:
+				reflect.ValueOf(v).Elem().FieldByName(field.Name).SetString(val)
+			case bool:
+				reflect.ValueOf(v).Elem().FieldByName(field.Name).SetBool(val)
+			case []byte:
+				reflect.ValueOf(v).Elem().FieldByName(field.Name).SetBytes(val)
+			}
+		}
+	}
+}
+
+func LcFirst(str string) string {
+	for i, v := range str {
+		return string(unicode.ToLower(v)) + str[i+1:]
+	}
+	return ""
 }
 
 func (r *row) MarshalJSON() (res []byte, err error) {
