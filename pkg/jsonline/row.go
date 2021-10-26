@@ -42,6 +42,7 @@ import (
 	"io"
 	"reflect"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/cgi-fr/jsonline/pkg/cast"
@@ -59,6 +60,23 @@ type Row interface {
 	SetAtIndex(index int, val interface{})
 	Len() int
 	Iter() func() (string, interface{}, bool)
+
+	GetString(key string) string
+	GetInt(key string) int
+	GetInt64(key string) int64
+	GetInt32(key string) int32
+	GetInt16(key string) int16
+	GetInt8(key string) int8
+	GetUint(key string) uint
+	GetUint64(key string) uint64
+	GetUint32(key string) uint32
+	GetUint16(key string) uint16
+	GetUint8(key string) uint8
+	GetFloat64(key string) float64
+	GetFloat32(key string) float32
+	GetBool(key string) bool
+	GetBytes(key string) []byte
+	GetTime(key string) time.Time
 
 	ImportAtKey(key string, val interface{}) error
 	ImportAtIndex(index int, val interface{}) error
@@ -577,4 +595,100 @@ func handledelim(t json.Token, dec *json.Decoder) (res interface{}, err error) {
 		}
 	}
 	return t, nil
+}
+
+func (r *row) GetString(key string) string {
+	result, _ := cast.ToString(r.GetOrNil(key))
+
+	return result.(string)
+}
+
+func (r *row) GetInt(key string) int {
+	result, _ := cast.ToInt(r.GetOrNil(key))
+
+	return result.(int)
+}
+
+func (r *row) GetInt64(key string) int64 {
+	result, _ := cast.ToInt64(r.GetOrNil(key))
+
+	return result.(int64)
+}
+
+func (r *row) GetInt32(key string) int32 {
+	result, _ := cast.ToInt32(r.GetOrNil(key))
+
+	return result.(int32)
+}
+
+func (r *row) GetInt16(key string) int16 {
+	result, _ := cast.ToInt16(r.GetOrNil(key))
+
+	return result.(int16)
+}
+
+func (r *row) GetInt8(key string) int8 {
+	result, _ := cast.ToInt8(r.GetOrNil(key))
+
+	return result.(int8)
+}
+
+func (r *row) GetUint(key string) uint {
+	result, _ := cast.ToUint(r.GetOrNil(key))
+
+	return result.(uint)
+}
+
+func (r *row) GetUint64(key string) uint64 {
+	result, _ := cast.ToUint64(r.GetOrNil(key))
+
+	return result.(uint64)
+}
+
+func (r *row) GetUint32(key string) uint32 {
+	result, _ := cast.ToUint32(r.GetOrNil(key))
+
+	return result.(uint32)
+}
+
+func (r *row) GetUint16(key string) uint16 {
+	result, _ := cast.ToUint16(r.GetOrNil(key))
+
+	return result.(uint16)
+}
+
+func (r *row) GetUint8(key string) uint8 {
+	result, _ := cast.ToUint8(r.GetOrNil(key))
+
+	return result.(uint8)
+}
+
+func (r *row) GetFloat64(key string) float64 {
+	result, _ := cast.ToFloat64(r.GetOrNil(key))
+
+	return result.(float64)
+}
+
+func (r *row) GetFloat32(key string) float32 {
+	result, _ := cast.ToFloat32(r.GetOrNil(key))
+
+	return result.(float32)
+}
+
+func (r *row) GetBool(key string) bool {
+	result, _ := cast.ToBool(r.GetOrNil(key))
+
+	return result.(bool)
+}
+
+func (r *row) GetBytes(key string) []byte {
+	result, _ := cast.ToBinary(r.GetOrNil(key))
+
+	return result.([]byte)
+}
+
+func (r *row) GetTime(key string) time.Time {
+	result, _ := cast.ToTime(r.GetOrNil(key))
+
+	return result.(time.Time)
 }
