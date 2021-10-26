@@ -126,6 +126,26 @@ func importFromBinary(val interface{}, targetType RawType) (interface{}, error) 
 	}
 }
 
+func importFromDate(val interface{}, targetType RawType) (interface{}, error) {
+	switch targetType.(type) {
+	case nil:
+		t, err := cast.ToDate(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return t, nil
+
+	default:
+		i, err := cast.To(targetType, val)
+		if err != nil {
+			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		}
+
+		return i, nil
+	}
+}
+
 func importFromDateTime(val interface{}, targetType RawType) (interface{}, error) {
 	switch targetType.(type) {
 	case nil:

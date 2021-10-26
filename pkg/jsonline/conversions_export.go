@@ -77,6 +77,20 @@ func exportToBinary(val interface{}) (interface{}, error) {
 	return base64.StdEncoding.EncodeToString(b.([]byte)), nil
 }
 
+func exportToDate(val interface{}) (interface{}, error) {
+	t, err := cast.ToDate(val)
+	if err != nil {
+		return nil, fmt.Errorf("%w %T to Date format: %v", ErrUnsupportedExportType, val, err)
+	}
+
+	str, err := cast.ToString(t)
+	if err != nil {
+		return nil, fmt.Errorf("%w %T to Date format: %v", ErrUnsupportedExportType, val, err)
+	}
+
+	return str, nil
+}
+
 func exportToDateTime(val interface{}) (interface{}, error) {
 	t, err := cast.ToTime(val)
 	if err != nil {

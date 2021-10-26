@@ -44,6 +44,7 @@ type Template interface {
 	WithNumeric(name string) Template
 	WithBoolean(name string) Template
 	WithBinary(name string) Template
+	WithDate(name string) Template
 	WithDateTime(name string) Template
 	WithTimestamp(name string) Template
 	WithAuto(name string) Template
@@ -54,6 +55,7 @@ type Template interface {
 	WithMappedNumeric(name string, rawtype RawType) Template
 	WithMappedBoolean(name string, rawtype RawType) Template
 	WithMappedBinary(name string, rawtype RawType) Template
+	WithMappedDate(name string, rawtype RawType) Template
 	WithMappedDateTime(name string, rawtype RawType) Template
 	WithMappedTimestamp(name string, rawtype RawType) Template
 	WithMappedAuto(name string, rawtype RawType) Template
@@ -97,6 +99,12 @@ func (t *template) WithBoolean(name string) Template {
 
 func (t *template) WithBinary(name string) Template {
 	t.empty.SetValue(name, NewValueBinary(nil))
+
+	return t
+}
+
+func (t *template) WithDate(name string) Template {
+	t.empty.SetValue(name, NewValueDate(nil))
 
 	return t
 }
@@ -151,6 +159,12 @@ func (t *template) WithMappedBoolean(name string, rawtype RawType) Template {
 
 func (t *template) WithMappedBinary(name string, rawtype RawType) Template {
 	t.empty.SetValue(name, NewValue(nil, Binary, rawtype))
+
+	return t
+}
+
+func (t *template) WithMappedDate(name string, rawtype RawType) Template {
+	t.empty.SetValue(name, NewValue(nil, Date, rawtype))
 
 	return t
 }
