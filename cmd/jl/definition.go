@@ -36,6 +36,7 @@ const (
 	Numeric   = "numeric"
 	Boolean   = "boolean"
 	Binary    = "binary"
+	Date      = "date"
 	DateTime  = "datetime"
 	Timestamp = "timestamp"
 	Auto      = "auto"
@@ -211,6 +212,7 @@ var formatRegistry = map[string]jsonline.Format{
 	Numeric:   jsonline.Numeric,
 	Boolean:   jsonline.Boolean,
 	Binary:    jsonline.Binary,
+	Date:      jsonline.Date,
 	DateTime:  jsonline.DateTime,
 	Timestamp: jsonline.Timestamp,
 	Auto:      jsonline.Auto,

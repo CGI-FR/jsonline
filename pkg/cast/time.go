@@ -40,6 +40,53 @@ import (
 	"time"
 )
 
+func ToDate(i interface{}) (interface{}, error) {
+	switch val := i.(type) {
+	case nil:
+		return val, nil
+
+	case time.Time:
+		return val.Format("2006-01-02"), nil
+
+	case string:
+		_, err := time.Parse("2006-01-02", val)
+		if err != nil {
+			i64, err := ToInt64(val)
+			if err != nil {
+				return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToDate, i, i)
+			}
+
+			return ToDate(i64)
+		}
+
+		return val, nil
+
+	case []byte:
+		t, err := ToDate(string(val))
+		if err != nil {
+			i64, err := ToInt64(val)
+			if err != nil {
+				return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToDate, i, i)
+			}
+
+			return ToDate(i64)
+		}
+
+		return t, nil
+
+	case int64:
+		return time.Unix(val, 0).Format("2006-01-02"), nil
+
+	default:
+		s, err := ToString(val)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %#v (%T)", ErrUnableToCastToTime, i, i)
+		}
+
+		return ToDate(s)
+	}
+}
+
 func ToTime(i interface{}) (interface{}, error) {
 	switch val := i.(type) {
 	case nil, time.Time:

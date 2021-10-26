@@ -173,3 +173,13 @@ func TestGetTypedValue(t *testing.T) {
 	assert.Equal(t, []byte("value"), r1.GetBytes("binary"))
 	assert.Equal(t, time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC), r1.GetTime("datetime"))
 }
+
+func TestDate(t *testing.T) {
+	r1 := jsonline.NewRow()
+	r1.SetValue("fromtime", jsonline.NewValue(time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC), jsonline.Date, nil)) //nolint:lll
+	r1.SetValue("fromstring", jsonline.NewValue("2021-09-24", jsonline.Date, nil))
+
+	res, err := r1.Export()
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{"fromstring": "2021-09-24", "fromtime": "2021-09-24"}, res)
+}

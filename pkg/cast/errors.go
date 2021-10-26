@@ -58,4 +58,5 @@ var (
 	ErrUnableToCastToString  = fmt.Errorf("%w to string", ErrUnableToCast)
 	ErrUnableToCastToBinary  = fmt.Errorf("%w to binary", ErrUnableToCast)
 	ErrUnableToCastToTime    = fmt.Errorf("%w to time", ErrUnableToCast)
+	ErrUnableToCastToDate    = fmt.Errorf("%w to date", ErrUnableToCast)
 )

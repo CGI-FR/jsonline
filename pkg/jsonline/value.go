@@ -51,6 +51,7 @@ const (
 	Numeric                 // Numeric (integer or decimal), e.g. : 2.4, 1.
 	Boolean                 // Boolean : true or false.
 	Binary                  // Binary representation encoded as base64.
+	Date                    // Date without zone info, e.g. : "2006-01-02".
 	DateTime                // DateTime as RFC3339, e.g. : "2006-01-02T15:04:05Z", "2006-01-02T15:04:05+07:00".
 	Timestamp               // Timestamp the number of seconds since 1970 ("UNIX time").
 	Auto                    // Auto columns have no specific format enforced.
@@ -140,6 +141,14 @@ func NewValueBinary(v interface{}) Value {
 	}
 }
 
+func NewValueDate(v interface{}) Value {
+	return &value{
+		raw: v,
+		f:   Date,
+		typ: nil,
+	}
+}
+
 func NewValueDateTime(v interface{}) Value {
 	return &value{
 		raw: v,
@@ -194,6 +203,8 @@ func (v *value) Export() (interface{}, error) {
 		return exportToBool(v.raw)
 	case Binary:
 		return exportToBinary(v.raw)
+	case Date:
+		return exportToDate(v.raw)
 	case DateTime:
 		return exportToDateTime(v.raw)
 	case Timestamp:
@@ -232,6 +243,8 @@ func (v *value) Import(val interface{}) error {
 		v.raw, err = importFromBoolean(val, v.typ)
 	case Binary:
 		v.raw, err = importFromBinary(val, v.typ)
+	case Date:
+		v.raw, err = importFromDate(val, v.typ)
 	case DateTime:
 		v.raw, err = importFromDateTime(val, v.typ)
 	case Timestamp:
