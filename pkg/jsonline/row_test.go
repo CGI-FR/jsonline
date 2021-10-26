@@ -97,3 +97,14 @@ func TestExportImport(t *testing.T) {
 
 	assert.Equal(t, r1.String(), r3.String())
 }
+
+func TestGetOrNil(t *testing.T) {
+	r1 := jsonline.NewRow()
+	r1.SetValue("string", jsonline.NewValueString("value"))
+
+	assert.Equal(t, nil, r1.GetOrNil("nokey"))
+	assert.Equal(t, "value", r1.GetOrNil("string"))
+
+	assert.Equal(t, nil, r1.GetAtIndexOrNil(2))
+	assert.Equal(t, "value", r1.GetAtIndexOrNil(0))
+}

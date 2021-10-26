@@ -50,7 +50,9 @@ type Row interface {
 
 	Has(key string) bool
 	Get(key string) (interface{}, bool)
+	GetOrNil(key string) interface{}
 	GetAtIndex(index int) (interface{}, bool)
+	GetAtIndexOrNil(index int) interface{}
 	Set(key string, val interface{})
 	SetAtIndex(index int, val interface{})
 	Len() int
@@ -203,6 +205,14 @@ func (r *row) Get(key string) (interface{}, bool) {
 	return nil, ok
 }
 
+func (r *row) GetOrNil(key string) interface{} {
+	val, ok := r.Get(key)
+	if !ok {
+		return nil
+	}
+	return val
+}
+
 func (r *row) GetAtIndex(index int) (interface{}, bool) {
 	var key string
 
@@ -216,6 +226,21 @@ func (r *row) GetAtIndex(index int) (interface{}, bool) {
 	}
 
 	return r.Get(key)
+}
+
+func (r *row) GetAtIndexOrNil(index int) interface{} {
+	var key string
+
+	for cur := r.l.Front(); cur != nil; cur = cur.Next() {
+		if index == 0 {
+			key, _ = cur.Value.(string)
+
+			break
+		}
+		index--
+	}
+
+	return r.GetOrNil(key)
 }
 
 func (r *row) Set(key string, val interface{}) {
