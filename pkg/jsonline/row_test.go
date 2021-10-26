@@ -108,3 +108,42 @@ func TestGetOrNil(t *testing.T) {
 	assert.Equal(t, nil, r1.GetAtIndexOrNil(2))
 	assert.Equal(t, "value", r1.GetAtIndexOrNil(0))
 }
+
+func TestMap(t *testing.T) {
+	r1 := jsonline.NewRow()
+	r1.SetValue("int", jsonline.NewValueNumeric(-1))
+	r1.SetValue("uint", jsonline.NewValueNumeric(uint(1)))
+	r1.SetValue("string", jsonline.NewValueString("value"))
+	r1.SetValue("numeric", jsonline.NewValueNumeric(42.5))
+	r1.SetValue("boolean", jsonline.NewValueBoolean(true))
+	r1.SetValue("binary", jsonline.NewValue("value", jsonline.Binary, []byte{}))
+
+	result := struct {
+		Int     int
+		Uint    uint
+		String  string
+		Numeric float32
+		Boolean bool
+		Binary  []byte
+	}{}
+
+	r1.MapTo(&result)
+
+	expected := struct {
+		Int     int
+		Uint    uint
+		String  string
+		Numeric float32
+		Boolean bool
+		Binary  []byte
+	}{
+		Int:     -1,
+		Uint:    1,
+		String:  "value",
+		Numeric: 42.5,
+		Boolean: true,
+		Binary:  []byte("value"),
+	}
+
+	assert.Equal(t, expected, result)
+}
