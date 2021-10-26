@@ -147,3 +147,29 @@ func TestMap(t *testing.T) {
 
 	assert.Equal(t, expected, result)
 }
+
+func TestGetTypedValue(t *testing.T) {
+	r1 := jsonline.NewRow()
+	r1.SetValue("string", jsonline.NewValueString("value"))
+	r1.SetValue("numeric", jsonline.NewValueNumeric(42.5))
+	r1.SetValue("boolean", jsonline.NewValueBoolean(true))
+	r1.SetValue("binary", jsonline.NewValueBinary("value"))
+	r1.SetValue("datetime", jsonline.NewValueDateTime(time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC)))
+
+	assert.Equal(t, "value", r1.GetString("string"))
+	assert.Equal(t, 42, r1.GetInt("numeric"))
+	assert.Equal(t, int64(42), r1.GetInt64("numeric"))
+	assert.Equal(t, int32(42), r1.GetInt32("numeric"))
+	assert.Equal(t, int16(42), r1.GetInt16("numeric"))
+	assert.Equal(t, int8(42), r1.GetInt8("numeric"))
+	assert.Equal(t, uint(42), r1.GetUint("numeric"))
+	assert.Equal(t, uint64(42), r1.GetUint64("numeric"))
+	assert.Equal(t, uint32(42), r1.GetUint32("numeric"))
+	assert.Equal(t, uint16(42), r1.GetUint16("numeric"))
+	assert.Equal(t, uint8(42), r1.GetUint8("numeric"))
+	assert.Equal(t, float64(42.5), r1.GetFloat64("numeric"))
+	assert.Equal(t, float32(42.5), r1.GetFloat32("numeric"))
+	assert.Equal(t, true, r1.GetBool("boolean"))
+	assert.Equal(t, []byte("value"), r1.GetBytes("binary"))
+	assert.Equal(t, time.Date(2021, time.September, 24, 21, 21, 0, 0, time.UTC), r1.GetTime("datetime"))
+}
