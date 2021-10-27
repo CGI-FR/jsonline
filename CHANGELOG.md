@@ -14,6 +14,13 @@ Types of changes
 - **`Fixed`** for any bug fixes.
 - **`Security`** in case of vulnerabilities.
 
+## [0.5.0] Unreleased
+
+- **`Added`** `GetOrNil` and `GetAtIndexOrNil` functions on Row interface : get a raw value or nil if it is not set.
+- **`Added`** `MapTo` function on Row interface : initialize a struct from an existing row.
+- **`Added`** `GetString`, `GetInt`, and more functions on Row interface : get a value and cast it directly to the required type.
+- **`Added`** `Date` format to display a date without time and zone informations.
+
 ## [0.4.0] 2021-10-13
 
 - **`Added`** `row.ImportAtKey` and `row.ImportAtIndex` methods (back from v0.2.0).
