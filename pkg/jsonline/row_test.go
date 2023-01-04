@@ -1,4 +1,4 @@
-// Copyright (C) 2021 CGI France
+// Copyright (C) 2022 CGI France
 //
 // This file is part of the jsonline library.
 //
@@ -19,6 +19,7 @@ package jsonline_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -182,4 +183,33 @@ func TestDate(t *testing.T) {
 	res, err := r1.Export()
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{"fromstring": "2021-09-24", "fromtime": "2021-09-24"}, res)
+}
+
+func TestPath(t *testing.T) {
+	r2 := jsonline.NewRow()
+	r2.SetValue("sub1", jsonline.NewValueAuto(12))
+	r2.SetValue("sub2", jsonline.NewValueAuto("hello"))
+
+	r1 := jsonline.NewRow()
+	r1.SetValue("root", r2)
+
+	res1, exists1 := r1.GetAtPath("root.sub1")
+	assert.True(t, exists1)
+	assert.Equal(t, 12, res1)
+
+	res2, exists2 := r1.GetAtPath("root.sub2")
+	assert.True(t, exists2)
+	assert.Equal(t, "hello", res2)
+
+	res3, exists3 := r1.GetAtPath("root.sub3")
+	assert.False(t, exists3)
+	assert.Nil(t, res3)
+
+	err1 := r1.ImportAtPath("root.sub1", 11)
+	assert.NoError(t, err1)
+
+	err2 := r1.ImportAtPath("root.sub2", "world")
+	assert.NoError(t, err2)
+
+	fmt.Println(r1.DebugString())
 }
