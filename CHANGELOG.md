@@ -16,7 +16,7 @@ Types of changes
 
 ## [0.6.0] Not released yet
 
-- **`Added`** `GetAtPath(path string) (interface{}, bool)`, `GetAtPathOrNil(path string) interface{}` and `ImportAtPath(path string, val interface{}) error` methods
+- **`Added`** `GetAtPath(path string)`, `GetAtPathOrNil(path string)` and `ImportAtPath(path string, val interface{})` methods
 
 ## [0.5.0] 2021-10-27
 
