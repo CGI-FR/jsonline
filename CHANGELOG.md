@@ -14,6 +14,10 @@ Types of changes
 - **`Fixed`** for any bug fixes.
 - **`Security`** in case of vulnerabilities.
 
+## [0.6.0] Not released yet
+
+- **`Added`** `GetAtPath(path string) (interface{}, bool)`, `GetAtPathOrNil(path string) interface{}` and `ImportAtPath(path string, val interface{}) error` methods
+
 ## [0.5.0] 2021-10-27
 
 - **`Added`** `GetOrNil` and `GetAtIndexOrNil` functions on Row interface : get a raw value or nil if it is not set.
