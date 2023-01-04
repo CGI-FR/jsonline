@@ -289,6 +289,10 @@ func (r *row) GetAtPath(path string) (interface{}, bool) {
 }
 
 func (r *row) GetAtPathOrNil(path string) interface{} {
+	if result, ok := r.GetAtPath(path); ok {
+		return result
+	}
+
 	return nil
 }
 
