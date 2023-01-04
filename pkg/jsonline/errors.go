@@ -1,4 +1,4 @@
-// Copyright (C) 2021 CGI France
+// Copyright (C) 2022 CGI France
 //
 // This file is part of the jsonline library.
 //
@@ -42,4 +42,5 @@ var (
 	ErrUnsupportedFormat     = errors.New("unsupported format")
 	ErrUnsupportedImportType = errors.New("can't import type")
 	ErrUnsupportedExportType = errors.New("can't export type")
+	ErrPathNotFound          = errors.New("path not found")
 )

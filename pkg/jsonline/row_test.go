@@ -1,4 +1,4 @@
-// Copyright (C) 2021 CGI France
+// Copyright (C) 2022 CGI France
 //
 // This file is part of the jsonline library.
 //
@@ -19,6 +19,7 @@ package jsonline_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -203,4 +204,12 @@ func TestPath(t *testing.T) {
 	res3, exists3 := r1.GetAtPath("root.sub3")
 	assert.False(t, exists3)
 	assert.Nil(t, res3)
+
+	err1 := r1.ImportAtPath("root.sub1", 11)
+	assert.NoError(t, err1)
+
+	err2 := r1.ImportAtPath("root.sub2", "world")
+	assert.NoError(t, err2)
+
+	fmt.Println(r1.DebugString())
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2021 CGI France
+// Copyright (C) 2022 CGI France
 //
 // This file is part of the jsonline library.
 //
@@ -82,9 +82,11 @@ type Row interface {
 
 	ImportAtKey(key string, val interface{}) error
 	ImportAtIndex(index int, val interface{}) error
+	ImportAtPath(path string, val interface{}) error
 
 	GetValue(key string) (Value, bool)
 	GetValueAtIndex(index int) (Value, bool)
+	GetValueAtPath(path string) (Value, bool)
 	SetValue(key string, val Value) Row
 	SetValueAtIndex(index int, val Value) Row
 	IterValues() func() (string, Value, bool)
@@ -214,6 +216,18 @@ func (r *row) ImportAtIndex(index int, val interface{}) error {
 	return r.ImportAtKey(key, val)
 }
 
+func (r *row) ImportAtPath(path string, val interface{}) error {
+	if value, exist := r.GetValueAtPath(path); exist {
+		if err := value.Import(val); err != nil {
+			return fmt.Errorf("%w", err)
+		}
+	} else {
+		return fmt.Errorf("%w", ErrPathNotFound)
+	}
+
+	return nil
+}
+
 func (r *row) Has(key string) bool {
 	_, ok := r.m[key]
 
@@ -269,23 +283,11 @@ func (r *row) GetAtIndexOrNil(index int) interface{} {
 }
 
 func (r *row) GetAtPath(path string) (interface{}, bool) {
-	keys := strings.Split(path, ".")
-
-	var row Row = r
-	for _, key := range keys {
-		value, exist := row.GetValue(key)
-		if !exist {
-			return nil, false
-		}
-
-		if cast, ok := value.(Row); ok {
-			row = cast
-		} else {
-			return value.Raw(), true
-		}
+	if value, ok := r.GetValueAtPath(path); ok {
+		return value.Raw(), true
 	}
 
-	return row.Raw(), true
+	return nil, false
 }
 
 func (r *row) GetAtPathOrNil(path string) interface{} {
@@ -370,6 +372,26 @@ func (r *row) GetValueAtIndex(index int) (Value, bool) {
 	return r.GetValue(key)
 }
 
+func (r *row) GetValueAtPath(path string) (Value, bool) {
+	keys := strings.Split(path, ".")
+
+	var row Row = r
+	for _, key := range keys {
+		value, exist := row.GetValue(key)
+		if !exist {
+			return nil, false
+		}
+
+		if cast, ok := value.(Row); ok {
+			row = cast
+		} else {
+			return value, true
+		}
+	}
+
+	return row, true
+}
+
 func (r *row) SetValue(key string, val Value) Row {
 	if _, ok := r.m[key]; !ok {
 		r.keys[key] = r.l.PushBack(key)
@@ -393,6 +415,10 @@ func (r *row) SetValueAtIndex(index int, val Value) Row {
 	}
 
 	return r.SetValue(key, val)
+}
+
+func (r *row) SetValueAtPath(path string, val Value) Row {
+	panic("not implemented")
 }
 
 func (r *row) IterValues() func() (string, Value, bool) {
