@@ -183,3 +183,24 @@ func TestDate(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]interface{}{"fromstring": "2021-09-24", "fromtime": "2021-09-24"}, res)
 }
+
+func TestPath(t *testing.T) {
+	r2 := jsonline.NewRow()
+	r2.SetValue("sub1", jsonline.NewValueAuto(12))
+	r2.SetValue("sub2", jsonline.NewValueAuto("hello"))
+
+	r1 := jsonline.NewRow()
+	r1.SetValue("root", r2)
+
+	res1, exists1 := r1.GetAtPath("root.sub1")
+	assert.True(t, exists1)
+	assert.Equal(t, 12, res1)
+
+	res2, exists2 := r1.GetAtPath("root.sub2")
+	assert.True(t, exists2)
+	assert.Equal(t, "hello", res2)
+
+	res3, exists3 := r1.GetAtPath("root.sub3")
+	assert.False(t, exists3)
+	assert.Nil(t, res3)
+}

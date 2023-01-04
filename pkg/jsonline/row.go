@@ -56,6 +56,8 @@ type Row interface {
 	GetOrNil(key string) interface{}
 	GetAtIndex(index int) (interface{}, bool)
 	GetAtIndexOrNil(index int) interface{}
+	GetAtPath(path string) (interface{}, bool)
+	GetAtPathOrNil(path string) interface{}
 	Set(key string, val interface{})
 	SetAtIndex(index int, val interface{})
 	Len() int
@@ -264,6 +266,30 @@ func (r *row) GetAtIndexOrNil(index int) interface{} {
 	}
 
 	return r.GetOrNil(key)
+}
+
+func (r *row) GetAtPath(path string) (interface{}, bool) {
+	keys := strings.Split(path, ".")
+
+	var row Row = r
+	for _, key := range keys {
+		value, exist := row.GetValue(key)
+		if !exist {
+			return nil, false
+		}
+
+		if cast, ok := value.(Row); ok {
+			row = cast
+		} else {
+			return value.Raw(), true
+		}
+	}
+
+	return row.Raw(), true
+}
+
+func (r *row) GetAtPathOrNil(path string) interface{} {
+	return nil
 }
 
 func (r *row) Set(key string, val interface{}) {
