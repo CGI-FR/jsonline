@@ -87,6 +87,7 @@ type Row interface {
 	GetValue(key string) (Value, bool)
 	GetValueAtIndex(index int) (Value, bool)
 	GetValueAtPath(path string) (Value, bool)
+	FindValuesAtPath(path string) ([]Value, bool)
 	SetValue(key string, val Value) Row
 	SetValueAtIndex(index int, val Value) Row
 	IterValues() func() (string, Value, bool)
@@ -390,6 +391,36 @@ func (r *row) GetValueAtPath(path string) (Value, bool) {
 	}
 
 	return row, true
+}
+
+func (r *row) FindValuesAtPath(path string) ([]Value, bool) {
+	keys := strings.SplitN(path, ".", 2) //nolint:gomnd
+
+	value, exist := r.GetValue(keys[0])
+	if !exist {
+		return nil, false
+	}
+
+	if cast, ok := value.(Row); ok {
+		return cast.FindValuesAtPath(keys[1])
+	}
+
+	result := []Value{}
+
+	switch typedValue := value.Raw().(type) {
+	case []interface{}:
+		for _, row := range typedValue {
+			if cast, ok := row.(Row); ok {
+				if values, exists := cast.FindValuesAtPath(keys[1]); exists {
+					result = append(result, values...)
+				}
+			}
+		}
+	default:
+		return []Value{value}, true
+	}
+
+	return result, true
 }
 
 func (r *row) SetValue(key string, val Value) Row {

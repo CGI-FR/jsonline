@@ -16,7 +16,8 @@ Types of changes
 
 ## [0.6.0] Not released yet
 
-- **`Added`** `GetAtPath(path string)`, `GetAtPathOrNil(path string)` and `ImportAtPath(path string, val interface{})` methods
+- **`Added`** row `GetAtPath`, `GetAtPathOrNil`, `FindValuesAtPath` and `ImportAtPath` methods
+- **`Added`** importer `ReadOne` method
 
 ## [0.5.0] 2021-10-27
 
