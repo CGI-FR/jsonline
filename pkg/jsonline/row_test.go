@@ -20,6 +20,7 @@ package jsonline_test
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -212,4 +213,53 @@ func TestPath(t *testing.T) {
 	assert.NoError(t, err2)
 
 	fmt.Println(r1.DebugString())
+}
+
+func TestPathArrays(t *testing.T) {
+	row1str := `
+	{
+		"lignes": [
+			{"nom": "ligne1", "details": [
+				{"nom": "detail 1.1", "tag": 0},
+				{"nom": "detail 1.2", "tag": 1},
+				{"nom": "detail 1.3", "tag": 2}
+			]},
+			{"nom": "ligne2", "details": [
+				{"nom": "detail 2.1", "tag": 3},
+				{"nom": "detail 2.2", "tag": 4}
+			]},
+			{"nom": "ligne3", "details": []},
+			{"nom": "ligne4"},
+			{"nom": "ligne5", "details": [
+				{"nom": "detail 5.1", "tag": 5},
+				{"tag": -1},
+				{"nom": null, "tag": 6}
+			]}
+		]
+	}
+	`
+
+	row1, err1 := jsonline.NewImporter(strings.NewReader(strings.ReplaceAll(row1str, "\n", ""))).ReadOne()
+	assert.NoError(t, err1)
+
+	values1, exists1 := row1.FindValuesAtPath("lignes.details.nom")
+	assert.True(t, exists1)
+
+	expected1 := []interface{}{
+		"detail 1.1",
+		"detail 1.2",
+		"detail 1.3",
+		"detail 2.1",
+		"detail 2.2",
+		"detail 5.1",
+		nil,
+	}
+
+	actual1 := []interface{}{}
+
+	for _, value1 := range values1 {
+		actual1 = append(actual1, value1.Raw())
+	}
+
+	assert.Equal(t, expected1, actual1)
 }

@@ -49,6 +49,7 @@ type Importer interface {
 	WithTemplate(Template) Importer
 	Import() bool
 	GetRow() (Row, error)
+	ReadOne() (Row, error)
 }
 
 type importer struct {
@@ -92,4 +93,12 @@ func (i *importer) GetRow() (Row, error) {
 	}
 
 	return row, nil
+}
+
+func (i *importer) ReadOne() (Row, error) {
+	if i.Import() {
+		return i.GetRow()
+	}
+
+	return nil, nil
 }
