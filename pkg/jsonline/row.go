@@ -394,7 +394,7 @@ func (r *row) GetValueAtPath(path string) (Value, bool) {
 }
 
 func (r *row) FindValuesAtPath(path string) ([]Value, bool) {
-	keys := strings.SplitN(path, ".", 2)
+	keys := strings.SplitN(path, ".", 2) //nolint:gomnd
 
 	value, exist := r.GetValue(keys[0])
 	if !exist {
