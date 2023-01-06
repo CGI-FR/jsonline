@@ -393,6 +393,7 @@ func (r *row) GetValueAtPath(path string) (Value, bool) {
 	return row, true
 }
 
+//nolint:cyclop
 func (r *row) FindValuesAtPath(path string) ([]Value, bool) {
 	keys := strings.SplitN(path, ".", 2) //nolint:gomnd
 
@@ -402,6 +403,10 @@ func (r *row) FindValuesAtPath(path string) ([]Value, bool) {
 	}
 
 	if cast, ok := value.(Row); ok {
+		if len(keys) < 2 { //nolint:gomnd
+			return []Value{value}, true
+		}
+
 		return cast.FindValuesAtPath(keys[1])
 	}
 
@@ -411,7 +416,11 @@ func (r *row) FindValuesAtPath(path string) ([]Value, bool) {
 	case []interface{}:
 		for _, row := range typedValue {
 			if cast, ok := row.(Row); ok {
-				if values, exists := cast.FindValuesAtPath(keys[1]); exists {
+				if len(keys) < 2 { //nolint:gomnd
+					if cast, ok := cast.(Value); ok {
+						result = append(result, cast)
+					}
+				} else if values, exists := cast.FindValuesAtPath(keys[1]); exists {
 					result = append(result, values...)
 				}
 			}

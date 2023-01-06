@@ -262,4 +262,12 @@ func TestPathArrays(t *testing.T) {
 	}
 
 	assert.Equal(t, expected1, actual1)
+
+	values2, exists2 := row1.FindValuesAtPath("lignes.details")
+	assert.True(t, exists2)
+	fmt.Println("===", values2, "===")
+
+	values3, exists3 := row1.FindValuesAtPath("lignes")
+	assert.True(t, exists3)
+	fmt.Println("===", values3, "===")
 }
