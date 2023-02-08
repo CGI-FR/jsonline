@@ -67,6 +67,8 @@ type Value interface {
 	Export() (interface{}, error)
 	Import(interface{}) error
 
+	ExportOrNil() interface{}
+
 	json.Unmarshaler
 	json.Marshaler
 	fmt.Stringer
@@ -187,6 +189,12 @@ func (v *value) GetRawType() RawType {
 
 func (v *value) Raw() interface{} {
 	return v.raw
+}
+
+func (v *value) ExportOrNil() interface{} {
+	result, _ := v.Export()
+
+	return result
 }
 
 func (v *value) Export() (interface{}, error) {
