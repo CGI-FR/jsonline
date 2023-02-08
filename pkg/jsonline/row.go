@@ -144,6 +144,12 @@ func (r *row) Raw() interface{} {
 	return result
 }
 
+func (r *row) ExportOrNil() interface{} {
+	result, _ := r.Export()
+
+	return result
+}
+
 func (r *row) Export() (interface{}, error) {
 	result := map[string]interface{}{}
 
@@ -393,12 +399,46 @@ func (r *row) GetValueAtPath(path string) (Value, bool) {
 	return row, true
 }
 
+//nolint: cyclop
+// FindValuesAtPath : rewrite and more testing needed => beta.
 func (r *row) FindValuesAtPath(path string) ([]Value, bool) {
 	keys := strings.SplitN(path, ".", 2) //nolint:gomnd
 
 	value, exist := r.GetValue(keys[0])
 	if !exist {
 		return nil, false
+	}
+
+	if len(keys) == 1 {
+		switch typedValue := value.Raw().(type) {
+		case []interface{}:
+			elements := []Value{}
+
+			for _, row := range typedValue {
+				if cast, ok := row.(Row); ok {
+					elements = append(elements, cast)
+				}
+			}
+
+			return []Value{NewValueAuto(elements)}, true
+		default:
+			return []Value{value}, true
+		}
+	} else if keys[1] == "*" {
+		switch typedValue := value.Raw().(type) {
+		case []interface{}:
+			elements := []Value{}
+
+			for _, row := range typedValue {
+				if cast, ok := row.(Row); ok {
+					elements = append(elements, cast)
+				}
+			}
+
+			return elements, true
+		default:
+			return []Value{value}, true
+		}
 	}
 
 	if cast, ok := value.(Row); ok {

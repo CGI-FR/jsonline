@@ -263,3 +263,99 @@ func TestPathArrays(t *testing.T) {
 
 	assert.Equal(t, expected1, actual1)
 }
+
+func TestPathArrays2(t *testing.T) {
+	row1str := `
+	{
+		"designation": "Acme Inc.",
+		"adresseSiègeSocial": {
+		  "NumeroRue": "123",
+		  "NomRue": "Main St.",
+		  "CodePostal": "12345",
+		  "Ville": "Anytown"
+		},
+		"employe": [
+		  {
+			"Nom": "Jane",
+			"Prenom": "Doe",
+			"dateNaissance": "01-01-1970",
+			"LieuNaissance": "Anytown",
+			"NombreEnfants": 1,
+			"enfant": [
+			  {
+				"Prenom": "John",
+				"DateNaissance": "01-01-2000",
+				"LieuNaissance": "Anytown"
+			  },
+			  {
+				"Prenom": "Jack",
+				"DateNaissance": "01-01-2002",
+				"LieuNaissance": "Anytown"
+			  }
+			]
+		  }
+		]
+	  }
+	`
+
+	row1, err1 := jsonline.NewImporter(strings.NewReader(strings.ReplaceAll(row1str, "\n", ""))).ReadOne()
+	assert.NoError(t, err1)
+
+	values1, exists1 := row1.FindValuesAtPath("employe.enfant")
+	assert.True(t, exists1)
+
+	result1, err2 := json.Marshal(values1)
+	assert.NoError(t, err2)
+
+	expected1 := `[[{"Prenom":"John","DateNaissance":"01-01-2000","LieuNaissance":"Anytown"},{"Prenom":"Jack","DateNaissance":"01-01-2002","LieuNaissance":"Anytown"}]]` //nolint: lll
+
+	assert.Equal(t, expected1, string(result1))
+}
+
+func TestPathArrays3(t *testing.T) {
+	row1str := `
+	{
+		"designation": "Acme Inc.",
+		"adresseSiègeSocial": {
+		  "NumeroRue": "123",
+		  "NomRue": "Main St.",
+		  "CodePostal": "12345",
+		  "Ville": "Anytown"
+		},
+		"employe": [
+		  {
+			"Nom": "Jane",
+			"Prenom": "Doe",
+			"dateNaissance": "01-01-1970",
+			"LieuNaissance": "Anytown",
+			"NombreEnfants": 1,
+			"enfant": [
+			  {
+				"Prenom": "John",
+				"DateNaissance": "01-01-2000",
+				"LieuNaissance": "Anytown"
+			  },
+			  {
+				"Prenom": "Jack",
+				"DateNaissance": "01-01-2002",
+				"LieuNaissance": "Anytown"
+			  }
+			]
+		  }
+		]
+	  }
+	`
+
+	row1, err1 := jsonline.NewImporter(strings.NewReader(strings.ReplaceAll(row1str, "\n", ""))).ReadOne()
+	assert.NoError(t, err1)
+
+	values1, exists1 := row1.FindValuesAtPath("employe.enfant.*")
+	assert.True(t, exists1)
+
+	result1, err2 := json.Marshal(values1)
+	assert.NoError(t, err2)
+
+	expected1 := `[{"Prenom":"John","DateNaissance":"01-01-2000","LieuNaissance":"Anytown"},{"Prenom":"Jack","DateNaissance":"01-01-2002","LieuNaissance":"Anytown"}]` //nolint: lll
+
+	assert.Equal(t, expected1, string(result1))
+}
