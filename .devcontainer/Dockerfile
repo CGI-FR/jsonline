@@ -1,4 +1,4 @@
-FROM adrienaury/go-devcontainer:v0.5
+FROM adrienaury/go-devcontainer:v2.0
 
 USER root
 

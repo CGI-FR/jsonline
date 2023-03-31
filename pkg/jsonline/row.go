@@ -32,6 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
+//nolint:nolintlint,interfacebloat,ireturn,varnamelen,nonamedreturns,forcetypeassert
 package jsonline
 
 import (
@@ -555,7 +556,7 @@ func (r *row) DebugString() string {
 	return strings.ReplaceAll(sb.String(), `"`, "`")
 }
 
-//nolint
+// nolint
 func (r *row) UnmarshalJSON(data []byte) error {
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.UseNumber()
@@ -582,7 +583,7 @@ func (r *row) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-//nolint
+// nolint
 func (r *row) parseobject(dec *json.Decoder) (err error) {
 	var t json.Token
 	for dec.More() {
@@ -630,7 +631,7 @@ func (r *row) parseobject(dec *json.Decoder) (err error) {
 	return nil
 }
 
-//nolint
+// nolint
 func parsearray(dec *json.Decoder) (arr []interface{}, err error) {
 	var t json.Token
 	arr = make([]interface{}, 0)
@@ -659,7 +660,7 @@ func parsearray(dec *json.Decoder) (arr []interface{}, err error) {
 	return
 }
 
-//nolint
+// nolint
 func handledelim(t json.Token, dec *json.Decoder) (res interface{}, err error) {
 	if delim, ok := t.(json.Delim); ok {
 		switch delim {
@@ -778,4 +779,35 @@ func (r *row) GetTime(key string) time.Time {
 	result, _ := cast.ToTime(r.GetOrNil(key))
 
 	return result.(time.Time)
+}
+
+// ValueForKey should return the value associated with the key or nil if
+// no entry exists for the key.
+func (r *row) ValueForKey(key string) (value any, has bool) {
+	value, has = r.Get(key)
+
+	return
+}
+
+// SetValueForKey sets the value for a key in the collection.
+func (r *row) SetValueForKey(key string, value any) {
+	r.Set(key, value)
+}
+
+// RemoveValueForKey removes the value for a key in the collection.
+func (r *row) RemoveValueForKey(key string) {
+	panic("unimplemented")
+}
+
+// Keys should return an list of the keys for all the entries in the
+// collection.
+func (r *row) Keys() []string {
+	keys := []string{}
+	iter := r.Iter()
+
+	for k, _, ok := iter(); ok; k, _, ok = iter() {
+		keys = append(keys, k)
+	}
+
+	return keys
 }

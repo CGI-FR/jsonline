@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with JL.  If not, see <http://www.gnu.org/licenses/>.
 
+//nolint:ireturn,varnamelen
 package main
 
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
@@ -60,7 +60,7 @@ func ReadRowDefinition(filename string) (*RowDefinition, error) {
 	}
 
 	if _, err := os.Stat(filename); err == nil {
-		dat, err := ioutil.ReadFile(filename)
+		dat, err := os.ReadFile(filename)
 		if err != nil {
 			return nil, fmt.Errorf("%w", err)
 		}
@@ -112,7 +112,8 @@ func parseDescriptor(def string) (jsonline.Format, jsonline.RawType) {
 }
 
 func parse(ti jsonline.Template, to jsonline.Template,
-	columns []ColumnDefinition) (jsonline.Template, jsonline.Template, error) {
+	columns []ColumnDefinition,
+) (jsonline.Template, jsonline.Template, error) {
 	for _, column := range columns {
 		iformat, irawtype := parseDescriptor(column.Input)
 		oformat, orawtype := parseDescriptor(column.Output)

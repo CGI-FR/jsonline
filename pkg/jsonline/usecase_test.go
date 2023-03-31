@@ -1,3 +1,4 @@
+//nolint:varnamelen
 package jsonline_test
 
 import (
