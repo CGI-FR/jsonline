@@ -32,6 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
+//nolint:forcetypeassert
 package jsonline
 
 import (
@@ -44,7 +45,7 @@ import (
 func exportToString(val interface{}) (interface{}, error) {
 	str, err := cast.ToString(val)
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to String format: %v", ErrUnsupportedExportType, val, err)
+		return nil, fmt.Errorf("%w %T to String format: %w", ErrUnsupportedExportType, val, err)
 	}
 
 	return str, nil
@@ -53,7 +54,7 @@ func exportToString(val interface{}) (interface{}, error) {
 func exportToNumber(val interface{}) (interface{}, error) {
 	nb, err := cast.ToNumber(val)
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to Number format: %v", ErrUnsupportedExportType, val, err)
+		return nil, fmt.Errorf("%w %T to Number format: %w", ErrUnsupportedExportType, val, err)
 	}
 
 	return nb, nil
@@ -62,7 +63,7 @@ func exportToNumber(val interface{}) (interface{}, error) {
 func exportToBool(val interface{}) (interface{}, error) {
 	b, err := cast.ToBool(val)
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to Boolean format: %v", ErrUnsupportedExportType, val, err)
+		return nil, fmt.Errorf("%w %T to Boolean format: %w", ErrUnsupportedExportType, val, err)
 	}
 
 	return b, nil
@@ -71,7 +72,7 @@ func exportToBool(val interface{}) (interface{}, error) {
 func exportToBinary(val interface{}) (interface{}, error) {
 	b, err := cast.ToBinary(val)
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to Binary format: %v", ErrUnsupportedExportType, val, err)
+		return nil, fmt.Errorf("%w %T to Binary format: %w", ErrUnsupportedExportType, val, err)
 	}
 
 	return base64.StdEncoding.EncodeToString(b.([]byte)), nil
@@ -80,12 +81,12 @@ func exportToBinary(val interface{}) (interface{}, error) {
 func exportToDate(val interface{}) (interface{}, error) {
 	t, err := cast.ToDate(val)
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to Date format: %v", ErrUnsupportedExportType, val, err)
+		return nil, fmt.Errorf("%w %T to Date format: %w", ErrUnsupportedExportType, val, err)
 	}
 
 	str, err := cast.ToString(t)
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to Date format: %v", ErrUnsupportedExportType, val, err)
+		return nil, fmt.Errorf("%w %T to Date format: %w", ErrUnsupportedExportType, val, err)
 	}
 
 	return str, nil
@@ -94,12 +95,12 @@ func exportToDate(val interface{}) (interface{}, error) {
 func exportToDateTime(val interface{}) (interface{}, error) {
 	t, err := cast.ToTime(val)
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to DateTime format: %v", ErrUnsupportedExportType, val, err)
+		return nil, fmt.Errorf("%w %T to DateTime format: %w", ErrUnsupportedExportType, val, err)
 	}
 
 	str, err := cast.ToString(t)
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to DateTime format: %v", ErrUnsupportedExportType, val, err)
+		return nil, fmt.Errorf("%w %T to DateTime format: %w", ErrUnsupportedExportType, val, err)
 	}
 
 	return str, nil
@@ -108,7 +109,7 @@ func exportToDateTime(val interface{}) (interface{}, error) {
 func exportToTimestamp(val interface{}) (interface{}, error) {
 	i64, err := cast.ToTimestamp(val)
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to Timestamp format: %v", ErrUnsupportedExportType, val, err)
+		return nil, fmt.Errorf("%w %T to Timestamp format: %w", ErrUnsupportedExportType, val, err)
 	}
 
 	return i64, nil

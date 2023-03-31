@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with JL.  If not, see <http://www.gnu.org/licenses/>.
 
+//nolint:varnamelen,ireturn
 package main
 
 import (
@@ -52,7 +53,7 @@ type RootCommand struct {
 }
 
 func NewRootCommand() (*RootCommand, error) {
-	rootCmd := cobra.Command{ //nolint:exhaustivestruct
+	rootCmd := cobra.Command{ //nolint:exhaustruct,exhaustivestruct
 		Use:   fmt.Sprintf("%v", name),
 		Short: "JSONLine templating",
 		Long:  `Order keys and enforce format of JSON lines.`,
@@ -139,7 +140,7 @@ func initConfig() {
 	if jsonlog {
 		log.Logger = zerolog.New(os.Stderr)
 	} else {
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: !color}) //nolint:exhaustivestruct
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: !color}) //nolint:exhaustruct,exhaustivestruct
 	}
 
 	debug := viper.GetBool("debug")
@@ -193,7 +194,7 @@ func initViper() {
 	viper.AddConfigPath("$HOME/.jl")
 
 	if err := viper.ReadInConfig(); err != nil {
-		// nolint: errorlint
+		//nolint:errorlint
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Config file not found; ignore
 		} else {

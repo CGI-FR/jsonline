@@ -32,7 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-//nolint:nolintlint
+//nolint:nolintlint,interfacebloat,ireturn,varnamelen,nonamedreturns,forcetypeassert
 package jsonline
 
 import (
@@ -785,6 +785,7 @@ func (r *row) GetTime(key string) time.Time {
 // no entry exists for the key.
 func (r *row) ValueForKey(key string) (value any, has bool) {
 	value, has = r.Get(key)
+
 	return
 }
 

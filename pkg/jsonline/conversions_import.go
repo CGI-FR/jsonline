@@ -32,6 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
+//nolint:varnamelen
 package jsonline
 
 import (
@@ -46,7 +47,7 @@ func importFromString(val interface{}, targetType RawType) (interface{}, error) 
 	case nil:
 		str, err := cast.ToString(val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return str, nil
@@ -54,7 +55,7 @@ func importFromString(val interface{}, targetType RawType) (interface{}, error) 
 	default:
 		i, err := cast.To(targetType, val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return i, nil
@@ -66,7 +67,7 @@ func importFromNumeric(val interface{}, targetType RawType) (interface{}, error)
 	case nil:
 		nb, err := cast.ToNumber(val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return nb, nil
@@ -74,7 +75,7 @@ func importFromNumeric(val interface{}, targetType RawType) (interface{}, error)
 	default:
 		i, err := cast.To(targetType, val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return i, nil
@@ -86,7 +87,7 @@ func importFromBoolean(val interface{}, targetType RawType) (interface{}, error)
 	case nil:
 		b, err := cast.ToBool(val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return b, nil
@@ -94,7 +95,7 @@ func importFromBoolean(val interface{}, targetType RawType) (interface{}, error)
 	default:
 		i, err := cast.To(targetType, val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return i, nil
@@ -104,12 +105,12 @@ func importFromBoolean(val interface{}, targetType RawType) (interface{}, error)
 func importFromBinary(val interface{}, targetType RawType) (interface{}, error) {
 	str, err := cast.ToString(val)
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 	}
 
 	b, err := base64.StdEncoding.DecodeString(str.(string))
 	if err != nil {
-		return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+		return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 	}
 
 	switch targetType.(type) {
@@ -119,7 +120,7 @@ func importFromBinary(val interface{}, targetType RawType) (interface{}, error) 
 	default:
 		i, err := cast.To(targetType, b)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, b, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, b, targetType, err)
 		}
 
 		return i, nil
@@ -131,7 +132,7 @@ func importFromDate(val interface{}, targetType RawType) (interface{}, error) {
 	case nil:
 		t, err := cast.ToDate(val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return t, nil
@@ -139,7 +140,7 @@ func importFromDate(val interface{}, targetType RawType) (interface{}, error) {
 	default:
 		i, err := cast.To(targetType, val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return i, nil
@@ -151,7 +152,7 @@ func importFromDateTime(val interface{}, targetType RawType) (interface{}, error
 	case nil:
 		t, err := cast.ToTime(val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return t, nil
@@ -159,7 +160,7 @@ func importFromDateTime(val interface{}, targetType RawType) (interface{}, error
 	default:
 		i, err := cast.To(targetType, val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return i, nil
@@ -171,7 +172,7 @@ func importFromTimestamp(val interface{}, targetType RawType) (interface{}, erro
 	case nil:
 		i64, err := cast.ToInt64(val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return i64, nil
@@ -179,7 +180,7 @@ func importFromTimestamp(val interface{}, targetType RawType) (interface{}, erro
 	default:
 		i, err := cast.To(targetType, val)
 		if err != nil {
-			return nil, fmt.Errorf("%w %T to %T format: %v", ErrUnsupportedImportType, val, targetType, err)
+			return nil, fmt.Errorf("%w %T to %T format: %w", ErrUnsupportedImportType, val, targetType, err)
 		}
 
 		return i, nil

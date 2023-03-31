@@ -32,7 +32,7 @@
 // obligated to do so.  If you do not wish to do so, delete this
 // exception statement from your version.
 
-//nolint:cyclop,gomnd
+//nolint:cyclop,varnamelen
 package cast
 
 import (
